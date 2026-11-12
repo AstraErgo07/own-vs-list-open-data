@@ -88,6 +88,48 @@ JD_NET_SERVICE_REVENUE_2025 = PublishedFigure(
     ),
 )
 
+
+JD_MARKETPLACE_MARKETING_2025 = PublishedFigure(
+    name="JD marketplace and marketing revenues",
+    value=107_131,
+    display="RMB 107.131 billion (8.2% of total net revenues)",
+    unit="RMB million",
+    year="FY2025",
+    document="JD.com, Inc. Form 20-F for the year ended 31 December 2025, filed 16 April 2026",
+    location="Item 5.A, Selected Statements of Operations Items — Net Revenues, category table, page 136",
+    url=JD_20F_FY2025_URL,
+    label=JD_20F_FY2025_LABEL,
+    note=(
+        "This line bundles commissions earned from third-party merchants with "
+        "marketing (advertising) services. The 20-F does not split the two. "
+        "Item 4.B, page 88: marketing is sold to 'suppliers to our online retail "
+        "business, third-party merchants on our online marketplace and other "
+        "partners,' so the figure is not a 3P-only take. The 20-F does not "
+        "publish GMV, so marketplace-and-marketing revenue divided by 3P GMV "
+        "cannot be computed from the filing. Cost of revenues includes "
+        "'traffic acquisition costs related to online marketing services' "
+        "(Item 5.A, page 136) but does not quantify them."
+    ),
+)
+
+JD_LOGISTICS_OTHER_REVENUE_2025 = PublishedFigure(
+    name="JD logistics and other service revenues",
+    value=178_152,
+    display="RMB 178.152 billion (13.6% of total net revenues)",
+    unit="RMB million",
+    year="FY2025",
+    document="JD.com, Inc. Form 20-F for the year ended 31 December 2025, filed 16 April 2026",
+    location="Item 5.A, Selected Statements of Operations Items — Net Revenues, category table, page 136",
+    url=JD_20F_FY2025_URL,
+    label=JD_20F_FY2025_LABEL,
+    note=(
+        "JD.com's consolidated logistics and other services line. It is broader "
+        "than logistics sold to 3P marketplace sellers (it includes JD Logistics "
+        "services to many customer types, and other services). It is not a "
+        "per-unit 3P take."
+    ),
+)
+
 JD_ELECTRONICS_REVENUE_2025 = PublishedFigure(
     name="JD electronics and home appliances revenues",
     value=605_131,
@@ -508,6 +550,30 @@ JDL_WAREHOUSES_2025 = PublishedFigure(
     note="Scale of the logistics network. Not a per-unit cost.",
 )
 
+
+JDL_EXTERNAL_REVENUE_2025 = PublishedFigure(
+    name="JD Logistics revenue from external customers",
+    value=136_832.892,
+    display="RMB 136.833 billion (63.0% of JD Logistics revenue)",
+    unit="RMB million",
+    year="FY2025",
+    document="JD Logistics, Inc. Annual Report 2025 (HKEX: 2618)",
+    location="MD&A, pages 17–18, revenue by JD Group versus external customers",
+    url=JDL_AR_2025_URL,
+    label=JDL_AR_2025_LABEL,
+    note=(
+        "The table is described as a breakdown of revenue by (i) JD Group and "
+        "(ii) external customers '(including revenue generated from third-party "
+        "merchants on the online marketplace of JD Group).' Third-party "
+        "marketplace merchants are a subset, not the whole: external customers "
+        "also include other enterprises that use express, freight and "
+        "supply-chain services. This figure cannot be treated as 3P-seller "
+        "logistics revenue, and cannot be divided by an unpublished 3P GMV "
+        "to get a per-unit logistics take. JD Group itself was RMB 80.314 "
+        "billion, 37.0%."
+    ),
+)
+
 # ---------------------------------------------------------------------------
 # Zalando SE Annual Report 2025 (fashion e-commerce 1P benchmark)
 # ---------------------------------------------------------------------------
@@ -665,6 +731,33 @@ JD_STRATEGY_CATEGORY_LIST = (
     "products; and food, beverage and fresh produce. 'Each of these categories "
     "is further divided into numerous subcategories.'"
 )
+
+JD_MARKETING_CUSTOMERS = (
+    "Published (JD 20-F FY2025), Item 4.B, page 88: 'We provide a variety of "
+    "digital marketing services to marketers on our e-commerce platform, "
+    "including suppliers to our online retail business, third-party merchants "
+    "on our online marketplace and other partners.'"
+)
+JD_COST_OF_REVENUES_SCOPE = (
+    "Published (JD 20-F FY2025), Item 5.A, page 136: 'Cost of revenues "
+    "primarily consists of our cost for acquiring the products that we sell "
+    "directly and the related inbound shipping charges, inventory write-downs, "
+    "traffic acquisition costs related to online marketing services, and cost "
+    "related to logistics services provided to third parties.'"
+)
+JD_NO_GMV = (
+    "The JD.com Form 20-F for the year ended 31 December 2025 does not "
+    "publish GMV, a 3P GMV, or a company take rate. An implied take rate "
+    "of marketplace-and-marketing revenue divided by 3P GMV therefore cannot "
+    "be computed from the filing."
+)
+JD_SERVICE_REVENUE_SCOPE = (
+    "Published (JD 20-F FY2025), Item 5.A, page 136: 'Net service revenues "
+    "primarily consist of fees earned from providing marketing and logistics "
+    "services to our business partners, and commissions earned from third-party "
+    "merchants for sales made through our online marketplace.'"
+)
+
 JD_MARKETPLACE_COMMISSIONS = (
     "Published (JD 20-F FY2025), Item 4.B: 'In our online marketplace business, "
     "third-party merchants offer products to customers on our online marketplace "
@@ -724,6 +817,8 @@ def sources_table() -> list[PublishedFigure]:
         JD_TOTAL_REVENUE_2025,
         JD_NET_PRODUCT_REVENUE_2025,
         JD_NET_SERVICE_REVENUE_2025,
+        JD_MARKETPLACE_MARKETING_2025,
+        JD_LOGISTICS_OTHER_REVENUE_2025,
         JD_ELECTRONICS_REVENUE_2025,
         JD_GENERAL_MERCH_REVENUE_2025,
         JD_COST_OF_REVENUES_PCT_2025,
@@ -745,6 +840,7 @@ def sources_table() -> list[PublishedFigure]:
         JDL_GROSS_PROFIT_2025,
         JDL_ISC_REVENUE_2025,
         JDL_WAREHOUSES_2025,
+        JDL_EXTERNAL_REVENUE_2025,
         ZALANDO_GROSS_MARGIN_2025,
         ZALANDO_FULFILMENT_PCT_2025,
         ZALANDO_RETURN_RATE,

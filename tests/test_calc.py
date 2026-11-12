@@ -17,6 +17,8 @@ from own_vs_list.calc import (
     KEEP_3P,
     TEST_3P_FIRST,
     Assumptions,
+    apply_scenario,
+    breakeven_chart_frame,
     contribution_1p,
     contribution_3p,
     counts,
@@ -25,14 +27,17 @@ from own_vs_list.calc import (
     evaluate_all,
     evaluate_band,
     extra_markdown_rate,
+    fees_only,
     gap_sensitivity,
     holding_cost,
     mid_band_table,
     money_tests,
     return_on_capital,
     safety_stock_days,
+    scenario_mid_table,
 )
 from own_vs_list.jd_fees import FEE_ROWS
+from own_vs_list.take import CENTRAL, FEES_ONLY, HIGH, LOW
 from own_vs_list.published import (
     DEFAULT_JD_FULFILMENT_PCT,
     DEFAULT_STOCK_COVER_DAYS,
@@ -146,10 +151,12 @@ class TestDecide:
         assert rule == "volatile_demand"
 
 
-class TestDefaultSample:
+class TestFeesOnlyBaseline:
+    """v2.0-comparable counts, with advertising and logistics left at zero."""
+
     @pytest.fixture
     def result(self):
-        return evaluate_all(Assumptions())
+        return evaluate_all(fees_only())
 
     def test_five_categories_and_sixty_bands(self, result):
         assert len(CATEGORIES) == 5
@@ -189,8 +196,8 @@ class TestDefaultSample:
         # Staple apparel can still go 1P.
         assert mid.loc["apparel_staple", "recommendation"] == BRING_IN_HOUSE
 
-    def test_without_midtail_everything_brings(self):
-        c = counts(evaluate_all(Assumptions(apply_midtail=False)))
+    def test_without_midtail_everything_brings_at_fees_only(self):
+        c = counts(evaluate_all(fees_only(Assumptions(apply_midtail=False))))
         assert c[BRING_IN_HOUSE] == 60
         assert c[TEST_3P_FIRST] == 0
         assert c[KEEP_3P] == 0
@@ -204,6 +211,9 @@ class TestDefaultSample:
 
     def test_tablet_published_fee_is_lower(self, result):
         mid = mid_band_table(result).set_index("sub_id")
+        _almost(mid.loc["co_tablet", "take_rate_fees"], 0.029)
+        _almost(mid.loc["co_pc", "take_rate_fees"], 0.039)
+        # Fees-only run: full take equals the published fee.
         _almost(mid.loc["co_tablet", "take_rate"], 0.029)
         _almost(mid.loc["co_pc", "take_rate"], 0.039)
 
@@ -217,3 +227,73 @@ class TestDefaultSample:
         assert result["price_rmb"].min() >= 39
         # No sterling headline figures in the result frame.
         assert "price_gbp" not in result.columns
+
+
+class TestCentralTake:
+    """Default v2.1 run: central advertising and logistics-margin extras."""
+
+    @pytest.fixture
+    def result(self):
+        return evaluate_all(Assumptions())
+
+    def test_default_is_full_take(self, result):
+        assert bool(result["use_full_3p_take"].all())
+        inc = CENTRAL.incremental
+        _almost(inc, 0.025 + 0.067 * 0.091 * 0.50)
+        mid = mid_band_table(result).set_index("sub_id")
+        _almost(mid.loc["co_pc", "take_rate"], 0.039 + inc)
+        _almost(mid.loc["co_tablet", "take_rate"], 0.029 + inc)
+        _almost(mid.loc["apparel_staple", "take_rate"], 0.069 + inc)
+        _almost(mid.loc["co_pc", "ad_take"], 0.025)
+        _almost(mid.loc["co_pc", "logistics_contrib_pct"], 0.067 * 0.091 * 0.50)
+
+    def test_default_all_band_counts(self, result):
+        c = counts(result)
+        assert c[BRING_IN_HOUSE] == 35
+        assert c[TEST_3P_FIRST] == 10
+        assert c[KEEP_3P] == 15
+
+    def test_default_mid_band_counts(self, result):
+        c = counts(mid_band_table(result))
+        assert c[BRING_IN_HOUSE] == 14
+        assert c[TEST_3P_FIRST] == 3
+        assert c[KEEP_3P] == 3
+
+    def test_mid_band_decisions(self, result):
+        mid = mid_band_table(result).set_index("sub_id")
+        # 1P-core head still comes in-house.
+        assert mid.loc["ha_major", "recommendation"] == BRING_IN_HOUSE
+        assert mid.loc["co_pc", "recommendation"] == BRING_IN_HOUSE
+        for sid in ("beauty_mass", "beauty_mid", "beauty_prestige"):
+            assert mid.loc[sid, "recommendation"] == BRING_IN_HOUSE
+        # Long-tail commercial and peripherals stay Keep 3P.
+        assert mid.loc["ha_commercial", "recommendation"] == KEEP_3P
+        assert mid.loc["co_peripherals", "recommendation"] == KEEP_3P
+        # Baby care becomes a close call at the central take.
+        assert mid.loc["baby_care", "recommendation"] == TEST_3P_FIRST
+        assert mid.loc["baby_care", "rule"] == "near_threshold"
+        # Staple apparel still clears 1P.
+        assert mid.loc["apparel_staple", "recommendation"] == BRING_IN_HOUSE
+
+    def test_without_midtail_not_everything_brings(self):
+        c = counts(evaluate_all(Assumptions(apply_midtail=False)))
+        assert c[BRING_IN_HOUSE] == 53
+        assert c[TEST_3P_FIRST] == 7
+        assert c[KEEP_3P] == 0
+
+    def test_breakeven_equals_contrib_share(self, result):
+        mid = mid_band_table(result)
+        for _, r in mid.iterrows():
+            _almost(r["breakeven_take"], r["contrib_1p_pct"])
+            _almost(r["breakeven_take"], r["contrib_1p_unit"] / r["price_rmb"])
+
+    def test_logistics_is_margin_only(self, result):
+        mid = mid_band_table(result).iloc[0]
+        expected = mid["jdl_gross_fee_pct"] * mid["jdl_gross_margin"] * mid["jdl_seller_share"]
+        _almost(mid["logistics_contrib_pct"], expected)
+        # Far smaller than the gross fee the seller would pay.
+        assert mid["logistics_contrib_pct"] < mid["jdl_gross_fee_pct"] * mid["jdl_seller_share"] * 0.2
+
+    def test_seller_pays_more_than_jd_keeps(self, result):
+        mid = mid_band_table(result)
+        assert (mid["seller_gross_cost_pct"] > mid["take_rate"]).all()

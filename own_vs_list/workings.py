@@ -25,6 +25,55 @@ def rmb(x, dp=2) -> str:
     return f"RMB {x:,.{dp}f}"
 
 
+
+def _take_step(sub, ev, price, net3p, a) -> str:
+    fees = ev["take_rate_fees"]
+    fees_rmb = ev["net_3p_fees_unit"]
+    body = (
+        f"The published operation-support service fee is {sub.fee.commission:.2%} "
+        f"and the published transaction service fee is {sub.fee.transaction_fee:.2%}, "
+        f"so the contractual take is {fees:.2%} of selling price "
+        f"({rmb(fees_rmb)} on {rmb(price, 0)}). "
+        f"Label: {sub.fee.label}. This is the JD Worldwide (cross-border) schedule."
+    )
+    if ev.get("use_full_3p_take"):
+        body += (
+            f" On top, this run adds an advertising take of {ev['ad_take']:.2%} "
+            f"({rmb(ev['net_3p_ad_unit'])}), a model estimate, and a logistics "
+            f"contribution of {ev['logistics_contrib_pct']:.2%} "
+            f"({rmb(ev['net_3p_logistics_unit'])}): that is JD Logistics' published "
+            f"9.1% gross margin, on a 6.7% fee proxy, applied only to the assumed "
+            f"{ev['jdl_seller_share']:.0%} of sales fulfilled by JDL. "
+        )
+        if ev["serving_cost_pct"]:
+            body += (
+                f"A trial marketplace serving cost of {ev['serving_cost_pct']:.2%} "
+                f"({rmb(ev['net_3p_serving_unit'])}) is subtracted. "
+            )
+        else:
+            body += (
+                "No marketplace serving cost is subtracted, because no 3P-only "
+                "rate is published. "
+            )
+        body += (
+            f"The full take is {ev['take_rate']:.2%} of selling price, "
+            f"or {rmb(net3p)}. "
+            f"The seller pays more than JD keeps: {ev['seller_gross_cost_pct']:.2%} "
+            f"of selling price, because the seller pays the full logistics fee, "
+            f"not only JD's 9.1% margin, and the full advertising spend. "
+            f"1P kept-per-unit equals this 3P take at a take rate of "
+            f"{ev['breakeven_take']:.2%} (the contribution breakeven)."
+        )
+    else:
+        body += (
+            f" This is a fees-only run, so advertising and the logistics margin "
+            f"are left at zero and the 3P take is {rmb(net3p)}. "
+            f"The contribution breakeven (the take at which 3P income equals "
+            f"1P kept-per-unit) is {ev['breakeven_take']:.2%}."
+        )
+    return body
+
+
 def workings(sub: SubCategory, band: Band, cat: Category, ev: dict, a: Assumptions) -> list[tuple[str, str]]:
     """A sequence of (heading, body) steps for an expander."""
     price = ev["price_rmb"]
@@ -50,14 +99,8 @@ def workings(sub: SubCategory, band: Band, cat: Category, ev: dict, a: Assumptio
         f"applied to this assumed price."
     ))
     steps.append((
-        "3P take (published JD Worldwide fees)",
-        f"The published operation-support service fee is {sub.fee.commission:.2%} "
-        f"and the published transaction service fee is {sub.fee.transaction_fee:.2%}, "
-        f"so the platform take is {sub.fee.take_rate:.2%} of selling price. "
-        f"On {rmb(price, 0)} that is {rmb(net3p)}. "
-        f"Label: {sub.fee.label}. The 20-F says merchants 'pay us sales commissions' "
-        f"but does not publish a per-category rate; this rate card fills that gap. "
-        f"It is the JD Worldwide (cross-border) schedule."
+        "3P take to JD (published fees, plus model extras in the default run)",
+        _take_step(sub, ev, price, net3p, a)
     ))
     steps.append((
         "1P cost of goods (published gross margin, not double-counted)",
@@ -89,7 +132,7 @@ def workings(sub: SubCategory, band: Band, cat: Category, ev: dict, a: Assumptio
         f"{LABEL_KEPT} = price − cost of goods − fulfilment − extra markdown − holding "
         f"= {rmb(price, 0)} − {rmb(cogs)} − {rmb(ful)} − {rmb(price*md)} − {rmb(hold)} "
         f"= {rmb(c1p)}. "
-        f"The 3P take is {rmb(net3p)}. "
+        f"The 3P take (full, in this run) is {rmb(net3p)}. "
         f"{LABEL_EXTRA} = {rmb(c1p)} − {rmb(net3p)} = {rmb(extra)}. "
         f"Return on stock is {roc:.0%} a year, against a {a.hurdle_rate:.0%} hurdle "
         f"(an assumption)."

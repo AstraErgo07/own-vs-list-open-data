@@ -25,6 +25,8 @@ from own_vs_list.published import (
     JD_INVENTORY_DAYS_2025,
     JD_NET_PRODUCT_REVENUE_2025,
     JD_NET_SERVICE_REVENUE_2025,
+    JD_MARKETPLACE_MARKETING_2025,
+    JDL_GROSS_PROFIT_2025,
     JD_PRODUCT_SHARE,
     JD_RETAIL_OP_MARGIN_2025,
     JD_RETAIL_REVENUE_2025,
@@ -76,6 +78,10 @@ def company_panel(expanded: bool = True) -> None:
         "*revenue* overstates 1P's share of goods sold. "
         f"Electronics and home appliances {JD_ELECTRONICS_REVENUE_2025.display}. "
         f"General merchandise {JD_GENERAL_MERCH_REVENUE_2025.display}. "
+        f"Marketplace and marketing {JD_MARKETPLACE_MARKETING_2025.display}, "
+        "bundling commissions and advertising; the 20-F does not split them "
+        "and does not publish 3P GMV. "
+        f"JD Logistics gross margin {JDL_GROSS_PROFIT_2025.display}. "
         f"Source: [JD 20-F FY2025]({JD_20F_FY2025_URL})."
     )
 

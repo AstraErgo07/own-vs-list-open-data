@@ -42,9 +42,9 @@ def test_main_page_loads_without_exception():
     assert "Keep 3P" in metric_labels
     metric_values = {m.label: str(m.value) for m in at.metric}
     # Headline metrics are the mid-price band of each sub-category (20 rows).
-    assert metric_values["Bring in-house"] == "15"
-    assert metric_values["Test as 3P first"] == "1"
-    assert metric_values["Keep 3P"] == "4"
+    assert metric_values["Bring in-house"] == "14"
+    assert metric_values["Test as 3P first"] == "3"
+    assert metric_values["Keep 3P"] == "3"
     expander_labels = [e.label for e in at.expander]
     assert any("flip rules" in x.lower() or "grounded" in x.lower() for x in expander_labels)
     assert any("mid-tail" in x.lower() or "cannot tell" in x.lower() or "worked" in x.lower()
@@ -58,6 +58,11 @@ def test_main_page_loads_without_exception():
     assert "Olist" not in blob
     # Currency is RMB, not a sterling headline.
     assert "家用电器" in blob or "Home appliances" in blob or "Home appliances" in _blob(at)
+    assert "breakeven" in blob.lower() or "Break-even" in blob or "Breakeven" in blob
+    assert "advertis" in blob.lower()
+    assert "logistics" in blob.lower()
+    assert "nuance" in blob.lower() or "override" in blob.lower() or "capital-light" in blob.lower()
+    assert "Made by Ami Sata" in blob
 
 
 def test_method_page_loads_and_credits_sources():
@@ -88,6 +93,10 @@ def test_method_page_loads_and_credits_sources():
     assert "服饰内衣" in text
     assert "母婴" in text
     assert "电脑" in text
+    assert "advertis" in text.lower() or "marketing" in text.lower()
+    assert "107" in text
+    assert "GMV" in text or "gmv" in text.lower()
+    assert "9.1%" in text or "9.1" in text
 
 
 def test_no_forbidden_retailer_names_in_source():

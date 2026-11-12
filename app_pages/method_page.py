@@ -20,6 +20,21 @@ from own_vs_list.calc import (
     counts,
 )
 from own_vs_list.jd_fees import FEE_ROWS, JDW_FEE_LABEL, JDW_FEE_URL
+from own_vs_list.take import (
+    AD_TAKE_CENTRAL,
+    AD_TAKE_HIGH,
+    AD_TAKE_LOW,
+    AD_TAKE_NOTE,
+    CENTRAL,
+    HIGH,
+    JDL_GROSS_FEE_NOTE,
+    JDL_SHARE_NOTE,
+    LOW,
+    SERVING_COST_NOTE,
+    central_take_range_text,
+    component_rows,
+    why_no_implied_take,
+)
 from own_vs_list.published import (
     ABHISHEK_AGENCY_CITE,
     BBY_GROSS_MARGIN_FY2026,
@@ -29,7 +44,13 @@ from own_vs_list.published import (
     JD_STRATEGY_3P_EXPANSION,
     JD_STRATEGY_AUTHENTICITY,
     JD_STRATEGY_CATEGORY_LIST,
+    JD_COST_OF_REVENUES_SCOPE,
+    JD_LOGISTICS_OTHER_REVENUE_2025,
+    JD_MARKETPLACE_MARKETING_2025,
+    JD_MARKETING_CUSTOMERS,
+    JD_NO_GMV,
     JDL_AR_2025_URL,
+    JDL_EXTERNAL_REVENUE_2025,
     JDL_GROSS_PROFIT_2025,
     JDL_REVENUE_2025,
     JDL_WAREHOUSES_2025,
@@ -60,10 +81,14 @@ This is a decision-support prototype for a question many marketplaces face:
 should we buy and stock a product ourselves (1P), leave it with a seller (3P),
 or test it on the marketplace first?
 
-Version 2.0 drops the Brazilian Olist catalogue and the UCI gift-retailer
-invoices. Those were a different market and a dated, wholesale-priced 1P
-basis. In their place: **JD's own category structure**, **published JD fees
-and filings**, and **representative price-point archetypes** that are clearly
+Version 2.1 keeps the v2.0 JD-category workflow and adds a fuller 3P take:
+not only the published commission and 0.90% transaction fee, but a
+model-estimated advertising take and JD's published logistics margin on
+an assumed share of sellers who use JD Logistics. Version 2.0 had already
+dropped the Brazilian Olist catalogue and the UCI gift-retailer invoices.
+Those were a different market and a dated, wholesale-priced 1P basis. In
+their place: **JD's own category structure**, **published JD fees and
+filings**, and **representative price-point archetypes** that are clearly
 labelled as assumptions, never as observed sales.
 
 JD is named as the source of the published company figures, the category
@@ -107,6 +132,45 @@ st.markdown(
     "No catalogue was collected."
 )
 
+st.subheader("The fuller 3P take (v2.1)")
+st.markdown(
+    "The v2.0 comparison counted only the published commission and the 0.90% "
+    "transaction fee. That understates what JD earns from a 3P sale. The 20-F "
+    "describes commissions, marketing (advertising) services, and logistics "
+    "services sold to merchants. This version adds those layers, carefully."
+)
+st.markdown(why_no_implied_take())
+st.markdown(central_take_range_text())
+src = pd.DataFrame(component_rows(CENTRAL))
+st.dataframe(
+    src.rename(columns={
+        "component": "Component",
+        "value": "Value in the central scenario",
+        "how_used": "How it is used",
+        "label": "Label",
+        "note": "Note and source",
+    }),
+    hide_index=True,
+    width="stretch",
+)
+st.markdown(JD_MARKETING_CUSTOMERS)
+st.markdown(JD_COST_OF_REVENUES_SCOPE)
+st.markdown(JD_NO_GMV)
+st.markdown(
+    f"Marketplace and marketing revenues: "
+    f"{JD_MARKETPLACE_MARKETING_2025.display}, "
+    f"{JD_MARKETPLACE_MARKETING_2025.label}, "
+    f"{JD_MARKETPLACE_MARKETING_2025.location}. "
+    f"Logistics and other service revenues: "
+    f"{JD_LOGISTICS_OTHER_REVENUE_2025.display}."
+)
+st.caption(
+    f"Advertising range: {AD_TAKE_LOW:.1%} / {AD_TAKE_CENTRAL:.1%} / "
+    f"{AD_TAKE_HIGH:.1%}, all model estimates. Central incremental take "
+    f"(ads + logistics margin): {CENTRAL.incremental:.2%} "
+    f"(low {LOW.incremental:.2%}, high {HIGH.incremental:.2%})."
+)
+
 st.subheader("1P cost ratios")
 st.markdown(
     f"""
@@ -138,16 +202,24 @@ st.markdown(
 """
 )
 
-st.subheader("JD Logistics, as context, not as a per-unit rate")
+st.subheader("JD Logistics: the margin, not the gross fee")
 st.markdown(
     f"{JDL_REVENUE_2025.label}: {JDL_REVENUE_2025.display}, "
     f"{JDL_REVENUE_2025.location} "
     f"([annual report]({JDL_AR_2025_URL})). "
-    f"{JDL_GROSS_PROFIT_2025.display}. "
-    f"{JDL_WAREHOUSES_2025.display}, {JDL_WAREHOUSES_2025.location}. "
-    "The annual report does not publish a per-parcel or per-category "
-    "fulfilment cost. JD.com's 6.7% fulfilment-to-revenue ratio remains the "
-    "1P product default."
+    f"Gross profit and gross margin: {JDL_GROSS_PROFIT_2025.display}. "
+    f"External customers: {JDL_EXTERNAL_REVENUE_2025.display}. "
+    f"{JDL_EXTERNAL_REVENUE_2025.note} "
+    f"{JDL_WAREHOUSES_2025.display}, {JDL_WAREHOUSES_2025.location}."
+)
+st.markdown(JDL_GROSS_FEE_NOTE)
+st.markdown(JDL_SHARE_NOTE)
+st.markdown(
+    "What enters the 3P take is only JD's published 9.1% gross margin, "
+    "applied to the 6.7% fee proxy, applied only to the assumed share of "
+    "sellers using JDL. At the central 50% share that is 0.30% of selling "
+    "price. The seller pays the full fee, not only the margin. JD.com's "
+    "6.7% fulfilment-to-revenue ratio remains the 1P product default."
 )
 
 st.subheader("The flip rules")
@@ -186,8 +258,13 @@ st.markdown(
   extra markdown 4% × CV; safety-stock service level and lead time;
   applying Best Buy, Zalando and JD company ratios to these archetypes;
   the mid-tail and long-tail classification of each band.
-- **Model estimate.** 1P contribution, 3P take, return on stock, safety-stock
-  days, the warning, and the recommendation.
+- **Model estimate.** 1P contribution, the advertising take (1.0% / 2.5% /
+  4.5% of selling price), the 6.7% logistics-fee proxy, 1P contribution,
+  the full 3P take, return on stock, safety-stock days, the warning, the
+  contribution breakeven, and the recommendation.
+- **Assumption (3P extras).** The share of 3P sales fulfilled by JD
+  Logistics (25% / 50% / 80%); any trial marketplace serving cost (zero
+  in the headline scenarios, because no 3P-only rate is published).
 """
 )
 
@@ -195,15 +272,22 @@ st.subheader("What this cannot tell you")
 st.markdown(
     """
 JD does not publish a 1P product-only gross margin, a per-category 1P
-fulfilment cost, or a domestic POP commission card. The Worldwide card may
-differ from the domestic one. Prices, weekly units and demand swing in this
-app are assumptions, not observed sales: there is no live JD catalogue here,
-and none was collected. Best Buy and Zalando figures are from different
-countries and companies. Zalando's 23% fulfilment is a European fashion
-cost level, used so that apparel fulfilment is not understated, and is a
-sensitivity against JD's 6.7%. The 16% JD blended margin is a ceiling for
-true 1P product GM. The 25% hurdle rarely binds at 38-day cover. This is a
-method demo, not a verdict on JD, and not a buying recommendation.
+fulfilment cost, a 3P GMV, a split of marketplace commissions from
+advertising, a domestic POP commission card, the share of marketplace
+sellers using JD Logistics, a per-unit 3P logistics tariff, or a 3P-only
+cost of serving the marketplace. Marketing revenue is also earned from
+1P suppliers, so RMB 107.131 billion is not a 3P-only numerator. Cost of
+revenues includes unpublished traffic-acquisition costs on marketing
+services, so the model's advertising take is a gross figure. The Worldwide
+card may differ from the domestic one. Prices, weekly units and demand
+swing in this app are assumptions, not observed sales: there is no live
+JD catalogue here, and none was collected. Best Buy and Zalando figures
+are from different countries and companies. Zalando's 23% fulfilment is a
+European fashion cost level, used so that apparel fulfilment is not
+understated, and is a sensitivity against JD's 6.7%. The 16% JD blended
+margin is a ceiling for true 1P product GM. The 25% hurdle rarely binds
+at 38-day cover. This is a method demo, not a verdict on JD, and not a
+buying recommendation.
 """
 )
 
@@ -227,14 +311,19 @@ st.dataframe(df, hide_index=True, width="stretch")
 st.subheader("What changed from the previous version")
 st.markdown(
     """
+Version 2.1 keeps the JD-category archetype model of v2.0 and extends
+the 3P side. The 3P take is no longer only the published commission and
+0.90% transaction fee: it adds a model-estimated advertising take and
+JD's published 9.1% logistics margin, applied only to an assumed share
+of sellers using JD Logistics, and it does not invent a 3P-only serving
+cost. A breakeven chart compares, for each sub-category, the take at
+which 3P income equals 1P kept-per-unit with the estimated JD take range.
 The Olist Brazilian marketplace catalogue (2016–18) and the UCI Online
-Retail II gift-retailer invoices are no longer used. Both were a credibility
-problem: a different market, dated sales, and wholesale prices that distorted
-the stocking side. Their licence notes have been removed. The processed
-Olist table is no longer in this repository. The company-level published
-panel (JD 20-F, Amazon 10-K, Best Buy 10-K) is retained and extended with
-JD Logistics and Zalando. The product workflow is now a JD-category
-archetype model with flip rules cited to filings and papers.
+Retail II gift-retailer invoices were already dropped in v2.0 and remain
+out. Both were a credibility problem: a different market, dated sales,
+and wholesale prices that distorted the stocking side. Their licence notes
+have been removed. The processed Olist table is no longer in this
+repository.
 """
 )
 

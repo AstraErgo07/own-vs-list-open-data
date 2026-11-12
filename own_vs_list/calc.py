@@ -25,6 +25,7 @@ from .archetypes import (
 )
 from .published import (
     ABHISHEK_AGENCY_FINDING,
+    DEFAULT_JD_FULFILMENT_PCT,
     DEFAULT_STOCK_COVER_DAYS,
     HAGIU_WRIGHT_FINDING,
     JIANG_MIDTAIL_FINDING,
@@ -34,6 +35,30 @@ from .published import (
     SAFETY_STOCK_Z,
     VOLATILITY_THRESHOLD_RATIONALE,
     VOLATILITY_WARNING_THRESHOLD,
+)
+from .take import (
+    AD_TAKE_CENTRAL,
+    AD_TAKE_HIGH,
+    AD_TAKE_LABEL,
+    AD_TAKE_LOW,
+    CENTRAL,
+    FEES_ONLY,
+    HIGH,
+    JDL_GROSS_FEE_LABEL,
+    JDL_GROSS_FEE_PCT,
+    JDL_GROSS_MARGIN,
+    JDL_GROSS_MARGIN_LABEL,
+    JDL_SHARE_CENTRAL,
+    JDL_SHARE_HIGH,
+    JDL_SHARE_LABEL,
+    JDL_SHARE_LOW,
+    LOW,
+    SCENARIOS,
+    SCENARIO_ORDER,
+    SERVING_COST_LABEL,
+    TakeScenario,
+    incremental_take,
+    logistics_contrib,
 )
 
 
@@ -77,9 +102,70 @@ class Assumptions:
     # Fulfilment alternative: use JD 6.7% for every category, including apparel.
     use_jd_fulfilment_everywhere: bool = False
     jd_fulfilment_pct: float = 0.067
+    # Full 3P take (v2.1). Default is the central scenario: published
+    # commission + transaction fee, plus a model-estimated advertising take
+    # and a logistics margin for an assumed share of sellers using JDL.
+    use_full_3p_take: bool = True
+    ad_take: float = AD_TAKE_CENTRAL
+    jdl_gross_fee_pct: float = JDL_GROSS_FEE_PCT
+    jdl_gross_margin: float = JDL_GROSS_MARGIN
+    jdl_seller_share: float = JDL_SHARE_CENTRAL
+    serving_cost_pct: float = 0.0
 
     def to_json(self) -> str:
         return json.dumps(asdict(self), sort_keys=True, default=str)
+
+    def logistics_contrib_pct(self) -> float:
+        """JD's logistics income as a share of selling price (margin only)."""
+        if not self.use_full_3p_take:
+            return 0.0
+        return logistics_contrib(
+            self.jdl_gross_fee_pct, self.jdl_gross_margin, self.jdl_seller_share
+        )
+
+    def incremental_3p(self) -> float:
+        """Ads + logistics margin minus serving costs. Zero when fees-only is on."""
+        if not self.use_full_3p_take:
+            return 0.0
+        return incremental_take(
+            self.ad_take,
+            self.jdl_gross_fee_pct,
+            self.jdl_gross_margin,
+            self.jdl_seller_share,
+            self.serving_cost_pct,
+        )
+
+    def effective_take(self, fees: float) -> float:
+        return float(fees) + self.incremental_3p()
+
+    def seller_gross_cost(self, fees: float) -> float:
+        """What the seller pays (full logistics fee, not only JD's margin)."""
+        if not self.use_full_3p_take:
+            return float(fees)
+        return (
+            float(fees)
+            + self.ad_take
+            + self.jdl_gross_fee_pct * self.jdl_seller_share
+        )
+
+
+def apply_scenario(a: Assumptions, scenario: TakeScenario | str) -> Assumptions:
+    """Copy assumptions, with the 3P-take components of a named scenario."""
+    s = SCENARIOS[scenario] if isinstance(scenario, str) else scenario
+    return replace(
+        a,
+        use_full_3p_take=s.use_full,
+        ad_take=s.ad_take if s.use_full else 0.0,
+        jdl_gross_fee_pct=s.jdl_gross_fee_pct,
+        jdl_gross_margin=s.jdl_gross_margin,
+        jdl_seller_share=s.jdl_seller_share if s.use_full else 0.0,
+        serving_cost_pct=s.serving_cost_pct,
+    )
+
+
+def fees_only(a: Assumptions | None = None) -> Assumptions:
+    """v2.0-comparable assumptions: commission + transaction fee only."""
+    return apply_scenario(a or Assumptions(), FEES_ONLY)
 
 
 def holding_cost(cogs: float, stock_cover_days: float, holding_rate: float) -> float:
@@ -117,7 +203,7 @@ def contribution_1p(price, cogs, fulfilment_cost, markdown_rate, holding) -> flo
 
 
 def contribution_3p(price, take_rate) -> float:
-    """Platform take per unit from a 3P sale: published commission + transaction fee."""
+    """Platform take per unit from a 3P sale: effective take times selling price."""
     return price * take_rate
 
 
@@ -224,19 +310,19 @@ def decide(c1p, net3p, roc, band: Band, sub: SubCategory, a: Assumptions) -> tup
 
 RULE_TEXT = {
     "1p_wins": (
-        "1P contribution beats the published 3P take, and return on stock "
+        "1P contribution beats the 3P take used in this run, and return on stock "
         "beats the hurdle. Assumed demand is high-velocity enough that the "
         "mid-tail learning step does not apply."
     ),
     "mid_tail_learn": (
-        "1P would win the money tests at these published average rates, but "
+        "1P would win the money tests at these rates, but "
         "assumed demand is mid-velocity with a high weekly swing. The "
         "recommendation is to test as 3P first and watch demand, which is "
         "how platforms treat the mid-tail in Jiang, Jerath and Srinivasan "
         "(2011): learn from early third-party sales before stocking."
     ),
     "long_tail_3p": (
-        "1P would win the money tests at these published average rates, but "
+        "1P would win the money tests at these rates, but "
         "assumed demand is a long tail (low velocity). Jiang, Jerath and "
         "Srinivasan (2011) document that platforms tend to leave long-tail "
         "products with independent sellers and stock the high-demand head "
@@ -263,7 +349,7 @@ RULE_TEXT = {
         "third-party merchants. The close call stays as test-first."
     ),
     "3p_wins_margin": (
-        "1P contribution does not beat the published 3P take, after "
+        "1P contribution does not beat the 3P take used in this run, after "
         "published fulfilment, CV-scaled extra markdown, and holding."
     ),
     "roc_below_hurdle": (
@@ -292,7 +378,11 @@ RULE_CITATIONS = {
             "published gross margin, minus published fulfilment, minus a "
             "CV-scaled extra markdown, minus physical holding. The 3P take "
             "is the published JD Worldwide commission plus the 0.90% "
-            "transaction fee. Bring in-house needs 1P to beat that take."
+            "transaction fee, plus (in the default v2.1 run) a model-estimated "
+            "advertising take and JD's logistics margin on an assumed share "
+            "of sellers using JD Logistics, minus any trial marketplace "
+            "serving cost. Bring in-house needs 1P to beat that take. "
+            "A fees-only mode repeats the v2.0 comparison."
         ),
     },
     "gmroi": {
@@ -377,11 +467,19 @@ def evaluate_band(sub: SubCategory, band: Band, cat: Category | None, a: Assumpt
     md = extra_markdown_rate(band.cv, a)
     hold = holding_cost(cogs, cover, a.holding_rate)
     c1p = contribution_1p(price, cogs, ful, md, hold)
-    net3p = contribution_3p(price, sub.fee.take_rate)
+    fees = float(sub.fee.take_rate)
+    take = a.effective_take(fees)
+    net3p_fees = contribution_3p(price, fees)
+    net3p = contribution_3p(price, take)
+    ad_unit = price * (a.ad_take if a.use_full_3p_take else 0.0)
+    log_pct = a.logistics_contrib_pct()
+    log_unit = price * log_pct
+    serve_unit = price * (a.serving_cost_pct if a.use_full_3p_take else 0.0)
     roc = return_on_capital(c1p, cogs, band.weekly_units, cover)
     extra = c1p - net3p  # Extra per unit from stocking it (can be negative)
     rec, rule = decide(c1p, net3p, roc, band, sub, a)
     warning = band.cv >= a.volatility_cv_threshold
+    breakeven = (c1p / price) if price else float("nan")
     return {
         "category_id": cat.id if cat else sub.fee.first_level,
         "category_zh": cat.name_zh if cat else sub.fee.first_level,
@@ -414,11 +512,35 @@ def evaluate_band(sub: SubCategory, band: Band, cat: Category | None, a: Assumpt
         "cover_label": sub.cover_label if a.cover_override is None else "Assumption (override)",
         "commission_rate": sub.fee.commission,
         "transaction_fee": sub.fee.transaction_fee,
-        "take_rate": sub.fee.take_rate,
+        "take_rate_fees": fees,
+        "take_rate": take,
+        "ad_take": a.ad_take if a.use_full_3p_take else 0.0,
+        "ad_take_label": AD_TAKE_LABEL if a.use_full_3p_take else "Not applied (fees-only run)",
+        "logistics_contrib_pct": log_pct,
+        "logistics_contrib_unit": log_unit,
+        "logistics_label": (
+            f"{JDL_GROSS_MARGIN_LABEL}; fee is {JDL_GROSS_FEE_LABEL}; "
+            f"share is {JDL_SHARE_LABEL}"
+            if a.use_full_3p_take else "Not applied (fees-only run)"
+        ),
+        "jdl_seller_share": a.jdl_seller_share if a.use_full_3p_take else 0.0,
+        "jdl_gross_fee_pct": a.jdl_gross_fee_pct,
+        "jdl_gross_margin": a.jdl_gross_margin,
+        "serving_cost_pct": a.serving_cost_pct if a.use_full_3p_take else 0.0,
+        "serving_label": SERVING_COST_LABEL,
+        "incremental_take": a.incremental_3p(),
+        "use_full_3p_take": a.use_full_3p_take,
         "commission_label": sub.fee.label,
         "deposit_usd": sub.fee.deposit_usd,
         "contrib_1p_unit": c1p,
+        "contrib_1p_pct": (c1p / price) if price else float("nan"),
+        "net_3p_fees_unit": net3p_fees,
+        "net_3p_ad_unit": ad_unit,
+        "net_3p_logistics_unit": log_unit,
+        "net_3p_serving_unit": serve_unit,
         "net_3p_unit": net3p,
+        "seller_gross_cost_pct": a.seller_gross_cost(fees),
+        "breakeven_take": breakeven,
         "extra_per_unit": extra,
         "return_on_capital": roc,
         "recommendation": rec,
@@ -451,8 +573,10 @@ def flip_threshold(sub: SubCategory, band: Band, cat: Category, a: Assumptions,
                    param: str, lo: float, hi: float, steps: int = 80) -> dict | None:
     """The value of `param` at which the mid-band recommendation first flips.
 
-    param is one of: gm, fulfilment_pct, hurdle, markdown_cv_coeff, cv
-    (cv is applied by temporarily swapping the band).
+    param is one of: gm, fulfilment_pct, hurdle, markdown_cv_coeff, cv,
+    ad_take, incremental_take (cv is applied by temporarily swapping the band;
+    incremental_take varies advertising so that ads + logistics minus serving
+    equals the trial value, holding logistics and serving fixed).
     """
     base = evaluate_band(sub, band, cat, a)["recommendation"]
     last_x = None
@@ -471,6 +595,20 @@ def flip_threshold(sub: SubCategory, band: Band, cat: Category, a: Assumptions,
             trial = replace(a, markdown_cv_coeff=x)
         elif param == "cv":
             trial_band = replace(band, cv=x)
+        elif param == "ad_take":
+            trial = replace(a, use_full_3p_take=True, ad_take=x)
+        elif param == "incremental_take":
+            # Hold logistics and serving fixed; solve for the ad take that
+            # delivers the requested incremental take.
+            log_and_serve = (
+                logistics_contrib(a.jdl_gross_fee_pct, a.jdl_gross_margin, a.jdl_seller_share)
+                - a.serving_cost_pct
+            )
+            trial = replace(a, use_full_3p_take=True, ad_take=x - log_and_serve)
+        elif param == "jdl_seller_share":
+            trial = replace(a, use_full_3p_take=True, jdl_seller_share=x)
+        elif param == "serving_cost_pct":
+            trial = replace(a, use_full_3p_take=True, serving_cost_pct=x)
         else:
             raise ValueError(param)
         rec = evaluate_band(sub, trial_band, cat, trial)["recommendation"]
@@ -506,6 +644,8 @@ def sensitivity_for_sub(sub: SubCategory, band: Band, cat: Category,
         ("hurdle", 0.10, 2.00, "Return-on-stock hurdle"),
         ("markdown_cv_coeff", 0.00, 0.15, "Extra markdown per unit of CV"),
         ("cv", 0.20, 2.50, "Assumed weekly CV"),
+        ("ad_take", 0.00, 0.12, "Advertising take as a share of price"),
+        ("incremental_take", 0.00, 0.15, "Full 3P extras (ads + logistics margin minus serving)"),
     ]
     out = []
     for param, lo, hi, label in specs:
@@ -523,6 +663,24 @@ def gap_sensitivity(a: Assumptions | None = None) -> pd.DataFrame:
     n = len(base)
 
     scenarios = [
+        ("Fees only: published commission + 0.90% transaction fee (the v2.0 3P take)",
+         apply_scenario(a, FEES_ONLY), "take",
+         "Drops advertising and the logistics margin, so you can see which recommendations the fuller 3P take is responsible for."),
+        ("Low 3P extras (1.0% ads, 25% JDL share)",
+         apply_scenario(a, LOW), "take",
+         "The conservative end of the model-estimate range for advertising and JDL use."),
+        ("High 3P extras (4.5% ads, 80% JDL share)",
+         apply_scenario(a, HIGH), "take",
+         "The aggressive end of the model-estimate range. Still a model estimate, not a published JD take."),
+        ("Advertising 4.5% with central logistics (isolates the ad lever)",
+         replace(a, use_full_3p_take=True, ad_take=AD_TAKE_HIGH, jdl_seller_share=JDL_SHARE_CENTRAL), "take",
+         "Holds the logistics assumption at the central 50% share so the advertising range can be seen on its own."),
+        ("Every 3P sale uses JD Logistics (central ads, 100% JDL share)",
+         replace(a, use_full_3p_take=True, jdl_seller_share=1.0), "take",
+         "The logistics contribution is only JD's 9.1% margin on the 6.7% fee proxy, so even 100% JDL use adds less than half a percentage point."),
+        ("Subtract a 1.0% marketplace serving cost (trial; not published)",
+         replace(a, use_full_3p_take=True, serving_cost_pct=0.01), "take",
+         "No 3P-only serving-cost rate is published. This is a trial sensitivity, not a filing figure."),
         ("Gross margin 16.0% (JD blended company margin) on every archetype",
          replace(a, gm_override=0.160), "gm",
          "JD does not publish a 1P product-only margin; 16% includes higher-margin services."),
@@ -620,9 +778,115 @@ def mid_band_flip_summary(a: Assumptions | None = None) -> pd.DataFrame:
                 "cv_flip_at": cv_f["at"],
                 "cv_flip_to": cv_f["to"] if cv_f["at"] is not None else None,
                 "take_rate": ev["take_rate"],
+                "take_rate_fees": ev["take_rate_fees"],
+                "ad_take": ev["ad_take"],
+                "logistics_contrib_pct": ev["logistics_contrib_pct"],
+                "incremental_take": ev["incremental_take"],
+                "breakeven_take": ev["breakeven_take"],
+                "contrib_1p_pct": ev["contrib_1p_pct"],
+                "seller_gross_cost_pct": ev["seller_gross_cost_pct"],
                 "gross_margin": ev["gross_margin"],
                 "fulfilment_pct": ev["fulfilment_pct"],
                 "velocity": mid.velocity,
                 "weekly_units_cv": mid.cv,
             })
     return pd.DataFrame(rows)
+
+
+def scenario_mid_table(a: Assumptions | None = None) -> pd.DataFrame:
+    """Mid-band 1P kept vs 3P take, and the recommendation, at each take scenario.
+
+    One row per sub-category. This is the before-versus-after comparison:
+    fees-only (v2.0) against low, central and high full takes.
+    """
+    a = a or Assumptions()
+    frames = {}
+    for s in SCENARIO_ORDER:
+        mid = mid_band_table(evaluate_all(apply_scenario(a, s))).set_index("sub_id")
+        frames[s.id] = mid
+    base = frames[CENTRAL.id]
+    rows = []
+    for sub_id, ev in base.iterrows():
+        row = {
+            "category_zh": ev["category_zh"],
+            "category_en": ev["category_en"],
+            "sub_id": sub_id,
+            "sub_zh": ev["sub_zh"],
+            "sub_en": ev["sub_en"],
+            "price_rmb": ev["price_rmb"],
+            "velocity": ev["velocity"],
+            "weekly_units_cv": ev["weekly_units_cv"],
+            "gross_margin": ev["gross_margin"],
+            "fulfilment_pct": ev["fulfilment_pct"],
+            "take_rate_fees": ev["take_rate_fees"],
+            "contrib_1p_unit": ev["contrib_1p_unit"],
+            "contrib_1p_pct": ev["contrib_1p_pct"],
+            "breakeven_take": ev["breakeven_take"],
+            "return_on_capital": ev["return_on_capital"],
+        }
+        for s in SCENARIO_ORDER:
+            m = frames[s.id].loc[sub_id]
+            row[f"take_{s.id}"] = m["take_rate"]
+            row[f"net3p_{s.id}"] = m["net_3p_unit"]
+            row[f"extra_{s.id}"] = m["extra_per_unit"]
+            row[f"rec_{s.id}"] = m["recommendation"]
+            row[f"rule_{s.id}"] = m["rule"]
+            row[f"seller_cost_{s.id}"] = m["seller_gross_cost_pct"]
+        row["flipped_from_fees"] = row["rec_fees_only"] != row["rec_central"]
+        row["flipped_at_low"] = row["rec_fees_only"] != row["rec_low"]
+        row["flipped_at_high"] = row["rec_fees_only"] != row["rec_high"]
+        be = ev["breakeven_take"]
+
+        def _side(take, be=be, band=a.near_threshold_band):
+            if be != be:  # NaN
+                return "undefined"
+            denom = max(abs(be), abs(take), 1e-9)
+            if abs(take - be) / denom <= band:
+                return "close (within 10%)"
+            if take < be:
+                return "1P still ahead on contribution"
+            return "3P ahead on contribution"
+
+        row["status_low"] = _side(row["take_low"])
+        row["status_central"] = _side(row["take_central"])
+        row["status_high"] = _side(row["take_high"])
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def breakeven_chart_frame(a: Assumptions | None = None) -> pd.DataFrame:
+    """One mid-band row per sub-category, ready for the breakeven chart."""
+    cmp_ = scenario_mid_table(a)
+    def _lab(r):
+        sub, cat = r["sub_zh"], r["category_zh"]
+        if str(sub).startswith(str(cat)):
+            return sub
+        return f"{cat} · {sub}"
+    cmp_["label"] = cmp_.apply(_lab, axis=1)
+    statuses = []
+    for _, r in cmp_.iterrows():
+        already_keep = r["rec_fees_only"] == KEEP_3P and r["rule_fees_only"] in {
+            "long_tail_3p",
+        }
+        if already_keep:
+            if r["take_high"] < r["breakeven_take"] * 0.9:
+                statuses.append(
+                    "Already Keep 3P on demand shape (1P would still win on money)"
+                )
+            elif r["take_low"] > r["breakeven_take"]:
+                statuses.append(
+                    "Already Keep 3P on demand shape (3P also ahead on money)"
+                )
+            else:
+                statuses.append(
+                    "Already Keep 3P on demand shape (money is close)"
+                )
+        elif r["take_high"] < r["breakeven_take"] * (1 - 0.10):
+            statuses.append("1P ahead even at the high take")
+        elif r["take_low"] > r["breakeven_take"] * (1 + 0.10):
+            statuses.append("3P ahead even at the low take")
+        else:
+            statuses.append("Take range crosses or is close to breakeven")
+    cmp_["status"] = statuses
+    return cmp_
+
