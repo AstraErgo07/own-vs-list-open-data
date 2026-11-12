@@ -1,8 +1,16 @@
 # Scripts
 
-Version 2.0 does not download a marketplace catalogue. Category archetypes,
-published fees and published cost ratios live in `own_vs_list/` and are
-built into the app. There is no raw-data rebuild step.
+`build_overview_pdf.py` builds the peer-review PDF overview
+(`/workspace/joybuy_own_vs_list_overview.pdf` and
+`docs/joybuy_own_vs_list_overview.pdf`).
 
-Earlier versions of this folder downloaded the Olist and UCI datasets;
-those scripts and the processed Olist table have been removed.
+It needs reportlab and matplotlib in addition to the app’s
+`requirements.txt`:
+
+```bash
+pip install reportlab matplotlib
+PYTHONPATH=.. python scripts/build_overview_pdf.py
+```
+
+The PDF is a companion for sharing with reviewers. The interactive
+model is the Streamlit app.

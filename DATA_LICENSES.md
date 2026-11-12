@@ -65,6 +65,40 @@ do not redistribute the documents.
   *Management Science* 61(1), 184–203.
   https://doi.org/10.1287/mnsc.2014.2042
 
+
+
+## UK and Joybuy sources added in v3.0 (figures cited, documents not redistributed)
+
+- **Currys plc Annual Report & Accounts 2025/26**, period ended 2 May 2026.
+  https://www.currysplc.com/media/pcrpulgi/currys-annual-report-2025-26-web.pdf
+  Group gross profit £1,697 million on revenue £9,254 million (Note 3,
+  page 132); stock days 60 (page 50). UK&I Adjusted EBIT margin of 2.9%
+  is an operating margin, not a gross margin, and is not used as GM.
+- **THG PLC FY2025 results.**
+  https://thg.ir-data.com/pdf/item/newsArticle/546
+  THG Beauty adjusted gross profit margin 39.3% (2024: 40.0%); group
+  adjusted distribution costs 12.3% of revenue.
+- **Zalando SE Annual Report 2025** (already cited above): 39.9% gross
+  margin and 23.0% fulfilment-cost ratio, EU figures, used as the
+  fashion 1P benchmark.
+- **Amazon.com, Inc. Q4 2025 earnings release**, 5 February 2026.
+  https://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-Fourth-Quarter-Results/
+  WW seller unit mix 61% of WW paid units in Q4 2025 (excludes Whole Foods).
+  The FY2025 10-K does not repeat this metric. Advertising services
+  US$68,635 million are from the 10-K.
+- **Amazon UK seller pricing** (referral fees used as a labelled
+  benchmark stand-in, not as Joybuy's fees).
+  https://sell.amazon.co.uk/pricing
+  FBA Rate Card Europe Fees, effective 2 November 2026:
+  https://m.media-amazon.com/images/G/02/sell/images/261014-FBA-Rate-Card-EN.pdf
+- **Joybuy launch and fee-publication status** (context, not a fee card).
+  Operator One, “Sell on Joybuy: An Invited Partner’s Guide”, September 2026:
+  https://o1.eu/news-insights/how-to-sell-on-joybuy
+  ChannelX, “JoyBuy to open up to UK and EU sellers”, 15 June 2026:
+  https://channelx.world/2026/06/joybuy-to-open-up-to-uk-and-eu-sellers/
+  Joybuy partner page (no commission rates listed):
+  https://www.joybuy.co.uk/help/partner-with-Joybuy
+
 ## Datasets no longer used
 
 The Brazilian E-Commerce Public Dataset by Olist (CC BY-NC-SA 4.0) and

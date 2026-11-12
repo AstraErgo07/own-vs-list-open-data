@@ -11,3 +11,7 @@ own_vs_list/decisions.csv
 .DS_Store
 data/processed/decisions.csv
 .pytest_cache/
+
+# The peer-review overview is kept in the repo.
+!docs/
+!docs/*.pdf

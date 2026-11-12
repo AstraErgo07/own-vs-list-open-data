@@ -1,64 +1,67 @@
-"""Published JD Worldwide category fees."""
+"""Amazon UK referral fees and VAT treatment."""
 from __future__ import annotations
 
-import math
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from own_vs_list.jd_fees import FEE_ROWS, TX
-from own_vs_list.published import JDW_FEE_URL, JDW_TRANSACTION_FEE
-
-
-def _almost(a, b, places=9):
-    assert math.isclose(a, b, rel_tol=0, abs_tol=10 ** (-places)), f"{a} != {b}"
-
-
-def test_transaction_fee_is_uniform():
-    _almost(TX, 0.009)
-    _almost(JDW_TRANSACTION_FEE, 0.009)
-    for row in FEE_ROWS.values():
-        _almost(row.transaction_fee, 0.009)
+from own_vs_list.amazon_uk_fees import (
+    AmazonUKFee,
+    BENCHMARK_LABEL,
+    blended_rate,
+    intro_effective_rate,
+)
+from own_vs_list.uk_sources import UK_VAT_RATE
 
 
-def test_headline_commission_rates():
-    assert FEE_ROWS["ha_major"].commission == 0.03
-    assert FEE_ROWS["ha_kitchen"].commission == 0.03
-    assert FEE_ROWS["co_pc"].commission == 0.03
-    assert FEE_ROWS["co_tablet"].commission == 0.02
-    assert FEE_ROWS["beauty_all"].commission == 0.05
-    assert FEE_ROWS["apparel_other"].commission == 0.06
-    assert FEE_ROWS["baby_other"].commission == 0.02
-    assert FEE_ROWS["baby_care"].commission == 0.02
-    assert FEE_ROWS["baby_stroller"].commission == 0.03
-    assert FEE_ROWS["baby_seat"].commission == 0.03
-    assert FEE_ROWS["baby_clothes"].commission == 0.05
+def test_computers_flat_7_percent_grossed_up_for_vat():
+    fee = AmazonUKFee("computers")
+    # £700 ex-VAT → £840 inc; 7% of 840 = £58.80; 58.80/700 = 8.4%.
+    assert abs(fee.effective_rate_on_ex_vat(700) - 0.07 * (1 + UK_VAT_RATE)) < 1e-12
+    assert BENCHMARK_LABEL.startswith("Benchmark: Amazon UK")
 
 
-def test_take_rate_is_sum():
-    for row in FEE_ROWS.values():
-        _almost(row.take_rate, row.commission + row.transaction_fee)
+def test_full_size_appliances_7_and_compact_15():
+    full = AmazonUKFee("full_size_appliances")
+    compact = AmazonUKFee("compact_appliances")
+    assert abs(full.effective_rate_on_ex_vat(400) - 0.084) < 1e-12
+    assert abs(compact.effective_rate_on_ex_vat(80) - 0.15 * 1.2) < 1e-12
 
 
-def test_category_names_are_jds_own():
-    assert FEE_ROWS["ha_major"].first_level == "家用电器"
-    assert FEE_ROWS["co_tablet"].second_level == "电脑整机"
-    assert FEE_ROWS["co_tablet"].third_level == "平板电脑"
-    assert FEE_ROWS["apparel_other"].first_level == "服饰内衣"
-    assert FEE_ROWS["beauty_all"].first_level == "美妆护肤"
-    assert FEE_ROWS["baby_clothes"].second_level == "童装"
+def test_beauty_above_ten_pounds_is_15_percent():
+    fee = AmazonUKFee("beauty")
+    # Mid skincare £28 ex → £33.60 inc, above £10, so 15% of inc = 18% of ex.
+    assert abs(fee.effective_rate_on_ex_vat(28) - 0.18) < 1e-12
+    # A £8 ex-VAT price is £9.60 inc, at or below £10, so 8% of inc = 9.6% of ex.
+    assert abs(fee.effective_rate_on_ex_vat(8) - 0.08 * 1.2) < 1e-12
 
 
-def test_fee_url_is_the_official_rule_page():
-    assert JDW_FEE_URL.endswith("ruleId=950583665543483392")
-    for row in FEE_ROWS.values():
-        assert row.url == JDW_FEE_URL
+def test_clothing_fba_rule_above_40():
+    fee = AmazonUKFee("clothing")
+    # £80 ex → £96 inc. FBA: 15% of first £40 + 7% of £56 = 6 + 3.92 = 9.92; /80 = 12.4%.
+    assert abs(fee.effective_rate_on_ex_vat(80, clothing_fba=True) - 9.92 / 80) < 1e-12
+    # Below £40 inc, FBA special does not apply. £30 ex → £36 inc, standard 15%.
+    assert abs(fee.effective_rate_on_ex_vat(30, clothing_fba=True) - 0.18) < 1e-12
 
 
-def test_deposits_are_in_usd_as_published():
-    # Apparel merchandise: USD 15,000 at every GMV band, brand-flagship 5,000.
-    assert FEE_ROWS["apparel_other"].deposit_usd == (15_000, 15_000, 15_000, 15_000, 5_000)
-    # Beauty: 10k / 10k / 15k / 15k, brand 5k.
-    assert FEE_ROWS["beauty_all"].deposit_usd == (10_000, 10_000, 15_000, 15_000, 5_000)
+def test_minimum_referral_25p():
+    fee = AmazonUKFee("computers")
+    # A £1 ex-VAT item: 7% of £1.20 = £0.084, floored at £0.25, so 25% of ex-VAT.
+    assert abs(fee.effective_rate_on_ex_vat(1.0) - 0.25 / 1.0) < 1e-12
+
+
+def test_intro_commission_and_blend():
+    fee = AmazonUKFee("computers")
+    intro = intro_effective_rate(700, 0.07)  # 7% of 840 / 700 = 8.4%
+    assert abs(intro - 0.084) < 1e-12
+    assert abs(blended_rate(fee, 700, 0.0, 0.07) - intro) < 1e-12
+    amazon = fee.effective_rate_on_ex_vat(700)
+    assert abs(blended_rate(fee, 700, 1.0, 0.07) - amazon) < 1e-12
+    mid = blended_rate(fee, 700, 0.5, 0.07)
+    assert abs(mid - 0.5 * (intro + amazon)) < 1e-12
+
+
+def test_benchmark_label_is_a_stand_in():
+    assert "stand-in" in BENCHMARK_LABEL.lower()
+    assert "joybuy publishes" in BENCHMARK_LABEL.lower() or "until Joybuy" in BENCHMARK_LABEL

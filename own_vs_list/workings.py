@@ -1,4 +1,4 @@
-"""Worked-example steps for one archetype, in plain English."""
+"""Worked-example steps for one archetype, in plain English, in GBP."""
 from __future__ import annotations
 
 from .calc import (
@@ -6,77 +6,17 @@ from .calc import (
     LABEL_KEPT,
     RULE_TEXT,
     Assumptions,
-    contribution_1p,
-    contribution_3p,
-    effective_cover_days,
-    extra_markdown_rate,
-    holding_cost,
-    return_on_capital,
-    _cover_base,
-    _ful,
-    _gm,
 )
-from .archetypes import Band, Category, SubCategory
 
 
-def rmb(x, dp=2) -> str:
-    if x < 0:
-        return f"-RMB {abs(x):,.{dp}f}"
-    return f"RMB {x:,.{dp}f}"
+def gbp(x, dp=2) -> str:
+    sign = "-" if x < 0 else ""
+    return f"{sign}£{abs(x):,.{dp}f}"
 
 
-
-def _take_step(sub, ev, price, net3p, a) -> str:
-    fees = ev["take_rate_fees"]
-    fees_rmb = ev["net_3p_fees_unit"]
-    body = (
-        f"The published operation-support service fee is {sub.fee.commission:.2%} "
-        f"and the published transaction service fee is {sub.fee.transaction_fee:.2%}, "
-        f"so the contractual take is {fees:.2%} of selling price "
-        f"({rmb(fees_rmb)} on {rmb(price, 0)}). "
-        f"Label: {sub.fee.label}. This is the JD Worldwide (cross-border) schedule."
-    )
-    if ev.get("use_full_3p_take"):
-        body += (
-            f" On top, this run adds an advertising take of {ev['ad_take']:.2%} "
-            f"({rmb(ev['net_3p_ad_unit'])}), a model estimate, and a logistics "
-            f"contribution of {ev['logistics_contrib_pct']:.2%} "
-            f"({rmb(ev['net_3p_logistics_unit'])}): that is JD Logistics' published "
-            f"9.1% gross margin, on a 6.7% fee proxy, applied only to the assumed "
-            f"{ev['jdl_seller_share']:.0%} of sales fulfilled by JDL. "
-        )
-        if ev["serving_cost_pct"]:
-            body += (
-                f"A trial marketplace serving cost of {ev['serving_cost_pct']:.2%} "
-                f"({rmb(ev['net_3p_serving_unit'])}) is subtracted. "
-            )
-        else:
-            body += (
-                "No marketplace serving cost is subtracted, because no 3P-only "
-                "rate is published. "
-            )
-        body += (
-            f"The full take is {ev['take_rate']:.2%} of selling price, "
-            f"or {rmb(net3p)}. "
-            f"The seller pays more than JD keeps: {ev['seller_gross_cost_pct']:.2%} "
-            f"of selling price, because the seller pays the full logistics fee, "
-            f"not only JD's 9.1% margin, and the full advertising spend. "
-            f"1P kept-per-unit equals this 3P take at a take rate of "
-            f"{ev['breakeven_take']:.2%} (the contribution breakeven)."
-        )
-    else:
-        body += (
-            f" This is a fees-only run, so advertising and the logistics margin "
-            f"are left at zero and the 3P take is {rmb(net3p)}. "
-            f"The contribution breakeven (the take at which 3P income equals "
-            f"1P kept-per-unit) is {ev['breakeven_take']:.2%}."
-        )
-    return body
-
-
-def workings(sub: SubCategory, band: Band, cat: Category, ev: dict, a: Assumptions) -> list[tuple[str, str]]:
-    """A sequence of (heading, body) steps for an expander."""
-    price = ev["price_rmb"]
+def steps(ev: dict, a: Assumptions | None = None) -> list[tuple[str, str]]:
+    """A list of (title, body) steps for an evaluate_band record."""
+    price = ev["price_gbp"]
     gm = ev["gross_margin"]
     cogs = ev["cogs"]
     ful = ev["fulfilment_cost"]
@@ -84,63 +24,70 @@ def workings(sub: SubCategory, band: Band, cat: Category, ev: dict, a: Assumptio
     md = ev["markdown_rate"]
     hold = ev["holding_cost"]
     c1p = ev["contrib_1p_unit"]
+    take = ev["take_rate"]
+    fees = ev["take_rate_fees"]
     net3p = ev["net_3p_unit"]
-    extra = ev["extra_per_unit"]
     roc = ev["return_on_capital"]
-    cover = ev["stock_cover_days"]
-    steps = []
-    steps.append((
-        "The archetype, and what is assumed",
-        f"This is a {band.name}-price archetype in {cat.name_zh} / {sub.display_zh}. "
-        f"The selling price, {rmb(price, 0)}, weekly units ({band.weekly_units:g}), "
-        f"velocity ({band.velocity}) and weekly demand swing (CV {band.cv:.2f}) are "
-        f"**assumptions**, not observed sales. They stand in for a typical SKU at "
-        f"this price band. The 3P fee and the 1P cost ratios are published figures, "
-        f"applied to this assumed price."
-    ))
-    steps.append((
-        "3P take to JD (published fees, plus model extras in the default run)",
-        _take_step(sub, ev, price, net3p, a)
-    ))
-    steps.append((
-        "1P cost of goods (published gross margin, not double-counted)",
-        f"Gross margin is {gm:.1%}, so cost of goods is {1-gm:.1%} × {rmb(price, 0)} "
-        f"= {rmb(cogs)}. Label: {ev['gm_label']}. "
-        f"Company-published margins are already after routine returns and markdowns, "
-        f"so those are not subtracted again. Only a CV-scaled extra markdown of "
-        f"{a.markdown_cv_coeff:.0%} × {band.cv:.2f} = {md:.2%} of price "
-        f"({rmb(price*md)}) is taken off on top, as an assumption for item-level "
-        f"demand risk above the company average."
-    ))
-    steps.append((
-        "1P fulfilment (published ratio)",
-        f"Fulfilment is {ful_pct:.1%} of selling price = {rmb(ful)}. "
-        f"Label: {ev['fulfilment_label']}. This is a company-level ratio, not a "
-        f"per-parcel fee."
-    ))
-    steps.append((
-        "Stock cover and holding (published days, plus a safety-stock assumption)",
-        f"Base cover is {ev['stock_cover_base']:.1f} days ({ev['cover_label']}). "
-        f"Safety stock of z × CV × √(lead weeks) × 7 days, with z = {a.safety_stock_z} "
-        f"(95% cycle-service) and a 2-week lead (assumption), brings effective cover "
-        f"to {cover:.1f} days. Physical holding at {a.holding_rate:.0%} a year on "
-        f"cost of goods is {rmb(hold)}. Cost of capital is not taken off here; it is "
-        f"tested by return on stock."
-    ))
-    steps.append((
-        f"{LABEL_KEPT}, and {LABEL_EXTRA}",
-        f"{LABEL_KEPT} = price − cost of goods − fulfilment − extra markdown − holding "
-        f"= {rmb(price, 0)} − {rmb(cogs)} − {rmb(ful)} − {rmb(price*md)} − {rmb(hold)} "
-        f"= {rmb(c1p)}. "
-        f"The 3P take (full, in this run) is {rmb(net3p)}. "
-        f"{LABEL_EXTRA} = {rmb(c1p)} − {rmb(net3p)} = {rmb(extra)}. "
-        f"Return on stock is {roc:.0%} a year, against a {a.hurdle_rate:.0%} hurdle "
-        f"(an assumption)."
-    ))
-    steps.append((
-        "How the recommendation is reached",
-        f"{RULE_TEXT[ev['rule']]} "
-        f"The recommendation is **{ev['recommendation']}** (a model estimate, "
-        f"for decision support, not a forecast)."
-    ))
-    return steps
+    rec = ev["recommendation"]
+    rule = ev["rule"]
+
+    gm_step = (
+        f"Assumed mid (or selected) selling price is {gbp(price, 0)} ex-VAT "
+        f"(Assumption). 1P gross margin in this run is {gm:.1%}, label: "
+        f"{ev['gm_label']}. Cost of goods is therefore {gbp(cogs)}."
+    )
+    ful_step = (
+        f"Fulfilment is {ful_pct:.1%} of the ex-VAT price ({gbp(ful)}), "
+        f"label: {ev['fulfilment_label']}. A CV-scaled extra markdown of "
+        f"{md:.1%} and physical holding of {gbp(hold)} (cover "
+        f"{ev['stock_cover_days']:.1f} days, including safety stock) are "
+        f"taken off on top. {LABEL_KEPT} is {gbp(c1p)} "
+        f"({ev['contrib_1p_pct']:.1%} of the ex-VAT price)."
+    )
+    take_step = (
+        f"The commission layer is {fees:.2%} of the ex-VAT price "
+        f"({gbp(ev['net_3p_fees_unit'])}). {ev['commission_label']} "
+    )
+    if ev.get("use_full_3p_take"):
+        take_step += (
+            f"This run adds an advertising take of {ev['ad_take']:.2%} "
+            f"({gbp(ev['net_3p_ad_unit'])}, {ev['ad_take_label']}) and a "
+            f"warehouse-fulfilment margin of {ev['logistics_contrib_pct']:.2%} "
+            f"({gbp(ev['net_3p_logistics_unit'])}): that is a "
+            f"{ev['logistics_margin']:.0%} margin on an {ev['logistics_fee_proxy']:.0%} "
+            f"fee proxy, applied only to the assumed {ev['warehouse_share']:.0%} "
+            f"of 3P sales that go through Joybuy warehouses. "
+        )
+        if ev["serving_cost_pct"]:
+            take_step += (
+                f"A trial serving cost of {ev['serving_cost_pct']:.2%} is subtracted. "
+            )
+        take_step += (
+            f"The effective 3P take is {take:.2%} ({gbp(net3p)} per unit). "
+            f"The seller's gross cost ({ev['seller_gross_cost_pct']:.2%}) is "
+            "larger, because the seller pays the gross fulfilment fee, not "
+            "only the platform's margin."
+        )
+    else:
+        take_step += f"Ads and warehouse margin are off, so the take is just the commission, {take:.2%} ({gbp(net3p)})."
+
+    extra = ev["extra_per_unit"]
+    money_step = (
+        f"{LABEL_EXTRA} is {gbp(extra)} ({'1P ahead' if extra > 0 else '3P ahead'} "
+        f"on contribution). Return on stock is {roc:.0%}. The hurdle is "
+        f"{(a.hurdle_rate if a else 0.25):.0%}, an Assumption. "
+        f"The 3P take that would equal 1P contribution (the breakeven take) "
+        f"is {ev['breakeven_take']:.1%} of the ex-VAT price."
+    )
+    rec_step = (
+        f"The recommendation is {rec}, on the rule '{rule}'. "
+        f"{RULE_TEXT[rule]} This is a model estimate on an assumed price "
+        "point, not a forecast and not Joybuy's actual number."
+    )
+    return [
+        ("1. Selling price and 1P margin", gm_step),
+        ("2. Fulfilment, markdown, holding, and 1P contribution", ful_step),
+        ("3. The 3P take", take_step),
+        ("4. The money tests", money_step),
+        ("5. The recommendation", rec_step),
+    ]

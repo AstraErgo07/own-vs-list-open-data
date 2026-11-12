@@ -1,299 +1,161 @@
-"""Decision rules, published-benchmark formulas, and default archetype counts."""
+"""Decision engine, maturity interpolation, and 1P/3P mix."""
 from __future__ import annotations
 
-import math
 import sys
-from dataclasses import replace
 from pathlib import Path
 
-import pytest
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
-
-from own_vs_list.archetypes import CATEGORIES, all_bands, category_by_id
 from own_vs_list.calc import (
     BRING_IN_HOUSE,
     KEEP_3P,
     TEST_3P_FIRST,
     Assumptions,
-    apply_scenario,
-    breakeven_chart_frame,
-    contribution_1p,
-    contribution_3p,
+    assumptions_at,
+    comparison_mid_table,
     counts,
     decide,
-    effective_cover_days,
     evaluate_all,
-    evaluate_band,
-    extra_markdown_rate,
-    fees_only,
-    gap_sensitivity,
-    holding_cost,
+    evaluate_entrant,
+    evaluate_established,
     mid_band_table,
+    mix_curve,
+    mix_summary,
     money_tests,
     return_on_capital,
-    safety_stock_days,
-    scenario_mid_table,
 )
-from own_vs_list.jd_fees import FEE_ROWS
-from own_vs_list.take import CENTRAL, FEES_ONLY, HIGH, LOW
-from own_vs_list.published import (
-    DEFAULT_JD_FULFILMENT_PCT,
-    DEFAULT_STOCK_COVER_DAYS,
-    SAFETY_STOCK_LEAD_WEEKS,
-    SAFETY_STOCK_Z,
-    VOLATILITY_WARNING_THRESHOLD,
-    ZALANDO_FULFILMENT_PCT_2025,
-    ZALANDO_GROSS_MARGIN_2025,
-)
+from own_vs_list.archetypes import Band, SubCategory, all_subcategories
+from own_vs_list.uk_sources import CURRYS_GROUP_GROSS_MARGIN_2026, THG_BEAUTY_GROSS_MARGIN_2025
 
 
-def _almost(a, b, places=6):
-    assert math.isclose(a, b, rel_tol=0, abs_tol=10 ** (-places)), f"{a} != {b}"
+def test_evaluate_shape():
+    a = evaluate_entrant()
+    b = evaluate_established()
+    assert len(a) == 60 and len(b) == 60
+    mid_a, mid_b = mid_band_table(a), mid_band_table(b)
+    assert len(mid_a) == 20 and len(mid_b) == 20
+    for df in (a, b):
+        assert set(df["recommendation"]).issubset({BRING_IN_HOUSE, TEST_3P_FIRST, KEEP_3P})
+        assert (df["currency"] == "GBP").all()
+        assert df["price_is_ex_vat"].all()
 
 
-class TestFormulas:
-    def test_holding_is_physical_only(self):
-        _almost(holding_cost(20.0, 37.8, 0.08), 20.0 * 0.08 * 37.8 / 365.0)
-
-    def test_safety_stock_days(self):
-        expected = 1.65 * 1.0 * (2.0 ** 0.5) * 7.0
-        _almost(safety_stock_days(1.0, z=1.65, lead_weeks=2.0), expected)
-
-    def test_extra_markdown_scales_with_cv(self):
-        a = Assumptions()
-        _almost(extra_markdown_rate(0.85, a), a.markdown_cv_coeff * 0.85)
-
-    def test_contribution_1p_no_double_count(self):
-        hold = holding_cost(31.0, 37.8, 0.08)
-        c = contribution_1p(40.0, 31.0, 2.68, 0.034, hold)
-        _almost(c, 40.0 - 31.0 - 2.68 - 40.0 * 0.034 - hold)
-
-    def test_contribution_3p_is_published_take(self):
-        _almost(contribution_3p(100.0, 0.039), 3.90)
-
-    def test_return_on_capital_cancels_weekly_units(self):
-        a = return_on_capital(4.0, 20.0, 10.0, 37.8)
-        b = return_on_capital(4.0, 20.0, 99.0, 37.8)
-        _almost(a, b)
-        _almost(a, (4.0 * 52) / (20.0 * 37.8 / 7.0))
-
-    def test_published_defaults(self):
-        _almost(DEFAULT_JD_FULFILMENT_PCT, 0.067)
-        _almost(DEFAULT_STOCK_COVER_DAYS, 37.8)
-        _almost(ZALANDO_GROSS_MARGIN_2025.value, 0.399)
-        _almost(ZALANDO_FULFILMENT_PCT_2025.value, 0.230)
-        _almost(SAFETY_STOCK_Z, 1.65)
-        _almost(VOLATILITY_WARNING_THRESHOLD, 1.0)
+def test_maturity_zero_is_entrant_one_is_established():
+    base = Assumptions()
+    at0 = evaluate_all(assumptions_at(0.0, base))
+    at1 = evaluate_all(assumptions_at(1.0, base))
+    ent = evaluate_entrant(base)
+    est = evaluate_established(base)
+    assert (at0["recommendation"] == ent["recommendation"]).all()
+    assert (at1["recommendation"] == est["recommendation"]).all()
+    # Entrant GM is lower, fulfilment is higher, ad take is lower.
+    assert at0["gross_margin"].mean() < at1["gross_margin"].mean()
+    assert at0["fulfilment_pct"].mean() > at1["fulfilment_pct"].mean()
+    assert at0["ad_take"].mean() < at1["ad_take"].mean()
 
 
-class TestDecide:
-    def _band(self, velocity="high", cv=0.50):
-        # A lightweight stand-in with the attributes decide() reads.
-        from own_vs_list.archetypes import Band
-        return Band("mid", 1000, 20, velocity, cv)
-
-    def _sub(self, strategic="1p_core"):
-        from own_vs_list.archetypes import HOME_APPLIANCES
-        sub = HOME_APPLIANCES.subs[0]
-        if strategic == sub.strategic:
-            return sub
-        return replace(sub, strategic=strategic) if False else sub
-
-    def test_volatility_does_not_override_by_default(self):
-        a = Assumptions()
-        band = self._band("high", cv=1.80)
-        sub = category_by_id("home_appliances").subs[0]
-        rec, rule = decide(80.0, 20.0, 1.50, band, sub, a)
-        assert rec == BRING_IN_HOUSE
-        assert rule == "1p_wins"
-        assert a.volatility_overrides_decision is False
-
-    def test_long_tail_keeps_3p_even_when_money_wins(self):
-        a = Assumptions()
-        band = self._band("low", cv=0.90)
-        sub = category_by_id("home_appliances").subs[0]
-        rec, rule = decide(80.0, 20.0, 1.50, band, sub, a)
-        assert rec == KEEP_3P
-        assert rule == "long_tail_3p"
-
-    def test_mid_tail_tests_first(self):
-        a = Assumptions()
-        band = self._band("mid", cv=1.20)
-        sub = category_by_id("home_appliances").subs[0]
-        rec, rule = decide(80.0, 20.0, 1.50, band, sub, a)
-        assert rec == TEST_3P_FIRST
-        assert rule == "mid_tail_learn"
-
-    def test_mid_tail_can_be_turned_off(self):
-        a = Assumptions(apply_midtail=False)
-        band = self._band("low", cv=1.20)
-        sub = category_by_id("home_appliances").subs[0]
-        rec, rule = decide(80.0, 20.0, 1.50, band, sub, a)
-        assert rec == BRING_IN_HOUSE
-        assert rule == "1p_wins"
-
-    def test_keep_when_1p_loses_margin(self):
-        a = Assumptions()
-        band = self._band("high", cv=0.40)
-        sub = category_by_id("home_appliances").subs[0]
-        rec, rule = decide(1.0, 8.0, 1.50, band, sub, a)
-        assert rec == KEEP_3P
-        assert rule == "3p_wins_margin"
-
-    def test_volatility_override_can_be_turned_on(self):
-        a = Assumptions(volatility_overrides_decision=True, volatility_cv_threshold=1.0)
-        band = self._band("high", cv=1.20)
-        sub = category_by_id("home_appliances").subs[0]
-        rec, rule = decide(80.0, 20.0, 1.50, band, sub, a)
-        assert rec == TEST_3P_FIRST
-        assert rule == "volatile_demand"
+def test_interpolation_matches_endpoints_and_midpoint_is_between():
+    low = evaluate_all(assumptions_at(0.0)).sort_values(["sub_id", "band"])
+    mid = evaluate_all(assumptions_at(0.5)).sort_values(["sub_id", "band"])
+    high = evaluate_all(assumptions_at(1.0)).sort_values(["sub_id", "band"])
+    # GM at 50% is halfway (relative haircut interpolates linearly).
+    assert ((mid["gross_margin"] - 0.5 * (low["gross_margin"].values + high["gross_margin"].values)).abs() < 1e-10).all()
 
 
-class TestFeesOnlyBaseline:
-    """v2.0-comparable counts, with advertising and logistics left at zero."""
-
-    @pytest.fixture
-    def result(self):
-        return evaluate_all(fees_only())
-
-    def test_five_categories_and_sixty_bands(self, result):
-        assert len(CATEGORIES) == 5
-        assert [c.name_zh for c in CATEGORIES] == [
-            "家用电器", "电脑、办公", "美妆护肤", "服饰内衣", "母婴",
-        ]
-        assert len(all_bands()) == 60
-        assert len(result) == 60
-        assert set(result["price_basis"].unique()) == {"Assumption"}
-        assert set(result["weekly_units_basis"].unique()) == {"Assumption"}
-        assert set(result["cv_basis"].unique()) == {"Assumption"}
-
-    def test_default_all_band_counts(self, result):
-        c = counts(result)
-        assert c[BRING_IN_HOUSE] == 38
-        assert c[TEST_3P_FIRST] == 3
-        assert c[KEEP_3P] == 19
-
-    def test_default_mid_band_counts(self, result):
-        c = counts(mid_band_table(result))
-        assert c[BRING_IN_HOUSE] == 15
-        assert c[TEST_3P_FIRST] == 1
-        assert c[KEEP_3P] == 4
-
-    def test_mid_band_decisions_by_subcategory(self, result):
-        mid = mid_band_table(result).set_index("sub_id")
-        # Head of JD's 1P-core categories.
-        assert mid.loc["ha_major", "recommendation"] == BRING_IN_HOUSE
-        assert mid.loc["co_pc", "recommendation"] == BRING_IN_HOUSE
-        # Long tail left with sellers.
-        assert mid.loc["ha_commercial", "recommendation"] == KEEP_3P
-        assert mid.loc["co_peripherals", "recommendation"] == KEEP_3P
-        assert mid.loc["apparel_seasonal", "recommendation"] == KEEP_3P
-        assert mid.loc["baby_clothes", "recommendation"] == KEEP_3P
-        # Mid-tail fashion: test first.
-        assert mid.loc["apparel_mid", "recommendation"] == TEST_3P_FIRST
-        # Staple apparel can still go 1P.
-        assert mid.loc["apparel_staple", "recommendation"] == BRING_IN_HOUSE
-
-    def test_without_midtail_everything_brings_at_fees_only(self):
-        c = counts(evaluate_all(fees_only(Assumptions(apply_midtail=False))))
-        assert c[BRING_IN_HOUSE] == 60
-        assert c[TEST_3P_FIRST] == 0
-        assert c[KEEP_3P] == 0
-
-    def test_warnings_do_not_force_test(self, result):
-        warned = result[result["volatility_warning"]]
-        assert len(warned) > 0
-        # Some warned rows are Keep (long tail), not forced Test.
-        assert (warned["recommendation"] == KEEP_3P).any()
-        assert (result["rule"] == "volatile_demand").sum() == 0
-
-    def test_tablet_published_fee_is_lower(self, result):
-        mid = mid_band_table(result).set_index("sub_id")
-        _almost(mid.loc["co_tablet", "take_rate_fees"], 0.029)
-        _almost(mid.loc["co_pc", "take_rate_fees"], 0.039)
-        # Fees-only run: full take equals the published fee.
-        _almost(mid.loc["co_tablet", "take_rate"], 0.029)
-        _almost(mid.loc["co_pc", "take_rate"], 0.039)
-
-    def test_apparel_uses_zalando_fulfilment(self, result):
-        mid = mid_band_table(result).set_index("sub_id")
-        _almost(mid.loc["apparel_staple", "fulfilment_pct"], 0.230)
-        _almost(mid.loc["ha_major", "fulfilment_pct"], 0.067)
-        _almost(mid.loc["apparel_staple", "gross_margin"], 0.399)
-
-    def test_prices_are_rmb_assumptions(self, result):
-        assert result["price_rmb"].min() >= 39
-        # No sterling headline figures in the result frame.
-        assert "price_gbp" not in result.columns
+def test_mix_sums_and_labels():
+    mix_a = mix_summary(evaluate_entrant())
+    mix_b = mix_summary(evaluate_established())
+    for m in (mix_a, mix_b):
+        assert m["n"] == 20
+        assert m["n_1p"] + m["n_test"] + m["n_keep"] == 20
+        assert abs(m["share_subs_1p"] + m["share_subs_3p_path"] - 1) < 1e-12
+        assert abs(m["share_sales_1p"] + m["share_sales_3p_path"] - 1) < 1e-12
+        assert "Assumption" in m["sales_basis"]
+    # Under the default assumptions, established has at least as many 1P
+    # recommendations as the entrant (beauty clears as the haircut fades).
+    assert mix_b["n_1p"] >= mix_a["n_1p"]
 
 
-class TestCentralTake:
-    """Default v2.1 run: central advertising and logistics-margin extras."""
+def test_comparison_table_flags_flips():
+    cmp_ = comparison_mid_table()
+    assert len(cmp_) == 20
+    # Beauty should flip or move toward 1P under default assumptions.
+    beauty = cmp_[cmp_["category_en"] == "Beauty"]
+    assert len(beauty) == 4
+    assert (beauty["c1p_pct_a"] < beauty["c1p_pct_b"]).all()
 
-    @pytest.fixture
-    def result(self):
-        return evaluate_all(Assumptions())
 
-    def test_default_is_full_take(self, result):
-        assert bool(result["use_full_3p_take"].all())
-        inc = CENTRAL.incremental
-        _almost(inc, 0.025 + 0.067 * 0.091 * 0.50)
-        mid = mid_band_table(result).set_index("sub_id")
-        _almost(mid.loc["co_pc", "take_rate"], 0.039 + inc)
-        _almost(mid.loc["co_tablet", "take_rate"], 0.029 + inc)
-        _almost(mid.loc["apparel_staple", "take_rate"], 0.069 + inc)
-        _almost(mid.loc["co_pc", "ad_take"], 0.025)
-        _almost(mid.loc["co_pc", "logistics_contrib_pct"], 0.067 * 0.091 * 0.50)
+def test_currys_and_thg_margins_are_the_established_defaults():
+    subs = {s.id: s for s in all_subcategories()}
+    assert abs(subs["laptops"].gm - CURRYS_GROUP_GROSS_MARGIN_2026.value) < 1e-12
+    assert abs(subs["skincare"].gm - THG_BEAUTY_GROSS_MARGIN_2025.value) < 1e-12
+    # Entrant applies the 25% haircut.
+    ent = mid_band_table(evaluate_entrant())
+    lap = ent[ent["sub_id"] == "laptops"].iloc[0]
+    assert abs(lap["gross_margin"] - CURRYS_GROUP_GROSS_MARGIN_2026.value * 0.75) < 1e-12
+    assert "Assumption" in lap["gm_label"]
 
-    def test_default_all_band_counts(self, result):
-        c = counts(result)
-        assert c[BRING_IN_HOUSE] == 35
-        assert c[TEST_3P_FIRST] == 10
-        assert c[KEEP_3P] == 15
 
-    def test_default_mid_band_counts(self, result):
-        c = counts(mid_band_table(result))
-        assert c[BRING_IN_HOUSE] == 14
-        assert c[TEST_3P_FIRST] == 3
-        assert c[KEEP_3P] == 3
+def test_entrant_commission_is_intro_established_is_amazon():
+    ent = mid_band_table(evaluate_entrant())
+    est = mid_band_table(evaluate_established())
+    lap_a = ent[ent["sub_id"] == "laptops"].iloc[0]
+    lap_b = est[est["sub_id"] == "laptops"].iloc[0]
+    # Intro 7% on VAT-inc = 8.4% of ex-VAT.
+    assert abs(lap_a["take_rate_fees"] - 0.084) < 1e-12
+    assert "Assumption" in lap_a["commission_label"]
+    # Established computers 7% on VAT-inc = 8.4% as well (same headline rate),
+    # but the label is the Amazon benchmark, and the full take is higher because of ads.
+    assert "Benchmark" in lap_b["commission_label"]
+    assert "Amazon UK" in lap_b["commission_label"]
+    assert lap_b["take_rate"] > lap_a["take_rate"]
+    assert lap_b["ad_take"] > lap_a["ad_take"]
 
-    def test_mid_band_decisions(self, result):
-        mid = mid_band_table(result).set_index("sub_id")
-        # 1P-core head still comes in-house.
-        assert mid.loc["ha_major", "recommendation"] == BRING_IN_HOUSE
-        assert mid.loc["co_pc", "recommendation"] == BRING_IN_HOUSE
-        for sid in ("beauty_mass", "beauty_mid", "beauty_prestige"):
-            assert mid.loc[sid, "recommendation"] == BRING_IN_HOUSE
-        # Long-tail commercial and peripherals stay Keep 3P.
-        assert mid.loc["ha_commercial", "recommendation"] == KEEP_3P
-        assert mid.loc["co_peripherals", "recommendation"] == KEEP_3P
-        # Baby care becomes a close call at the central take.
-        assert mid.loc["baby_care", "recommendation"] == TEST_3P_FIRST
-        assert mid.loc["baby_care", "rule"] == "near_threshold"
-        # Staple apparel still clears 1P.
-        assert mid.loc["apparel_staple", "recommendation"] == BRING_IN_HOUSE
 
-    def test_without_midtail_not_everything_brings(self):
-        c = counts(evaluate_all(Assumptions(apply_midtail=False)))
-        assert c[BRING_IN_HOUSE] == 53
-        assert c[TEST_3P_FIRST] == 7
-        assert c[KEEP_3P] == 0
+def test_vat_toggle_changes_the_take():
+    with_vat = mid_band_table(evaluate_established(Assumptions(apply_referral_on_vat_inc=True)))
+    no_vat = mid_band_table(evaluate_established(Assumptions(apply_referral_on_vat_inc=False)))
+    # For a 7% category the fee drops from 8.4% to 7% when VAT gross-up is off.
+    lap_w = with_vat[with_vat["sub_id"] == "laptops"].iloc[0]["take_rate_fees"]
+    lap_n = no_vat[no_vat["sub_id"] == "laptops"].iloc[0]["take_rate_fees"]
+    assert abs(lap_w - 0.084) < 1e-12
+    assert abs(lap_n - 0.07) < 1e-12
 
-    def test_breakeven_equals_contrib_share(self, result):
-        mid = mid_band_table(result)
-        for _, r in mid.iterrows():
-            _almost(r["breakeven_take"], r["contrib_1p_pct"])
-            _almost(r["breakeven_take"], r["contrib_1p_unit"] / r["price_rmb"])
 
-    def test_logistics_is_margin_only(self, result):
-        mid = mid_band_table(result).iloc[0]
-        expected = mid["jdl_gross_fee_pct"] * mid["jdl_gross_margin"] * mid["jdl_seller_share"]
-        _almost(mid["logistics_contrib_pct"], expected)
-        # Far smaller than the gross fee the seller would pay.
-        assert mid["logistics_contrib_pct"] < mid["jdl_gross_fee_pct"] * mid["jdl_seller_share"] * 0.2
+def test_money_tests_and_decide_still_behave():
+    a = Assumptions(maturity=1.0, apply_midtail=False, apply_strategic_tilt=False)
+    # Clear 1P win.
+    both, near, margin = money_tests(c1p=10, net3p=3, roc=1.0, a=a)
+    assert both and margin and not near
+    # Clear 3P win.
+    both, near, margin = money_tests(c1p=1, net3p=5, roc=0.0, a=a)
+    assert not both and not margin and not near
+    band = Band("mid", 100, 20, "high", 0.4)
+    # We only need a stub sub for strategic; use a real one.
+    sub = all_subcategories()[0]
+    rec, rule = decide(10, 3, 1.0, band, sub, a)
+    assert rec == BRING_IN_HOUSE and rule == "1p_wins"
+    rec, rule = decide(1, 5, 0.0, band, sub, a)
+    assert rec == KEEP_3P
 
-    def test_seller_pays_more_than_jd_keeps(self, result):
-        mid = mid_band_table(result)
-        assert (mid["seller_gross_cost_pct"] > mid["take_rate"]).all()
+
+def test_roc_formula():
+    # c1p=10, cogs=100, cover=70 days = 10 weeks. Annual 10*52=520; inv=100*10=1000; ROC=52%.
+    assert abs(return_on_capital(10, 100, 5, 70) - 0.52) < 1e-12
+    assert return_on_capital(-1, 100, 5, 70) == 0.0
+
+
+def test_mix_curve_has_endpoints():
+    curve = mix_curve()
+    assert curve.iloc[0]["maturity"] == 0.0
+    assert curve.iloc[-1]["maturity"] == 1.0
+    assert "share_subs_1p" in curve.columns
+    assert "share_sales_1p" in curve.columns
+
+
+def test_no_sterling_headline_in_scenario_names():
+    # Scenario names must not claim a Joybuy pound profit.
+    from own_vs_list.maturity import SCENARIO_A_BLURB, SCENARIO_B_BLURB
+    for text in (SCENARIO_A_BLURB, SCENARIO_B_BLURB):
+        assert "Joybuy makes" not in text
+        assert "£ million" not in text

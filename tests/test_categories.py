@@ -1,37 +1,45 @@
-"""JD first-level and sub-category structure used in the app."""
+"""UK category catalogue: five English names, 20 sub-categories, 60 bands."""
 from __future__ import annotations
 
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from own_vs_list.archetypes import CATEGORIES, all_subcategories
-
-
-def test_five_first_level_categories_use_jd_names():
-    names = [c.name_zh for c in CATEGORIES]
-    assert names == ["家用电器", "电脑、办公", "美妆护肤", "服饰内衣", "母婴"]
+from own_vs_list.archetypes import CATEGORIES, all_bands, all_subcategories
 
 
-def test_three_to_five_subs_each():
-    for c in CATEGORIES:
-        assert 3 <= len(c.subs) <= 5, c.name_zh
-    assert len(all_subcategories()) == 20
+EXPECTED = {
+    "Home appliances",
+    "Computers and office",
+    "Beauty",
+    "Clothing",
+    "Mother and baby",
+}
 
 
-def test_every_sub_has_three_price_bands():
-    for s in all_subcategories():
-        names = [b.name for b in s.bands]
-        assert names == ["low", "mid", "high"], s.id
-        assert all(b.price_rmb > 0 for b in s.bands)
-        assert all(b.weekly_units > 0 for b in s.bands)
-        assert all(b.velocity in {"high", "mid", "low"} for b in s.bands)
+def test_five_uk_categories_in_english():
+    names = {c.name_en for c in CATEGORIES}
+    assert names == EXPECTED
+    assert len(CATEGORIES) == 5
 
 
-def test_fee_ids_resolve():
-    from own_vs_list.jd_fees import FEE_ROWS
-    for s in all_subcategories():
-        assert s.fee_id in FEE_ROWS
-        assert s.fee is FEE_ROWS[s.fee_id]
+def test_twenty_subs_sixty_bands():
+    subs = all_subcategories()
+    bands = all_bands()
+    assert len(subs) == 20
+    assert len(bands) == 60
+    for cat, sub, band in bands:
+        assert band.name in {"low", "mid", "high"}
+        assert band.price_gbp > 0
+        assert band.weekly_units > 0
+        assert band.velocity in {"high", "mid", "low"}
+        assert band.cv > 0
+
+
+def test_prices_are_gbp_ex_vat_assumptions():
+    for sub in all_subcategories():
+        assert sub.gm > 0 and sub.gm < 1
+        assert sub.fulfilment_pct > 0
+        mids = [b for b in sub.bands if b.name == "mid"]
+        assert len(mids) == 1
