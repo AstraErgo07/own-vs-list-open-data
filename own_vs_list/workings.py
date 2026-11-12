@@ -1,161 +1,103 @@
-"""Plain-English workings for one product, shown in a collapsible expander."""
+"""Worked-example steps for one archetype, in plain English."""
 from __future__ import annotations
 
+from .calc import (
+    LABEL_EXTRA,
+    LABEL_KEPT,
+    RULE_TEXT,
+    Assumptions,
+    contribution_1p,
+    contribution_3p,
+    effective_cover_days,
+    extra_markdown_rate,
+    holding_cost,
+    return_on_capital,
+    _cover_base,
+    _ful,
+    _gm,
+)
+from .archetypes import Band, Category, SubCategory
 
-def _gbp(x, dp=2):
-    try:
-        x = float(x)
-    except (TypeError, ValueError):
-        return "n/a"
+
+def rmb(x, dp=2) -> str:
     if x < 0:
-        return f"-£{abs(x):,.{dp}f}"
-    return f"£{x:,.{dp}f}"
+        return f"-RMB {abs(x):,.{dp}f}"
+    return f"RMB {x:,.{dp}f}"
 
 
-def _pct(x, dp=0):
-    try:
-        return f"{float(x):.{dp}%}"
-    except (TypeError, ValueError):
-        return "n/a"
-
-
-def own_vs_list_workings(row: dict, a) -> list[dict]:
-    """A short sequence of named steps whose results match the engine."""
-    price = float(row["price"])
-    net = float(row["price_ex_vat"])
-    cogs = float(row["cogs"])
-    ful = float(row["fulfilment_cost"])
-    ret = float(row["return_rate"])
-    md = float(row["markdown_rate"])
-    hold = float(row["holding_cost_unit"])
-    c1p = float(row["contrib_1p_unit"])
-    c3p = float(row["contrib_3p_unit"])
-    net3p = float(row["net_3p_unit"])
-    roc = float(row["return_on_capital"])
-    cv = float(row["weekly_units_cv"])
-    rate = float(row["commission_rate"])
-    cover = float(row.get("stock_cover_days", a.stock_cover_days))
-    base_cover = float(row.get("stock_cover_base", a.stock_cover_days))
-    safety = float(row.get("safety_stock_days", max(cover - base_cover, 0.0)))
-    warned = bool(row.get("volatility_warning", cv > a.volatility_cv_threshold))
-    steps = [
-        {
-            "step": "Selling price used",
-            "how": (
-                f"Recorded marketplace price {_gbp(price)}, converted to pounds "
-                "at the published ECB rate where the original currency is reais"
-                + ("; VAT stripped" if getattr(a, "vat_rate", 0) else ", as recorded, no VAT strip")
-                + ". Observed."
-            ),
-            "result": _gbp(net),
-        },
-        {
-            "step": "Cost of goods",
-            "how": (
-                f"{_pct(a.cogs_pct, 1)} of the selling price, so a "
-                f"{_pct(1.0 - a.cogs_pct, 1)} gross margin. "
-                f"{row.get('cogs_label') or 'See Data and method for the published source.'} "
-                "Published company-average gross margins are already after routine "
-                "markdowns and, typically, after returns, so those are not subtracted "
-                "again as a second layer."
-            ),
-            "result": _gbp(cogs),
-        },
-        {
-            "step": "1P fulfilment",
-            "how": row.get("fulfilment_basis") or (
-                f"{_pct(a.jd_fulfilment_pct, 1)} of selling price, from JD's published "
-                "fulfilment-to-revenue ratio."
-            ),
-            "result": _gbp(ful),
-        },
-        {
-            "step": "Extra markdown for item-level demand risk",
-            "how": (
-                f"{_pct(a.markdown_cv_coeff)} × weekly demand swing of {_pct(cv)} "
-                f"= {_pct(md, 1)} of selling price. This is an assumption: it is the "
-                "extra risk above the company-average margin, not a second full markdown."
-            ),
-            "result": _gbp(net * md),
-        },
-        {
-            "step": "Stock cover and physical holding",
-            "how": (
-                f"Base cover {base_cover:.1f} days "
-                f"({row.get('stock_cover_label') or 'published JD inventory days'}). "
-                f"Safety stock {safety:.1f} days (z = {a.safety_stock_z:.2f}, "
-                f"lead time {a.safety_stock_lead_weeks:.0f} weeks, times this item's CV). "
-                f"Total {cover:.1f} days. Physical holding is {_pct(a.holding_rate)} a year "
-                "on cost, an assumption: cost of capital is tested only by the hurdle."
-                + (f" Extra returns of {_pct(ret)} are also taken off." if ret else "")
-            ),
-            "result": _gbp(hold) + (f" holding, plus {_gbp(net * ret)} returns" if ret else " holding"),
-        },
-        {
-            "step": "= Kept per unit if we stock it",
-            "how": (
-                "Selling price, minus cost of goods, fulfilment, the extra markdown, "
-                "any extra returns, and physical holding."
-            ),
-            "result": _gbp(c1p),
-        },
-        {
-            "step": "3P referral fee (published Amazon UK rate)",
-            "how": (
-                f"{row.get('amazon_category_name') or 'mapped category'}: "
-                f"{row.get('referral_rule') or _pct(rate)}. "
-                f"Effective rate {_pct(rate, 1)}. "
-                f"Minus a {_gbp(a.marketplace_cost_per_unit)} cost to serve (assumption). "
-                "JD's 20-F does not publish a per-category seller commission card, "
-                "so the product-level 3P fee uses the Amazon UK rate card."
-            ),
-            "result": _gbp(c3p),
-        },
-        {
-            "step": "Net 3P value per unit",
-            "how": (
-                f"3P referral, minus {_pct(a.diversion_rate)} diversion times the "
-                "1P figure above (floored at zero). Diversion is an assumption: "
-                "there is no substitute catalogue in this sample."
-            ),
-            "result": _gbp(net3p),
-        },
-        {
-            "step": "= Extra per unit from stocking it",
-            "how": "Kept per unit if we stock it, minus net 3P value.",
-            "result": _gbp(c1p - net3p),
-        },
-        {
-            "step": "Return on the stock you would hold",
-            "how": (
-                "A year's 1P contribution, divided by average stock at cost, including "
-                "safety stock. Weekly volume cancels. "
-                f"The hurdle is {_pct(a.hurdle_rate)} (assumption)."
-            ),
-            "result": _pct(roc),
-        },
-        {
-            "step": "Weekly demand swing and warning",
-            "how": (
-                f"Coefficient of variation of weekly units, including quiet weeks "
-                f"({row.get('cv_basis', 'observed')}). "
-                f"A warning is raised when this is above {_pct(a.volatility_cv_threshold)}. "
-                "The warning does not change the recommendation: the extra markdown and "
-                "safety stock have already fed into the money tests."
-            ),
-            "result": (
-                f"{_pct(cv)}"
-                + (" — warning: highly variable demand" if warned else " — no volatility warning")
-            ),
-        },
-        {
-            "step": "Decision",
-            "how": (
-                "Bring in-house if 1P contribution is higher than net 3P and return on "
-                "stock beats the hurdle; test first if a money test is within 10% of "
-                "the line; otherwise keep 3P."
-            ),
-            "result": row["recommendation"],
-        },
-    ]
+def workings(sub: SubCategory, band: Band, cat: Category, ev: dict, a: Assumptions) -> list[tuple[str, str]]:
+    """A sequence of (heading, body) steps for an expander."""
+    price = ev["price_rmb"]
+    gm = ev["gross_margin"]
+    cogs = ev["cogs"]
+    ful = ev["fulfilment_cost"]
+    ful_pct = ev["fulfilment_pct"]
+    md = ev["markdown_rate"]
+    hold = ev["holding_cost"]
+    c1p = ev["contrib_1p_unit"]
+    net3p = ev["net_3p_unit"]
+    extra = ev["extra_per_unit"]
+    roc = ev["return_on_capital"]
+    cover = ev["stock_cover_days"]
+    steps = []
+    steps.append((
+        "The archetype, and what is assumed",
+        f"This is a {band.name}-price archetype in {cat.name_zh} / {sub.display_zh}. "
+        f"The selling price, {rmb(price, 0)}, weekly units ({band.weekly_units:g}), "
+        f"velocity ({band.velocity}) and weekly demand swing (CV {band.cv:.2f}) are "
+        f"**assumptions**, not observed sales. They stand in for a typical SKU at "
+        f"this price band. The 3P fee and the 1P cost ratios are published figures, "
+        f"applied to this assumed price."
+    ))
+    steps.append((
+        "3P take (published JD Worldwide fees)",
+        f"The published operation-support service fee is {sub.fee.commission:.2%} "
+        f"and the published transaction service fee is {sub.fee.transaction_fee:.2%}, "
+        f"so the platform take is {sub.fee.take_rate:.2%} of selling price. "
+        f"On {rmb(price, 0)} that is {rmb(net3p)}. "
+        f"Label: {sub.fee.label}. The 20-F says merchants 'pay us sales commissions' "
+        f"but does not publish a per-category rate; this rate card fills that gap. "
+        f"It is the JD Worldwide (cross-border) schedule."
+    ))
+    steps.append((
+        "1P cost of goods (published gross margin, not double-counted)",
+        f"Gross margin is {gm:.1%}, so cost of goods is {1-gm:.1%} × {rmb(price, 0)} "
+        f"= {rmb(cogs)}. Label: {ev['gm_label']}. "
+        f"Company-published margins are already after routine returns and markdowns, "
+        f"so those are not subtracted again. Only a CV-scaled extra markdown of "
+        f"{a.markdown_cv_coeff:.0%} × {band.cv:.2f} = {md:.2%} of price "
+        f"({rmb(price*md)}) is taken off on top, as an assumption for item-level "
+        f"demand risk above the company average."
+    ))
+    steps.append((
+        "1P fulfilment (published ratio)",
+        f"Fulfilment is {ful_pct:.1%} of selling price = {rmb(ful)}. "
+        f"Label: {ev['fulfilment_label']}. This is a company-level ratio, not a "
+        f"per-parcel fee."
+    ))
+    steps.append((
+        "Stock cover and holding (published days, plus a safety-stock assumption)",
+        f"Base cover is {ev['stock_cover_base']:.1f} days ({ev['cover_label']}). "
+        f"Safety stock of z × CV × √(lead weeks) × 7 days, with z = {a.safety_stock_z} "
+        f"(95% cycle-service) and a 2-week lead (assumption), brings effective cover "
+        f"to {cover:.1f} days. Physical holding at {a.holding_rate:.0%} a year on "
+        f"cost of goods is {rmb(hold)}. Cost of capital is not taken off here; it is "
+        f"tested by return on stock."
+    ))
+    steps.append((
+        f"{LABEL_KEPT}, and {LABEL_EXTRA}",
+        f"{LABEL_KEPT} = price − cost of goods − fulfilment − extra markdown − holding "
+        f"= {rmb(price, 0)} − {rmb(cogs)} − {rmb(ful)} − {rmb(price*md)} − {rmb(hold)} "
+        f"= {rmb(c1p)}. "
+        f"The 3P take is {rmb(net3p)}. "
+        f"{LABEL_EXTRA} = {rmb(c1p)} − {rmb(net3p)} = {rmb(extra)}. "
+        f"Return on stock is {roc:.0%} a year, against a {a.hurdle_rate:.0%} hurdle "
+        f"(an assumption)."
+    ))
+    steps.append((
+        "How the recommendation is reached",
+        f"{RULE_TEXT[ev['rule']]} "
+        f"The recommendation is **{ev['recommendation']}** (a model estimate, "
+        f"for decision support, not a forecast)."
+    ))
     return steps

@@ -1,4 +1,4 @@
-"""Own stock vs marketplace listing: company panel plus the product workflow."""
+"""Own stock vs marketplace listing: company panel plus the JD category workflow."""
 from pathlib import Path
 import sys
 from dataclasses import replace
@@ -12,37 +12,39 @@ import streamlit as st
 from common.decisions import now, save_decision
 from common.panel import company_panel
 from common.text import VERSION
+from own_vs_list.archetypes import CATEGORIES, category_by_id
 from own_vs_list.calc import (
     BRING_IN_HOUSE,
     KEEP_3P,
     LABEL_EXTRA,
     LABEL_KEPT,
     RECOMMENDATIONS,
+    RULE_CITATIONS,
+    RULE_TEXT,
     TEST_3P_FIRST,
     Assumptions,
-    cv_distribution,
-    evaluate_portfolio,
+    counts,
+    evaluate_all,
+    evaluate_band,
     gap_sensitivity,
-    hurdle_sensitivity,
-    load_listings,
+    mid_band_flip_summary,
+    mid_band_table,
+    sensitivity_for_sub,
 )
-from own_vs_list.fees import AMAZON_FEE_LABEL
 from own_vs_list.insights import insights
 from own_vs_list.published import (
     BBY_GROSS_MARGIN_FY2026,
-    DEFAULT_STOCK_COVER_DAYS,
-    JD_FULFILMENT_PCT_2025,
+    DEFAULT_JD_FULFILMENT_PCT,
     JD_GROSS_MARGIN_2025,
-    JD_INVENTORY_DAYS_2025,
-    SAFETY_STOCK_LEAD_WEEKS,
-    SAFETY_STOCK_RATIONALE,
+    JDW_FEE_LABEL,
+    JDW_FEE_URL,
     SAFETY_STOCK_Z,
     VOLATILITY_THRESHOLD_RATIONALE,
+    ZALANDO_FULFILMENT_PCT_2025,
+    ZALANDO_GROSS_MARGIN_2025,
 )
-from own_vs_list.workings import own_vs_list_workings
+from own_vs_list.workings import rmb, workings
 
-DATA = ROOT / "data" / "processed" / "products.csv.gz"
-GAPS_DEFAULT = ROOT / "data" / "processed" / "gap_sensitivity.csv"
 DECISIONS = ROOT / "data" / "processed" / "decisions.csv"
 LOG_COLUMNS = [
     "ts", "product_id", "title", "recommendation", "action",
@@ -51,151 +53,116 @@ LOG_COLUMNS = [
 ]
 
 
-@st.cache_data(show_spinner=False)
-def _listings() -> pd.DataFrame:
-    return load_listings(DATA)
-
-
-def _assumptions(gm, ful_pct, use_fba, cover, hurdle, diversion, md_cv, mkt_cost,
-                 vat, amazon, safety, z, lead, extra_ret, vol_override, vol_bar) -> Assumptions:
-    return Assumptions(
-        cogs_pct=1.0 - gm,
-        jd_fulfilment_pct=0.0 if use_fba else ful_pct,
-        use_published_fulfilment=use_fba,
-        stock_cover_days=cover,
+def _assumptions(hurdle, md_cv, midtail, strategic, safety, vol_override, vol_bar,
+                 ful_mode, gm_mode, holding) -> Assumptions:
+    a = Assumptions(
         hurdle_rate=hurdle,
-        diversion_rate=diversion,
         markdown_cv_coeff=md_cv,
-        marketplace_cost_per_unit=mkt_cost,
-        vat_rate=vat,
-        use_amazon_referral=amazon,
-        commission_override=0.08,
+        apply_midtail=midtail,
+        apply_strategic_tilt=strategic,
         apply_safety_stock=safety,
-        safety_stock_z=z,
-        safety_stock_lead_weeks=lead,
-        return_rate=extra_ret,
         volatility_overrides_decision=vol_override,
         volatility_cv_threshold=vol_bar,
+        holding_rate=holding,
     )
+    if ful_mode == "jd":
+        a = replace(a, use_jd_fulfilment_everywhere=True)
+    elif ful_mode == "zalando":
+        a = replace(a, fulfilment_override=ZALANDO_FULFILMENT_PCT_2025.value)
+    if gm_mode == "jd":
+        a = replace(a, gm_override=JD_GROSS_MARGIN_2025.value)
+    elif gm_mode == "bby":
+        a = replace(a, gm_override=BBY_GROSS_MARGIN_FY2026.value)
+    elif gm_mode == "zalando":
+        a = replace(a, gm_override=ZALANDO_GROSS_MARGIN_2025.value)
+    return a
 
 
 @st.cache_data(show_spinner="Recalculating recommendations…")
 def _eval(*p):
-    return evaluate_portfolio(_listings(), _assumptions(*p))
+    return evaluate_all(_assumptions(*p))
 
 
 @st.cache_data(show_spinner="Ranking the gaps…")
 def _gaps(*p):
-    a = _assumptions(*p)
-    if a == Assumptions() and GAPS_DEFAULT.exists():
-        return pd.read_csv(GAPS_DEFAULT)
-    return gap_sensitivity(_listings(), a)
+    return gap_sensitivity(_assumptions(*p))
 
 
 @st.cache_data(show_spinner=False)
-def _hurdles(*p):
-    hs, _, _ = hurdle_sensitivity(_listings(), _assumptions(*p))
-    return hs
-
-
-@st.cache_data(show_spinner=False)
-def _no_risk(*p):
-    a = _assumptions(*p)
-    return evaluate_portfolio(_listings(), replace(a, apply_safety_stock=False, markdown_cv_coeff=0.0))
+def _mid_flips(*p):
+    return mid_band_flip_summary(_assumptions(*p))
 
 
 @st.cache_data(show_spinner=False)
 def _insights(*p):
     a = _assumptions(*p)
-    return insights(
-        _listings(), a,
-        result=_eval(*p),
-        gaps=_gaps(*p),
-        money_no_risk=_no_risk(*p),
-    )
+    res = _eval(*p)
+    return insights(a, result=res, mid=mid_band_table(res), gaps=_gaps(*p))
 
 
-def _fmt_gbp(x):
+def _fmt_rmb(x, dp=2):
     try:
         x = float(x)
     except (TypeError, ValueError):
-        return "n/a"
-    return f"-£{abs(x):,.2f}" if x < 0 else f"£{x:,.2f}"
+        return "—"
+    return rmb(x, dp)
 
 
 st.title("Own stock vs marketplace listing")
 st.caption(
-    "A method demo on a real marketplace catalogue, with 1P costs taken from "
-    "published company filings. This is decision support, not a forecast. "
-    f"{VERSION}."
+    f"{VERSION} · Five JD categories, published fees and filings, "
+    "and flip rules grounded in how platforms actually decide. "
+    "Made by Ami Sata."
 )
-
-listings = _listings()
 
 with st.sidebar:
     st.subheader("Assumptions you can change")
     st.caption(
-        "Defaults are taken from published filings where a clean figure exists. "
-        "Everything else is labelled as an assumption."
+        "Each sub-category has its own published 1P cost ratios by default. "
+        "The controls below apply a single published figure to every archetype, "
+        "or change a labelled assumption."
     )
-    gm_choice = st.selectbox(
-        "1P product gross margin",
+    gm_mode_label = st.selectbox(
+        "1P gross margin",
         [
-            f"22.5% — {BBY_GROSS_MARGIN_FY2026.label} (default)",
-            f"16.0% — {JD_GROSS_MARGIN_2025.label} (blended company margin)",
-            "18% — assumption, between the two published figures",
-            "30% — assumption, a richer merchandise margin",
+            "Each sub-category's own published default",
+            f"22.5% on every archetype — {BBY_GROSS_MARGIN_FY2026.label}",
+            f"16.0% on every archetype — {JD_GROSS_MARGIN_2025.label} (blended)",
+            f"39.9% on every archetype — {ZALANDO_GROSS_MARGIN_2025.label}",
         ],
         index=0,
     )
-    if gm_choice.startswith("22.5%"):
-        gm = 0.225
-    elif gm_choice.startswith("16.0%"):
-        gm = 0.160
-    elif gm_choice.startswith("18%"):
-        gm = 0.180
+    if gm_mode_label.startswith("22.5%"):
+        gm_mode = "bby"
+    elif gm_mode_label.startswith("16.0%"):
+        gm_mode = "jd"
+    elif gm_mode_label.startswith("39.9%"):
+        gm_mode = "zalando"
     else:
-        gm = 0.300
+        gm_mode = "own"
 
-    ful_choice = st.selectbox(
+    ful_mode_label = st.selectbox(
         "1P fulfilment",
         [
-            f"JD 6.7% of selling price — {JD_FULFILMENT_PCT_2025.label} (default)",
-            "Published Amazon UK FBA per-parcel rate (UK alternative)",
-            "JD 6.0% of selling price — FY2023 published ratio",
+            "Each sub-category's own published default",
+            f"6.7% on every archetype — Published (JD 20-F FY2025)",
+            f"23.0% on every archetype — {ZALANDO_FULFILMENT_PCT_2025.label}",
         ],
         index=0,
     )
-    use_fba = "FBA" in ful_choice
-    if "6.0%" in ful_choice:
-        ful_pct = 0.060
+    if "6.7%" in ful_mode_label:
+        ful_mode = "jd"
+    elif "23.0%" in ful_mode_label:
+        ful_mode = "zalando"
     else:
-        ful_pct = 0.067
-
-    cover_choice = st.selectbox(
-        "Base stock cover (before safety stock)",
-        [
-            f"{DEFAULT_STOCK_COVER_DAYS} days — {JD_INVENTORY_DAYS_2025.label} (default)",
-            "31.5 days — JD FY2024 published inventory days",
-            "50 days — assumption",
-        ],
-        index=0,
-    )
-    if cover_choice.startswith("31.5"):
-        cover_d = 31.5
-    elif cover_choice.startswith("50"):
-        cover_d = 50.0
-    else:
-        cover_d = DEFAULT_STOCK_COVER_DAYS
+        ful_mode = "own"
 
     hurdle = st.slider("Return on stock we would need (assumption)", 10, 200, 25, 5, format="%d%%") / 100.0
-    diversion = st.slider("Share of 3P sales that would have been 1P (assumption)", 0, 60, 25, 5, format="%d%%") / 100.0
-    md_cv = st.slider("Extra markdown as a share of price, per unit of weekly CV (assumption)", 0, 8, 4, 1, format="%d%%") / 100.0
-    mkt_cost = st.slider("Cost to serve a 3P sale (assumption)", 0.20, 1.00, 0.50, 0.10, format="£%.2f")
-    extra_ret = st.slider("Extra returns on top of published gross margin (default 0%)", 0, 10, 0, 1, format="%d%%") / 100.0
+    md_cv = st.slider("Extra markdown as a share of price, per unit of weekly CV (assumption)", 0, 12, 4, 1, format="%d%%") / 100.0
+    holding = st.slider("Physical holding rate (assumption)", 4, 16, 8, 2, format="%d%%") / 100.0
+    midtail = st.toggle("Apply the mid-tail and long-tail rule (default on)", value=True)
+    strategic = st.toggle("Apply the category-control tilt in close cases (default on)", value=True)
     safety = st.toggle("Apply the safety-stock adjustment (default on)", value=True)
-    vat = st.toggle("Treat prices as including 20% VAT and strip it (assumption, off by default)", value=False)
-    amazon = st.toggle("Use published Amazon UK referral fees (default on). Off: 7% flat.", value=True)
     vol_override = st.toggle(
         "Use volatility as an automatic Test-first override (off by default: warning only)",
         value=False,
@@ -207,283 +174,316 @@ with st.sidebar:
     )
     vol_bar = {"0.75": 0.75, "1.00 (default)": 1.00, "1.50": 1.50}[vol_bar_label]
     st.caption(
-        f"3P fees: {AMAZON_FEE_LABEL} when the referral toggle is on. "
-        "JD's 20-F does not publish a per-category seller commission card. "
-        "This treats the 3P side as charging Amazon UK-level referral fees, "
-        "a benchmark assumption. No Amazon catalogue was collected."
+        f"3P fees: {JDW_FEE_LABEL}. "
+        f"[Fee schedule]({JDW_FEE_URL}). "
+        "This is the JD Worldwide (cross-border) published card. "
+        "A domestic JD.com POP card may differ and was not independently "
+        "available as a public page without a merchant login. "
+        "No JD catalogue was collected."
     )
 
-params = (
-    gm, ful_pct, use_fba, cover_d, hurdle, diversion, md_cv, mkt_cost,
-    0.20 if vat else 0.0, amazon, safety, SAFETY_STOCK_Z,
-    SAFETY_STOCK_LEAD_WEEKS, extra_ret, vol_override, vol_bar,
-)
-res = _eval(*params)
+params = (hurdle, md_cv, midtail, strategic, safety, vol_override, vol_bar, ful_mode, gm_mode, holding)
 a = _assumptions(*params)
+res = _eval(*params)
+mid = mid_band_table(res)
+gaps = _gaps(*params)
 
 company_panel(expanded=False)
 
-st.subheader("The product-level workflow")
+st.subheader("The category-level workflow")
 st.markdown(
-    "Each row is a real product from the Brazilian E-Commerce Public Dataset "
-    "by Olist (observed prices, weights, weekly demand). The 1P scenario asks: "
-    "if a platform stocked this item, using published retailer benchmarks, "
-    "would contribution and return on stock beat leaving it with the seller? "
-    "The 3P scenario uses published Amazon UK referral fees. Volatility raises "
-    "a warning and adds safety stock and an extra markdown; it does not, by "
-    "default, force a recommendation."
+    "Five first-level JD categories, using JD's own names from its published "
+    "Worldwide POP fee schedule, each with named sub-categories (or, where "
+    "the fee is uniform, assumed price-band archetypes). There are no "
+    "invented sales figures presented as observed: prices, weekly units and "
+    "demand swing are **assumptions**, labelled as such. 1P costs come from "
+    "published retailer filings. 3P fees come from the published JD card. "
+    "The flip rules are grounded in JD's 20-F and in the agency-versus-reselling "
+    "and mid-tail literature, and each rule cites its basis below. "
+    "Figures are in **renminbi**."
 )
 
-cats = ["All categories", "Shared categories only"] + sorted(res["category"].dropna().unique().tolist())
-c1, c2, c3 = st.columns(3)
-with c1:
-    cat = st.selectbox("Category", cats)
-with c2:
-    rec = st.selectbox("Recommendation", ["All"] + list(RECOMMENDATIONS))
-with c3:
-    warn_f = st.selectbox("Volatility warning", ["All", "Warning only", "No warning"])
-
-view = res
-if cat == "Shared categories only":
-    view = view[view["category_shared"].astype(bool)]
-elif cat != "All categories":
-    view = view[view["category"] == cat]
-if rec != "All":
-    view = view[view["recommendation"] == rec]
-if warn_f == "Warning only":
-    view = view[view["volatility_warning"]]
-elif warn_f == "No warning":
-    view = view[~view["volatility_warning"]]
-
-n = len(view)
-counts = {r: int((view["recommendation"] == r).sum()) for r in RECOMMENDATIONS}
-gmv = float(view["gmv_annual"].sum()) if n else 0.0
-units = float((view["weekly_units"] * 52).sum()) if n else 0.0
-avg_price = (gmv / units) if units else 0.0
-gmv_all = float(view["gmv_annual"].sum()) if n else 1.0
-gmv_share = {
-    r: (float(view.loc[view["recommendation"] == r, "gmv_annual"].sum()) / gmv_all) if gmv_all else 0.0
-    for r in RECOMMENDATIONS
-}
-n_warn = int(view["volatility_warning"].sum()) if n else 0
-
+# Headline metrics: mid-band (one per sub-category) is the main view.
+c_mid = counts(mid)
+c_all = counts(res)
+n_warn_mid = int(mid["volatility_warning"].sum())
 m1, m2, m3, m4 = st.columns(4)
-m1.metric(BRING_IN_HOUSE, f"{counts[BRING_IN_HOUSE]:,}", f"{gmv_share[BRING_IN_HOUSE]:.0%} of run-rate")
-m2.metric(TEST_3P_FIRST, f"{counts[TEST_3P_FIRST]:,}", f"{gmv_share[TEST_3P_FIRST]:.0%} of run-rate")
-m3.metric(KEEP_3P, f"{counts[KEEP_3P]:,}", f"{gmv_share[KEEP_3P]:.0%} of run-rate")
-m4.metric("Products in this view", f"{n:,}", f"{n_warn:,} with a volatility warning")
-
+m1.metric(BRING_IN_HOUSE, f"{c_mid[BRING_IN_HOUSE]}", f"{c_all[BRING_IN_HOUSE]} of 60 across all price bands")
+m2.metric(TEST_3P_FIRST, f"{c_mid[TEST_3P_FIRST]}", f"{c_all[TEST_3P_FIRST]} of 60 across all price bands")
+m3.metric(KEEP_3P, f"{c_mid[KEEP_3P]}", f"{c_all[KEEP_3P]} of 60 across all price bands")
+m4.metric("Sub-categories (mid-price)", f"{len(mid)}", f"{n_warn_mid} with a volatility warning")
 st.caption(
-    f"Observed annual run-rate in this view: {_fmt_gbp(gmv)} of recorded sales "
-    f"(average selling price {_fmt_gbp(avg_price)}). "
-    "This is quantity times recorded price in the historical window, not a forecast. "
-    "SKU counts and run-rate shares can disagree: cheaper, steadier lines pull "
-    "the product count toward Bring in-house, while run-rate is more evenly split."
+    "The headline counts are the mid-price archetype of each sub-category, "
+    f"{len(mid)} in all, across five first-level categories. The delta on each "
+    "tile is the count across all three assumed price bands (60 rows). "
+    "These are model estimates, not a forecast."
 )
 
-with st.expander("What this sample shows, under these assumptions", expanded=True):
-    for b in _insights(*params):
-        st.markdown(f"- {b}")
+for b in _insights(*params):
+    st.markdown(f"- {b}")
 
-with st.expander("Weekly demand swing in this sample (observed)"):
+# Rule citations
+with st.expander("The flip rules, and what they are grounded in"):
     st.markdown(
-        "Weekly demand includes quiet weeks between the first and last sale. "
-        "The coefficient of variation is computed at product level when the "
-        "series is long enough (at least 12 weeks spanned and at least 8 "
-        "positive weeks); otherwise the category-level figure is used. "
-        + VOLATILITY_THRESHOLD_RATIONALE
+        "Each rule is written in plain English and cites a published filing "
+        "or a published paper. Volatility is a cost and a warning, not an "
+        "automatic override."
     )
-    st.dataframe(cv_distribution(listings)[["measure", "display"]].rename(
-        columns={"measure": "Measure", "display": "In this sample"}
-    ), hide_index=True, width="stretch")
+    for key in ("contribution", "gmroi", "midtail", "strategic", "volatility"):
+        info = RULE_CITATIONS[key]
+        st.markdown(f"**{info['title']}**")
+        st.markdown(info["basis"])
+        st.markdown(f"In this model: {info['in_this_model']}")
+        st.caption(info["cite"])
 
-with st.expander("Diagnostic: without the CV-scaled risk adjustment"):
-    st.markdown(
-        "This is **not** the recommendation. It turns off the extra markdown "
-        "and the safety-stock adjustment, leaving only the published "
-        "company-average margin, fulfilment ratio and inventory days. Use it "
-        "to see how much item-level demand risk is doing."
-    )
-    money = _no_risk(*params)
-    mview = money
-    if cat == "Shared categories only":
-        mview = mview[mview["category_shared"].astype(bool)]
-    elif cat != "All categories":
-        mview = mview[mview["category"] == cat]
-    mc = {r: int((mview["recommendation"] == r).sum()) for r in RECOMMENDATIONS}
+with st.expander("Diagnostic: without the mid-tail and long-tail rule"):
+    off = evaluate_all(replace(a, apply_midtail=False))
+    oc = counts(off)
     d1, d2, d3 = st.columns(3)
-    d1.metric(f"{BRING_IN_HOUSE} (no CV risk adjustment)", f"{mc[BRING_IN_HOUSE]:,}")
-    d2.metric(f"{TEST_3P_FIRST} (no CV risk adjustment)", f"{mc[TEST_3P_FIRST]:,}")
-    d3.metric(f"{KEEP_3P} (no CV risk adjustment)", f"{mc[KEEP_3P]:,}")
-
-with st.expander("What the filings and the data still cannot tell us (ranked by how many recommendations flip)"):
+    d1.metric(f"{BRING_IN_HOUSE} (no mid-tail rule)", f"{oc[BRING_IN_HOUSE]}")
+    d2.metric(f"{TEST_3P_FIRST} (no mid-tail rule)", f"{oc[TEST_3P_FIRST]}")
+    d3.metric(f"{KEEP_3P} (no mid-tail rule)", f"{oc[KEEP_3P]}")
     st.markdown(
-        "JD does not publish a 1P product-only gross margin or a per-category "
-        "seller commission card. Olist has no product-return field, and neither "
-        "filing gives a physical holding rate, a diversion rate, or a service-level "
-        "target for safety stock. The table ranks those gaps by how many "
-        "recommendations change when each input is moved on its own, at the "
-        "current assumptions (filters above do not apply here: this is the full sample)."
+        "At these published company-average margins, unit contribution almost "
+        "always beats the published 3P take (commissions on JD Worldwide are "
+        "3% to 7% plus 0.90%). What creates Keep and Test in the default "
+        "result is the demand-shape rule, which is how platforms actually "
+        "treat the head, the mid-tail and the long tail. This diagnostic is "
+        "here so that is visible, not hidden."
     )
-    st.caption(SAFETY_STOCK_RATIONALE)
-    gaps = _gaps(*params)
-    show = gaps[["rank", "scenario", "flipped", "flipped_share", "why_this_is_a_gap"]].copy()
-    show["flipped_share"] = (show["flipped_share"] * 100).round(1).astype(str) + "%"
-    show = show.rename(columns={
-        "scenario": "What we changed",
-        "flipped": "Recommendations flipped",
-        "flipped_share": "Share of the sample",
-        "why_this_is_a_gap": "Why this is a gap",
-    })
-    st.dataframe(show, hide_index=True, width="stretch")
 
-    hs = _hurdles(*params)
-    st.caption(
-        "Raising the hurdle, all else equal, versus the current setting. "
-        "With about 38 days of cover, a modest positive 1P contribution already "
-        "produces a high return on stock, so the 25% bar is rarely what decides. "
-        "A 100% or 150% bar would."
-    )
-    hs_show = hs[["hurdle", "Bring in-house", "Test as 3P first", "Keep 3P", "flipped_vs_current"]].copy()
-    hs_show["hurdle"] = (hs_show["hurdle"] * 100).round(0).astype(int).astype(str) + "%"
-    st.dataframe(hs_show, hide_index=True, width="stretch")
+# Category selector
+cat_labels = [f"{c.name_zh}  ({c.name_en})" for c in CATEGORIES]
+cat_choice = st.selectbox("First-level category", ["All five categories"] + cat_labels)
+if cat_choice == "All five categories":
+    view_mid = mid
+    view_all = res
+    current_cat = None
+else:
+    cid = CATEGORIES[cat_labels.index(cat_choice)].id
+    current_cat = category_by_id(cid)
+    view_mid = mid[mid["category_id"] == cid]
+    view_all = res[res["category_id"] == cid]
+    st.markdown(current_cat.blurb)
 
-st.subheader("Products")
+st.markdown("**Mid-price recommendation, by sub-category**")
 st.caption(
-    f"{LABEL_KEPT} is 1P contribution per unit. "
-    f"{LABEL_EXTRA} is that figure minus net 3P value. "
-    "Sellers are anonymised. Prices are in pounds. "
-    "A volatility warning means weekly demand swings by more than the bar; "
-    "it is not, by itself, a recommendation."
+    "One assumed mid-price SKU per sub-category. Low and high price bands "
+    "are in the table below. Prices are assumptions. Fees and cost ratios "
+    "are published."
 )
-cols = [
-    "title", "category", "price", "gmv_annual", "weekly_units",
-    "weekly_units_cv", "volatility_warning", "stock_cover_days",
-    "contrib_1p_unit", "advantage_1p_unit", "return_on_capital",
+
+show = view_mid[[
+    "sub_zh", "price_rmb", "take_rate", "gross_margin", "fulfilment_pct",
+    "contrib_1p_unit", "net_3p_unit", "extra_per_unit", "return_on_capital",
+    "velocity", "weekly_units_cv", "volatility_warning",
     "recommendation", "rule",
-]
-pretty = {
-    "title": "Product",
-    "category": "Category",
-    "price": "Selling price",
-    "gmv_annual": "Annual run-rate (observed)",
-    "weekly_units": "Weekly units (observed)",
-    "weekly_units_cv": "Weekly demand swing",
-    "volatility_warning": "Volatility warning",
-    "stock_cover_days": "Days of stock (including safety stock)",
+]].copy()
+show = show.rename(columns={
+    "sub_zh": "Sub-category",
+    "price_rmb": "Assumed mid price (RMB)",
+    "take_rate": "Published 3P take",
+    "gross_margin": "1P gross margin",
+    "fulfilment_pct": "1P fulfilment",
     "contrib_1p_unit": LABEL_KEPT,
-    "advantage_1p_unit": LABEL_EXTRA,
-    "return_on_capital": "Return on the stock you would hold",
+    "net_3p_unit": "3P take per unit",
+    "extra_per_unit": LABEL_EXTRA,
+    "return_on_capital": "Return on stock",
+    "velocity": "Assumed velocity",
+    "weekly_units_cv": "Assumed weekly CV",
+    "volatility_warning": "Volatility warning",
     "recommendation": "Recommendation",
-    "rule": "Which rule decided",
-}
-table = view[cols].rename(columns=pretty).copy()
+    "rule": "Rule",
+})
 st.dataframe(
-    table,
+    show.style.format({
+        "Assumed mid price (RMB)": "{:,.0f}",
+        "Published 3P take": "{:.2%}",
+        "1P gross margin": "{:.1%}",
+        "1P fulfilment": "{:.1%}",
+        LABEL_KEPT: "RMB {:,.2f}",
+        "3P take per unit": "RMB {:,.2f}",
+        LABEL_EXTRA: "RMB {:,.2f}",
+        "Return on stock": "{:.0%}",
+        "Assumed weekly CV": "{:.2f}",
+    }, na_rep="—"),
     hide_index=True,
     width="stretch",
-    column_config={
-        "Selling price": st.column_config.NumberColumn(format="£%.2f"),
-        "Annual run-rate (observed)": st.column_config.NumberColumn(format="£%.0f"),
-        "Weekly units (observed)": st.column_config.NumberColumn(format="%.2f"),
-        "Weekly demand swing": st.column_config.NumberColumn(format="%.0%"),
-        "Days of stock (including safety stock)": st.column_config.NumberColumn(format="%.0f"),
-        LABEL_KEPT: st.column_config.NumberColumn(format="£%.2f"),
-        LABEL_EXTRA: st.column_config.NumberColumn(format="£%.2f"),
-        "Return on the stock you would hold": st.column_config.NumberColumn(format="%.0%"),
-    },
 )
 
-# Category summary
-st.caption("Recommendations by category, in this view:")
-if n:
-    by_cat = (
-        view.groupby("category")
-        .agg(
-            Products=("sku", "count"),
-            **{BRING_IN_HOUSE: ("recommendation", lambda s: int((s == BRING_IN_HOUSE).sum()))},
-            **{TEST_3P_FIRST: ("recommendation", lambda s: int((s == TEST_3P_FIRST).sum()))},
-            **{KEEP_3P: ("recommendation", lambda s: int((s == KEEP_3P).sum()))},
-            **{"Median price": ("price", "median")},
-            **{"Median weekly swing": ("weekly_units_cv", "median")},
-        )
-        .sort_values("Products", ascending=False)
-        .reset_index()
-        .rename(columns={"category": "Category"})
+# Reasons, as a readable list
+st.markdown("**Why, in one sentence**")
+for _, row in view_mid.iterrows():
+    st.markdown(
+        f"- **{row['sub_zh']}** ({row['recommendation']}): {row['rule_text']}"
     )
+
+# Flip sensitivity at mid band
+st.markdown("**What would flip the mid-price recommendation**")
+st.caption(
+    "Each cell is the published-or-assumed value at which this mid-price "
+    "archetype first changes recommendation, holding everything else at "
+    "the current settings. A dash means it does not flip inside the range we tested."
+)
+flips = _mid_flips(*params)
+if current_cat is not None:
+    flips = flips[flips["category_zh"] == current_cat.name_zh]
+flip_show = flips[[
+    "category_zh", "sub_zh", "recommendation",
+    "gm_flip_at", "gm_flip_to",
+    "ful_flip_at", "ful_flip_to",
+    "cv_flip_at", "cv_flip_to",
+]].rename(columns={
+    "category_zh": "Category",
+    "sub_zh": "Sub-category",
+    "recommendation": "Current",
+    "gm_flip_at": "Flips if 1P GM goes to",
+    "gm_flip_to": "New recommendation (GM)",
+    "ful_flip_at": "Flips if fulfilment goes to",
+    "ful_flip_to": "New recommendation (fulfilment)",
+    "cv_flip_at": "Flips if assumed CV goes to",
+    "cv_flip_to": "New recommendation (CV)",
+})
+st.dataframe(
+    flip_show.style.format({
+        "Flips if 1P GM goes to": "{:.1%}",
+        "Flips if fulfilment goes to": "{:.1%}",
+        "Flips if assumed CV goes to": "{:.2f}",
+    }, na_rep="—"),
+    hide_index=True,
+    width="stretch",
+)
+
+# All price bands
+with st.expander("All three assumed price bands (low, mid, high)"):
+    all_show = view_all[[
+        "category_zh", "sub_zh", "band", "price_rmb", "weekly_units",
+        "velocity", "weekly_units_cv", "contrib_1p_unit", "net_3p_unit",
+        "extra_per_unit", "return_on_capital", "recommendation", "rule",
+        "volatility_warning",
+    ]].rename(columns={
+        "category_zh": "Category",
+        "sub_zh": "Sub-category",
+        "band": "Price band",
+        "price_rmb": "Assumed price (RMB)",
+        "weekly_units": "Assumed weekly units",
+        "velocity": "Assumed velocity",
+        "weekly_units_cv": "Assumed weekly CV",
+        "contrib_1p_unit": LABEL_KEPT,
+        "net_3p_unit": "3P take per unit",
+        "extra_per_unit": LABEL_EXTRA,
+        "return_on_capital": "Return on stock",
+        "recommendation": "Recommendation",
+        "rule": "Rule",
+        "volatility_warning": "Volatility warning",
+    })
     st.dataframe(
-        by_cat,
+        all_show.style.format({
+            "Assumed price (RMB)": "{:,.0f}",
+            "Assumed weekly units": "{:g}",
+            "Assumed weekly CV": "{:.2f}",
+            LABEL_KEPT: "RMB {:,.2f}",
+            "3P take per unit": "RMB {:,.2f}",
+            LABEL_EXTRA: "RMB {:,.2f}",
+            "Return on stock": "{:.0%}",
+        }, na_rep="—"),
         hide_index=True,
         width="stretch",
-        column_config={
-            "Median price": st.column_config.NumberColumn(format="£%.2f"),
-            "Median weekly swing": st.column_config.NumberColumn(format="%.0%"),
+    )
+
+# Worked example
+st.markdown("**A worked example**")
+# Default: mid 大家电, or first mid of current category
+example_pool = view_mid if len(view_mid) else mid
+options = [
+    f"{r['category_zh']} / {r['sub_zh']} / {r['band']} (RMB {r['price_rmb']:,.0f})"
+    for _, r in view_all.iterrows()
+]
+# Prefer mid 大家电 as default when viewing all
+default_ix = 0
+for i, (_, r) in enumerate(view_all.iterrows()):
+    if r["sub_id"] == "ha_major" and r["band"] == "mid":
+        default_ix = i
+        break
+    if r["band"] == "mid" and default_ix == 0:
+        default_ix = i
+chosen = st.selectbox("Pick an archetype", options, index=min(default_ix, len(options) - 1))
+chosen_row = view_all.iloc[options.index(chosen)]
+# Rebuild objects for workings
+cat_obj = category_by_id(chosen_row["category_id"])
+sub_obj = next(s for s in cat_obj.subs if s.id == chosen_row["sub_id"])
+band_obj = next(b for b in sub_obj.bands if b.name == chosen_row["band"])
+ev = evaluate_band(sub_obj, band_obj, cat_obj, a)
+with st.expander("How we got to this recommendation", expanded=True):
+    for heading, body in workings(sub_obj, band_obj, cat_obj, ev, a):
+        st.markdown(f"**{heading}**")
+        st.markdown(body)
+
+# Accept / override
+st.markdown("**Record a decision on this archetype**")
+note = st.text_input("Optional note", value="", key="decision_note")
+b1, b2 = st.columns(2)
+logged = st.empty()
+if b1.button("Accept this recommendation"):
+    save_decision(
+        {
+            "ts": now(),
+            "product_id": f"{chosen_row['sub_id']}:{chosen_row['band']}",
+            "title": chosen,
+            "recommendation": chosen_row["recommendation"],
+            "action": "accept",
+            "note": note,
+            "weekly_units_cv": chosen_row["weekly_units_cv"],
+            "contrib_1p_unit": chosen_row["contrib_1p_unit"],
+            "net_3p_unit": chosen_row["net_3p_unit"],
+            "return_on_capital": chosen_row["return_on_capital"],
+            "volatility_warning": chosen_row["volatility_warning"],
         },
+        DECISIONS, LOG_COLUMNS,
     )
-
-st.subheader("A worked example")
-if n:
-    prefer = view[view["recommendation"] == BRING_IN_HOUSE]
-    if prefer.empty:
-        prefer = view[view["recommendation"] == KEEP_3P]
-    if prefer.empty:
-        prefer = view
-    default_idx = int(prefer.index[0])
-    options = list(view.index)
-    labels = {
-        i: (
-            f"{view.loc[i, 'title']}  ·  {view.loc[i, 'recommendation']}  ·  "
-            f"{_fmt_gbp(view.loc[i, 'price'])}"
-            + ("  ·  volatility warning" if view.loc[i, "volatility_warning"] else "")
-        )
-        for i in options
-    }
-    chosen = st.selectbox(
-        "Pick a product to see the arithmetic",
-        options,
-        index=options.index(default_idx) if default_idx in options else 0,
-        format_func=lambda i: labels[i],
+    logged.caption("Saved: accepted. This is a local log on this computer, not a live buying decision.")
+if b2.button("Override this recommendation"):
+    save_decision(
+        {
+            "ts": now(),
+            "product_id": f"{chosen_row['sub_id']}:{chosen_row['band']}",
+            "title": chosen,
+            "recommendation": chosen_row["recommendation"],
+            "action": "override",
+            "note": note,
+            "weekly_units_cv": chosen_row["weekly_units_cv"],
+            "contrib_1p_unit": chosen_row["contrib_1p_unit"],
+            "net_3p_unit": chosen_row["net_3p_unit"],
+            "return_on_capital": chosen_row["return_on_capital"],
+            "volatility_warning": chosen_row["volatility_warning"],
+        },
+        DECISIONS, LOG_COLUMNS,
     )
-    row = view.loc[chosen]
-    with st.expander("How we got to this recommendation", expanded=True):
-        steps = own_vs_list_workings(row.to_dict(), a)
-        for s in steps:
-            st.markdown(f"**{s['step']}** — {s['how']}")
-            st.caption(f"Result: {s['result']}")
-        st.caption(
-            "Every input is Published, Observed, Assumption, or a Model estimate. "
-            "See Data and method for sources."
-        )
+    logged.caption("Saved: overridden. This is a local log on this computer, not a live buying decision.")
 
-    st.markdown("**Your call on this product**")
-    note = st.text_input("A short note (optional)", key=f"note_{chosen}")
-    b1, b2 = st.columns(2)
-    rec_payload = {
-        "ts": now(),
-        "product_id": row["sku"],
-        "title": row["title"],
-        "recommendation": row["recommendation"],
-        "note": note,
-        "weekly_units_cv": row["weekly_units_cv"],
-        "contrib_1p_unit": row["contrib_1p_unit"],
-        "net_3p_unit": row["net_3p_unit"],
-        "return_on_capital": row["return_on_capital"],
-        "volatility_warning": bool(row["volatility_warning"]),
-    }
-    with b1:
-        if st.button("Accept this recommendation", key=f"acc_{chosen}"):
-            save_decision({**rec_payload, "action": "accept"}, DECISIONS, LOG_COLUMNS)
-            st.success("Saved your accept on this product.")
-    with b2:
-        if st.button("Override: I would choose differently", key=f"ov_{chosen}"):
-            save_decision({**rec_payload, "action": "override"}, DECISIONS, LOG_COLUMNS)
-            st.success("Saved your override on this product.")
-else:
-    st.info("No products in this view. Change the filters.")
-
-st.caption(
-    "Independent portfolio project using an openly licensed marketplace dataset "
-    "and published company filings. "
-    "This is a method demo, not a forecast and not a description of any live marketplace. "
-    "Made by Ami Sata."
+# Ranked gaps
+st.subheader("What the filings and the archetypes still cannot tell us")
+st.markdown(
+    "JD does not publish a 1P product-only gross margin or a domestic "
+    "per-category commission card. The Worldwide card may differ from a "
+    "domestic POP card. Prices, weekly units and demand swing here are "
+    "assumptions, not observed sales. Zalando and Best Buy figures are "
+    "from different geographies and companies. The catalogue of a live "
+    "JD 1P warehouse is not in this model, and was not collected."
+)
+st.markdown("**Ranked by how many of the 60 price-band recommendations flip**")
+gap_show = gaps[[
+    "rank", "scenario", "flipped", "flipped_share",
+    BRING_IN_HOUSE, TEST_3P_FIRST, KEEP_3P, "why_this_is_a_gap",
+]].rename(columns={
+    "rank": "Rank",
+    "scenario": "What we changed",
+    "flipped": "Flipped",
+    "flipped_share": "Share",
+    "why_this_is_a_gap": "Why this is a gap",
+})
+st.dataframe(
+    gap_show.style.format({"Share": "{:.1%}"}),
+    hide_index=True,
+    width="stretch",
 )

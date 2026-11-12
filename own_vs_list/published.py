@@ -401,6 +401,279 @@ BBY_GROSS_MARGIN_FY2026 = PublishedFigure(
 )
 
 
+
+# ---------------------------------------------------------------------------
+# JD Worldwide Open Platform published fee schedule
+# ---------------------------------------------------------------------------
+# This is a public platform rule page, not a product listing. We use it as
+# the 3P commission and transaction-fee card. It is the JD Worldwide
+# (cross-border) schedule; a domestic JD.com POP card may differ and was
+# not independently available as a public page without a merchant login.
+# That geographic scope is disclosed in the app and the README.
+
+JDW_FEE_RULE_ID = "950583665543483392"
+JDW_FEE_URL = (
+    "https://jdw-rule.jd.hk/detail?ruleId=950583665543483392"
+)
+JDW_FEE_LABEL = (
+    "Published (JD Worldwide Open Platform category fee standard, "
+    "rule 950583665543483392)"
+)
+JDW_FEE_DOCUMENT = (
+    "JD Worldwide Open Platform category fee standard "
+    "(京东全球购开放平台各类目资费标准), public rule page"
+)
+JDW_TRANSACTION_FEE = 0.009  # 0.90%, uniform for POP merchants from 1 April 2023
+JDW_TRANSACTION_FEE_NOTE = (
+    "Article 6 of the same rule page: from 1 April 2023, POP merchants on "
+    "JD Worldwide Open Platform are charged a uniform 0.90% transaction "
+    "service fee on the purchase price of each order. From 13 September 2024, "
+    "the fee is refunded when a cancellation or after-sales refund is caused "
+    "by the customer."
+)
+
+# ---------------------------------------------------------------------------
+# JD Logistics (HKEX: 2618) Annual Report 2025
+# ---------------------------------------------------------------------------
+JDL_AR_2025_URL = (
+    "https://www.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042401322.pdf"
+)
+JDL_AR_2025_LABEL = "Published (JD Logistics Annual Report 2025, HKEX 2618)"
+JDL_RESULTS_2025_URL = (
+    "https://www.hkexnews.hk/listedco/listconews/sehk/2026/0305/2026030500918.pdf"
+)
+
+JDL_REVENUE_2025 = PublishedFigure(
+    name="JD Logistics total revenue, FY2025",
+    value=217_146.986,
+    display="RMB 217.147 billion",
+    unit="RMB million",
+    year="FY2025",
+    document="JD Logistics, Inc. Annual Report 2025 (HKEX: 2618)",
+    location="MD&A, page 16, year-ended 31 December 2025 comparison table; also Annual Results Announcement 5 March 2026",
+    url=JDL_AR_2025_URL,
+    label=JDL_AR_2025_LABEL,
+    note=(
+        "Up 18.8% from RMB 182.838 billion in 2024. This is the logistics "
+        "subsidiary's own revenue, not a per-unit 1P fulfilment rate. "
+        "JD.com's published fulfilment-to-revenue ratio of 6.7% (20-F FY2025) "
+        "remains the 1P product fulfilment default."
+    ),
+)
+
+JDL_GROSS_PROFIT_2025 = PublishedFigure(
+    name="JD Logistics gross profit and gross margin, FY2025",
+    value=0.091,
+    display="RMB 19.768 billion, implied gross margin 9.1%",
+    unit="share",
+    year="FY2025",
+    document="JD Logistics, Inc. Annual Report 2025 (HKEX: 2618)",
+    location="MD&A, page 16: gross profit RMB 19,767.969 million on revenue RMB 217,146.986 million (19,767,969 / 217,146,986 = 9.1%)",
+    url=JDL_AR_2025_URL,
+    label=JDL_AR_2025_LABEL,
+    note=(
+        "This is JD Logistics' margin on logistics services, not a 1P "
+        "merchandise margin and not a per-parcel fulfilment cost. Cost of "
+        "revenue was RMB 197.379 billion. The 2025 annual report does not "
+        "publish a per-parcel or per-category fulfilment cost."
+    ),
+)
+
+JDL_ISC_REVENUE_2025 = PublishedFigure(
+    name="JD Logistics integrated supply-chain customer revenue, FY2025",
+    value=0.535,
+    display="RMB 116.223 billion (53.5% of JD Logistics revenue)",
+    unit="share",
+    year="FY2025",
+    document="JD Logistics, Inc. Annual Report 2025 (HKEX: 2618)",
+    location="MD&A, pages 16–17, revenue by integrated supply-chain customers vs other customers",
+    url=JDL_AR_2025_URL,
+    label=JDL_AR_2025_LABEL,
+    note=(
+        "Customers who used warehouse or inventory-management related services. "
+        "Other customers (express and freight) were RMB 100.924 billion, 46.5%."
+    ),
+)
+
+JDL_WAREHOUSES_2025 = PublishedFigure(
+    name="JD Logistics warehouse network, 31 December 2025",
+    value=1600,
+    display="Over 1,600 self-operated warehouses, more than 34 million sqm GFA",
+    unit="count",
+    year="31 Dec 2025",
+    document="JD Logistics, Inc. Annual Report 2025 (HKEX: 2618)",
+    location="CEO’s Statement, page 5; MD&A, page 12 (also: over 2,000 cloud warehouses under the Open Warehouse Platform; coverage of nearly all counties and districts in China)",
+    url=JDL_AR_2025_URL,
+    label=JDL_AR_2025_LABEL,
+    note="Scale of the logistics network. Not a per-unit cost.",
+)
+
+# ---------------------------------------------------------------------------
+# Zalando SE Annual Report 2025 (fashion e-commerce 1P benchmark)
+# ---------------------------------------------------------------------------
+ZALANDO_AR_2025_URL = (
+    "https://corporate.zalando.com/sites/default/files/media-download/"
+    "zalando-se_full-year_annual-report-2025_eng_261003_s.pdf"
+)
+ZALANDO_AR_2025_LABEL = "Published (Zalando SE Annual Report 2025)"
+ZALANDO_RETURNS_URL = "https://corporate.zalando.com/en/about-us/what-we-do/returns-zalando"
+ZALANDO_RETURNS_LABEL = "Published (Zalando Corporate, Returns at Zalando)"
+
+ZALANDO_GROSS_MARGIN_2025 = PublishedFigure(
+    name="Zalando group gross margin, FY2025",
+    value=0.399,
+    display="39.9% (40.7% in 2024); cost of sales 60.1% of revenue",
+    unit="share",
+    year="FY2025",
+    document="Zalando SE Annual Report 2025",
+    location="Combined Management Report, page 82: 'gross margin reached 39.9% in 2025 (prior year: 40.7%)'; cost of sales EUR 7,422.4 million, 60.1% of revenue (prior year 59.3%). Consolidated income statement: gross profit EUR 4,923.8 million.",
+    url=ZALANDO_AR_2025_URL,
+    label=ZALANDO_AR_2025_LABEL,
+    note=(
+        "A European fashion e-commerce retailer (own retail plus partner business). "
+        "B2C gross margin was 42.3% (43.5% in 2024); B2B was 15.0%. "
+        "Used as the default 1P merchandise gross margin for apparel and "
+        "baby-clothing archetypes. It is not a JD figure, and it is already "
+        "after routine returns and markdowns. Geography is disclosed."
+    ),
+)
+
+ZALANDO_FULFILMENT_PCT_2025 = PublishedFigure(
+    name="Zalando fulfilment cost ratio, FY2025",
+    value=0.230,
+    display="23.0% of revenue (22.9% in 2024)",
+    unit="share",
+    year="FY2025",
+    document="Zalando SE Annual Report 2025",
+    location="Combined Management Report, page 82: 'The fulfilment cost ratio as a percentage of revenue remained broadly stable at 23.0% in 2025, from 22.9% in 2024'",
+    url=ZALANDO_AR_2025_URL,
+    label=ZALANDO_AR_2025_LABEL,
+    note=(
+        "A published fashion-specialist fulfilment ratio, in a business whose "
+        "item return rate is about 50% (see the Zalando returns page). It likely "
+        "already includes return handling, so the model does not add a second "
+        "full return-fulfilment layer on top. It is a European cost level, not "
+        "JD's China network, and is used only for apparel-like 1P archetypes so "
+        "that fashion fulfilment is not understated. JD's 6.7% is a sensitivity."
+    ),
+)
+
+ZALANDO_RETURN_RATE = PublishedFigure(
+    name="Zalando average item return rate",
+    value=0.50,
+    display="An average of 50% of items ordered are returned, across all markets",
+    unit="share",
+    year="stated as 'in recent years', page accessed 12 November 2026",
+    document="Zalando Corporate, 'Returns at Zalando'",
+    location="Official corporate page: 'across all our markets, an average of 50 percent of the items ordered are returned.' The annual report states that estimated returns reduce revenue (sales-channel and country-specific return rates).",
+    url=ZALANDO_RETURNS_URL,
+    label=ZALANDO_RETURNS_LABEL,
+    note=(
+        "An item-count rate, not a revenue rate. Published gross margin is already "
+        "net of returns. The 50% figure is used only as context for why fashion "
+        "fulfilment is expensive, not as an extra subtraction from gross margin."
+    ),
+)
+
+# ---------------------------------------------------------------------------
+# Academic papers used to ground flip rules (findings, not numbers)
+# ---------------------------------------------------------------------------
+JIANG_MIDTAIL_CITE = (
+    "Jiang, B., Jerath, K., and Srinivasan, K. (2011). Firm Strategies in the "
+    "“Mid Tail” of Platform-Based Retailing. Marketing Science 30(5), 757–775. "
+    "https://doi.org/10.1287/mksc.1110.0656"
+)
+JIANG_MIDTAIL_URL = "https://doi.org/10.1287/mksc.1110.0656"
+JIANG_MIDTAIL_FINDING = (
+    "The paper records that Amazon tends to stock and sell high-demand products "
+    "itself and leave long-tail products to independent sellers who pay a fee. "
+    "For mid-tail products, where demand is uncertain in advance, the platform "
+    "may learn from early third-party sales which items are worth selling "
+    "directly. That is the basis for the model's 'test as 3P first on the "
+    "unproven tail' rule: it is a learning step, not an automatic rejection of 1P."
+)
+
+ABHISHEK_AGENCY_CITE = (
+    "Abhishek, V., Jerath, K., and Zhang, Z. J. (2016). Agency Selling or "
+    "Reselling? Channel Structures in Electronic Retailing. Management Science "
+    "62(8), 2259–2280. https://doi.org/10.1287/mnsc.2015.2230"
+)
+ABHISHEK_AGENCY_URL = "https://doi.org/10.1287/mnsc.2015.2230"
+ABHISHEK_AGENCY_FINDING = (
+    "The paper compares agency selling (the supplier sells on the platform and "
+    "pays a commission; the platform does not take inventory) with reselling "
+    "(the platform buys and resells, sets the price, and earns a merchandise "
+    "margin). Agency is more channel-efficient and tends to lower retail prices, "
+    "but hands pricing control to the supplier. The platform's choice depends on "
+    "which format yields more, given costs, control, and cross-channel effects. "
+    "That is the basis for comparing 1P contribution with the 3P commission take."
+)
+
+HAGIU_WRIGHT_CITE = (
+    "Hagiu, A., and Wright, J. (2015). Marketplace or Reseller? Management "
+    "Science 61(1), 184–203. https://doi.org/10.1287/mnsc.2014.2042"
+)
+HAGIU_WRIGHT_URL = "https://doi.org/10.1287/mnsc.2014.2042"
+HAGIU_WRIGHT_FINDING = (
+    "The paper treats the 1P vs 3P choice as a question of who should hold "
+    "control rights over non-contractible decisions (marketing, pricing, "
+    "fulfilment, service): the intermediary (reseller / 1P) or the supplier "
+    "(marketplace / 3P). Reseller mode is preferred when the intermediary has "
+    "the more important information, or when activities spill over across "
+    "products. Marketplace mode is preferred when independent suppliers have "
+    "better product-specific information (for example, style and fit in fashion). "
+    "That is the basis for a documented strategic tilt in close cases: "
+    "electronics and appliances, where JD's fulfilment and authenticity are "
+    "named strengths, lean 1P; fashion, where suppliers often know the SKU "
+    "better, leans 3P."
+)
+
+# JD 20-F strategy excerpts used as flip-rule citations (page-referenced).
+JD_STRATEGY_1P_CATEGORIES = (
+    "Published (JD 20-F FY2025), Item 4.B, page 87: 'In our online retail "
+    "business, we purchase products from suppliers and sell them directly to "
+    "our customers. We offer a wide range of product categories through our "
+    "online retail business, including electronics products, home appliances "
+    "and a large variety of other general merchandise categories.' "
+    "Item 5, revenue discussion: net revenues from electronics and home "
+    "appliances include computer, communication and consumer electronics "
+    "products as well as home appliances (RMB 605.1 billion, 46.2% of total)."
+)
+JD_STRATEGY_3P_EXPANSION = (
+    "Published (JD 20-F FY2025), Item 5, page 134: 'We intend to further "
+    "(i) expand our selection of general merchandise products, such as "
+    "supermarket, fashion, pharmaceutical and healthcare products, which are "
+    "well received by customers and expected to have a potential for greater "
+    "online penetration; (ii) attract more third-party merchants to our online "
+    "marketplace; and (iii) provide more fulfillment and other value-added "
+    "services to third-party merchants and others.'"
+)
+JD_STRATEGY_AUTHENTICITY = (
+    "Published (JD 20-F FY2025), Item 3.D, risk factors, and Item 4.B, page 87: "
+    "JD's customer-experience claim is 'authentic products at competitive prices' "
+    "with its own nationwide fulfilment. Item 3.D, page 29: the marketplace is "
+    "subject to risks associated with third-party merchants, including quality, "
+    "delivery, and 'counterfeit or unlicensed products'; some marketplace "
+    "products 'may compete with the products we sell directly, which may "
+    "cannibalize our online retail.'"
+)
+JD_STRATEGY_CATEGORY_LIST = (
+    "Published (JD 20-F FY2025), Item 4.B, pages 92–93, lists JD's product "
+    "categories, including home appliances; mobile handsets and other digital "
+    "products; computers (desktop, laptop, printers and other office equipment); "
+    "apparel; cosmetics and other personal care items; maternal and childcare "
+    "products; and food, beverage and fresh produce. 'Each of these categories "
+    "is further divided into numerous subcategories.'"
+)
+JD_MARKETPLACE_COMMISSIONS = (
+    "Published (JD 20-F FY2025), Item 4.B: 'In our online marketplace business, "
+    "third-party merchants offer products to customers on our online marketplace "
+    "and pay us sales commissions.' The 20-F does not publish a per-category "
+    "commission rate; the rate card used in the model is the published JD "
+    "Worldwide Open Platform category fee standard."
+)
+
+
 # Defaults derived from the figures above, used by the decision engine.
 DEFAULT_GROSS_MARGIN = BBY_GROSS_MARGIN_FY2026.value          # 0.225
 DEFAULT_COGS_PCT = 1.0 - DEFAULT_GROSS_MARGIN                 # 0.775
@@ -430,18 +703,18 @@ MARKDOWN_CV_COEFF = 0.04
 
 # Warning threshold: CV > 1 means the week-to-week standard deviation exceeds
 # the average weekly sale. A conventional bar for highly variable demand.
-# In this Olist sample, about 41% of products sit above it. It is a warning,
-# not an automatic recommendation, and the app also shows 0.75 and 1.5.
+# It is a warning, not an automatic recommendation. Category CVs in this
+# version are stated assumptions, not observed series.
 VOLATILITY_WARNING_THRESHOLD = 1.0
 VOLATILITY_THRESHOLD_RATIONALE = (
     "A weekly coefficient of variation above 1 means the standard deviation of "
     "weekly units is larger than the average itself: demand is, in that sense, "
     "highly variable. This is a conventional statistical bar, not a figure from "
     "a filing. The model uses it as a warning only. Extra safety stock and an "
-    "extra markdown already scale with each product's CV, so volatile items are "
-    "treated more cautiously in the money tests whether or not they cross the bar. "
-    "The app also reports decisions if the bar is 0.75 or 1.5, and if volatility "
-    "were still used as an automatic override (it is not, by default)."
+    "extra markdown already scale with each archetype's assumed CV, so more "
+    "variable lines are treated more cautiously in the money tests whether or "
+    "not they cross the bar. In this version, weekly CVs are assumptions, "
+    "not observed sales. The app also reports decisions if the bar is 0.75 or 1.5."
 )
 
 
@@ -468,4 +741,11 @@ def sources_table() -> list[PublishedFigure]:
         AMZN_COST_OF_SALES_PCT_2025,
         AMZN_INVENTORIES_2025,
         BBY_GROSS_MARGIN_FY2026,
+        JDL_REVENUE_2025,
+        JDL_GROSS_PROFIT_2025,
+        JDL_ISC_REVENUE_2025,
+        JDL_WAREHOUSES_2025,
+        ZALANDO_GROSS_MARGIN_2025,
+        ZALANDO_FULFILMENT_PCT_2025,
+        ZALANDO_RETURN_RATE,
     ]

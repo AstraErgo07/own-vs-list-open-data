@@ -1,588 +1,628 @@
-"""own_vs_list/calc.py - Own stock vs marketplace listing. Pure functions, no AI.
+"""1P vs 3P decision engine for JD category archetypes.
 
-A decision-support engine. For each product it compares two scenarios on the
-same observed marketplace item:
-
-- 1P: if the platform stocked it, using published retailer benchmarks for
-  cost of goods, fulfilment as a share of price, and stock cover, plus a
-  risk adjustment that scales with weekly demand swing.
-- 3P: if it stays with the seller, using published Amazon UK referral fees.
-
-Volatility is a warning and a cost adjustment, not an automatic override.
-
-Every input is labelled Published, Observed, Assumption or Model estimate.
-Contribution is used throughout, not profit.
+Prices and weekly demand are assumptions. Cost ratios and 3P fees are
+published. Recommendations are model estimates, for decision support,
+not a forecast and not a verdict on any live SKU.
 """
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, dataclass, replace
+from dataclasses import asdict, dataclass, field, replace
 
-import numpy as np
 import pandas as pd
 
-from .fees import (
-    AMAZON_FEE_LABEL,
-    SENSITIVITY_REFERRAL_LOW,
-    SENSITIVITY_REFERRAL_MID,
-    amazon_category_for,
-    referral_fee,
+from .archetypes import (
+    CATEGORIES,
+    STRATEGIC_1P,
+    STRATEGIC_3P,
+    STRATEGIC_AUTH,
+    STRATEGIC_MIXED,
+    Band,
+    Category,
+    SubCategory,
+    all_bands,
+    all_subcategories,
 )
 from .published import (
-    BBY_GROSS_MARGIN_FY2026,
-    DEFAULT_COGS_PCT,
-    DEFAULT_GROSS_MARGIN,
-    DEFAULT_JD_FULFILMENT_PCT,
+    ABHISHEK_AGENCY_FINDING,
     DEFAULT_STOCK_COVER_DAYS,
-    JD_FULFILMENT_PCT_2025,
-    JD_GROSS_MARGIN_2025,
-    JD_INVENTORY_DAYS_2024,
-    JD_INVENTORY_DAYS_2025,
+    HAGIU_WRIGHT_FINDING,
+    JIANG_MIDTAIL_FINDING,
     MARKDOWN_CV_COEFF,
     SAFETY_STOCK_LEAD_WEEKS,
     SAFETY_STOCK_RATIONALE,
     SAFETY_STOCK_Z,
-    SENSITIVITY_JD_GROSS_MARGIN,
     VOLATILITY_THRESHOLD_RATIONALE,
     VOLATILITY_WARNING_THRESHOLD,
 )
 
-BRING_IN_HOUSE = "Bring in-house"
-KEEP_3P = "Keep 3P"
-TEST_3P_FIRST = "Test as 3P first"
-RECOMMENDATIONS = [BRING_IN_HOUSE, TEST_3P_FIRST, KEEP_3P]
-EPSILON = 0.01
 
+BRING_IN_HOUSE = "Bring in-house"
+TEST_3P_FIRST = "Test as 3P first"
+KEEP_3P = "Keep 3P"
+RECOMMENDATIONS = (BRING_IN_HOUSE, TEST_3P_FIRST, KEEP_3P)
+
+# Plain labels (style preference from earlier versions).
 LABEL_KEPT = "Kept per unit if we stock it"
 LABEL_EXTRA = "Extra per unit from stocking it"
 
-COGS_LABEL_DEFAULT = (
-    f"Assumption, aligned with {BBY_GROSS_MARGIN_FY2026.label}: "
-    f"1P gross margin {DEFAULT_GROSS_MARGIN:.1%}, so cost of goods "
-    f"{DEFAULT_COGS_PCT:.1%} of selling price. "
-    f"JD's published {JD_GROSS_MARGIN_2025.value:.1%} consolidated gross margin "
-    "is blended (it includes higher-margin services) and is used as a sensitivity, "
-    "not as the product-level default."
-)
-FULFILMENT_LABEL_JD = (
-    f"{JD_FULFILMENT_PCT_2025.label}: {DEFAULT_JD_FULFILMENT_PCT:.1%} of selling price. "
-    "Company-level fulfilment as a share of total net revenues, used as the 1P "
-    "per-unit fulfilment benchmark."
-)
-COVER_LABEL_JD = (
-    f"{JD_INVENTORY_DAYS_2025.label}: {DEFAULT_STOCK_COVER_DAYS} days of 1P retail "
-    "inventory, before the safety-stock adjustment."
-)
+# Velocity bars used by the mid-tail rule. These are assumptions.
+# "high" clears the mid-tail learning step; "low" does not; "mid" depends
+# on whether assumed CV is above the warning bar.
+VELOCITY_HIGH = "high"
+VELOCITY_MID = "mid"
+VELOCITY_LOW = "low"
 
 
 @dataclass
 class Assumptions:
-    """Editable assumptions. Defaults are documented in the README and published.py."""
+    """Editable assumptions. Published defaults live on each sub-category."""
 
-    # Physical holding only (Assumption). Cost of capital is tested by the hurdle.
-    holding_rate: float = 0.08
-    vat_rate: float = 0.0
-    hurdle_rate: float = 0.25
-    marketplace_cost_per_unit: float = 0.50
-    diversion_rate: float = 0.25
-    volatility_cv_threshold: float = VOLATILITY_WARNING_THRESHOLD
-    # If True, CV above the threshold forces Test as 3P first. Default is False:
-    # volatility is a warning plus a cost adjustment, not an override.
-    volatility_overrides_decision: bool = False
-    near_threshold_band: float = 0.10
-    gmv_flag_quantile: float = 0.75
-
-    cogs_pct: float = DEFAULT_COGS_PCT
-    # Base markdown is 0 because published gross margins are already after
-    # routine markdowns and (typically) after returns. The CV-scaled extra
-    # markdown below is the item-level risk layer.
-    markdown_rate: float = 0.0
-    markdown_cv_coeff: float = MARKDOWN_CV_COEFF
-    return_rate: float = 0.0          # extra returns on top of published GM
-    use_observed_returns: bool = False
-
-    stock_cover_days: float = DEFAULT_STOCK_COVER_DAYS
+    holding_rate: float = 0.08            # Assumption: physical holding only
+    hurdle_rate: float = 0.25             # Assumption: return on stock
+    near_threshold_band: float = 0.10     # Assumption: 10% closeness
+    markdown_cv_coeff: float = MARKDOWN_CV_COEFF  # Assumption
+    markdown_rate: float = 0.0            # base extra markdown; 0 so as not to double-count published GM
+    apply_safety_stock: bool = True
     safety_stock_z: float = SAFETY_STOCK_Z
     safety_stock_lead_weeks: float = SAFETY_STOCK_LEAD_WEEKS
-    apply_safety_stock: bool = True
+    volatility_cv_threshold: float = VOLATILITY_WARNING_THRESHOLD
+    volatility_overrides_decision: bool = False  # default off: warning only
+    apply_midtail: bool = True            # Jiang et al. learning rule
+    apply_strategic_tilt: bool = True     # only inside the near-threshold band
+    # Optional global overrides (None = use each sub-category's published default).
+    gm_override: float | None = None
+    fulfilment_override: float | None = None
+    cover_override: float | None = None
+    # Fulfilment alternative: use JD 6.7% for every category, including apparel.
+    use_jd_fulfilment_everywhere: bool = False
+    jd_fulfilment_pct: float = 0.067
 
-    # 1P fulfilment: default is JD's published 6.7% of selling price.
-    # If use_published_fulfilment is True, each row's Amazon UK FBA fee is used
-    # instead (a UK per-parcel alternative).
-    use_published_fulfilment: bool = False
-    jd_fulfilment_pct: float = DEFAULT_JD_FULFILMENT_PCT
-    fulfilment_cost: float = 3.06     # fallback £ only if a row has no FBA figure
-
-    use_amazon_referral: bool = True
-    commission_override: float = SENSITIVITY_REFERRAL_MID
-    price_markup: float = 1.0
-
-    def with_diversion(self, rate):
-        return replace(self, diversion_rate=rate)
-
-    def with_cogs(self, pct):
-        return replace(self, cogs_pct=pct)
-
-    def with_gross_margin(self, gm):
-        return replace(self, cogs_pct=1.0 - gm)
-
-    def with_hurdle(self, rate):
-        return replace(self, hurdle_rate=rate)
-
-    def with_fulfilment(self, cost):
-        return replace(self, fulfilment_cost=cost, use_published_fulfilment=True,
-                       jd_fulfilment_pct=0.0)
-
-    def with_jd_fulfilment(self, pct=DEFAULT_JD_FULFILMENT_PCT):
-        return replace(self, jd_fulfilment_pct=pct, use_published_fulfilment=False)
-
-    def with_fba_fulfilment(self):
-        return replace(self, use_published_fulfilment=True)
-
-    def with_flat_commission(self, rate):
-        return replace(self, use_amazon_referral=False, commission_override=rate)
-
-    def to_json(self):
+    def to_json(self) -> str:
         return json.dumps(asdict(self), sort_keys=True, default=str)
 
 
-def holding_cost(cogs, stock_cover_days, holding_rate):
-    """Physical holding cost per unit: cogs x physical holding rate x days / 365.
+def holding_cost(cogs: float, stock_cover_days: float, holding_rate: float) -> float:
+    """Physical holding cost per unit: cogs × rate × days / 365.
 
-    holding_rate is storage, insurance and shrink only. Cost of capital is not
-    subtracted from contribution; it is tested only by comparing return on stock
-    with the hurdle.
+    Cost of capital is not subtracted here; it is tested by return on stock.
     """
     return cogs * holding_rate * stock_cover_days / 365.0
 
 
-def safety_stock_days(cv, z=SAFETY_STOCK_Z, lead_weeks=SAFETY_STOCK_LEAD_WEEKS):
+def safety_stock_days(cv: float, z: float = SAFETY_STOCK_Z, lead_weeks: float = SAFETY_STOCK_LEAD_WEEKS) -> float:
     """Extra days of cover: z × CV × sqrt(lead time in weeks) × 7."""
     cv = max(float(cv), 0.0)
     return float(z) * cv * (float(lead_weeks) ** 0.5) * 7.0
 
 
-def effective_cover_days(cv, a: Assumptions) -> float:
-    base = float(a.stock_cover_days)
+def effective_cover_days(cv: float, base_days: float, a: Assumptions) -> float:
     if not a.apply_safety_stock:
-        return base
-    return base + safety_stock_days(cv, a.safety_stock_z, a.safety_stock_lead_weeks)
+        return float(base_days)
+    return float(base_days) + safety_stock_days(cv, a.safety_stock_z, a.safety_stock_lead_weeks)
 
 
-def extra_markdown_rate(cv, a: Assumptions) -> float:
-    """Item-level extra markdown, scaled by weekly CV, on top of the published GM."""
+def extra_markdown_rate(cv: float, a: Assumptions) -> float:
     return float(a.markdown_rate) + float(a.markdown_cv_coeff) * max(float(cv), 0.0)
 
 
-def contribution_1p(price, cogs, fulfilment_cost, return_rate, markdown_rate, holding):
-    """= price - cogs - fulfilment - price x return_rate - price x markdown_rate - holding.
+def contribution_1p(price, cogs, fulfilment_cost, markdown_rate, holding) -> float:
+    """Kept per unit if we stock it.
 
-    `price` is the revenue per unit after any VAT strip. When return_rate and
-    the base markdown_rate are zero, published gross margin is being used as
-    already net of company-average returns and routine markdowns; only a
-    CV-scaled extra markdown (passed in as markdown_rate) is subtracted.
+    Published GM is already after routine returns and markdowns, so those
+    are not subtracted again. Only the CV-scaled extra markdown and
+    physical holding are taken off on top.
     """
-    return price - cogs - fulfilment_cost - price * return_rate - price * markdown_rate - holding
+    return price - cogs - fulfilment_cost - price * markdown_rate - holding
 
 
-def contribution_3p(price, commission_rate, marketplace_cost_per_unit):
-    """= price x commission_rate - marketplace cost per unit."""
-    return price * commission_rate - marketplace_cost_per_unit
+def contribution_3p(price, take_rate) -> float:
+    """Platform take per unit from a 3P sale: published commission + transaction fee."""
+    return price * take_rate
 
 
-def average_inventory_value(cogs, weekly_units, stock_cover_days):
-    """= cogs x weekly_units x stock_cover_days / 7."""
-    return cogs * weekly_units * (stock_cover_days / 7.0)
+def return_on_capital(c1p, cogs, weekly_units, cover_days) -> float:
+    """Annual 1P contribution / average inventory value.
 
-
-def return_on_capital(c1p, cogs, weekly_units, stock_cover_days):
-    """Annual 1P contribution (52 weeks) / average inventory value.
-
-    Weekly units cancel, so the figure depends on unit contribution, cost of
-    goods and stock cover, not on volume.
+    Weekly units cancel: (c1p × 52) / (cogs × cover_days / 7).
+    If contribution is not positive, return on stock is zero.
     """
-    inv = average_inventory_value(cogs, weekly_units, stock_cover_days)
-    return (c1p * weekly_units * 52) / inv if inv > 0 else 0.0
+    if c1p <= 0 or cogs <= 0 or cover_days <= 0:
+        return 0.0
+    avg_inv = cogs * (cover_days / 7.0)  # per weekly unit; units cancel
+    return (c1p * 52.0) / avg_inv
 
 
-def net_3p_benefit(c3p, diversion_rate, lost_1p_contribution):
-    """= 3P contribution - diversion_rate x lost 1P contribution (floored at 0)."""
-    return c3p - diversion_rate * max(lost_1p_contribution, 0.0)
+def _gm(sub: SubCategory, a: Assumptions) -> float:
+    return a.gm_override if a.gm_override is not None else sub.gm
 
 
-def decide(c1p, net3p, roc, cv, a: Assumptions):
-    """Money tests first. Volatility is a warning, unless the override is turned on.
+def _ful(sub: SubCategory, a: Assumptions) -> float:
+    if a.fulfilment_override is not None:
+        return a.fulfilment_override
+    if a.use_jd_fulfilment_everywhere:
+        return a.jd_fulfilment_pct
+    return sub.fulfilment_pct
 
-    Near a threshold, test first. Bring in-house only if 1P contribution beats
-    net 3P AND return on stock beats the hurdle; otherwise Keep 3P.
+
+def _cover_base(sub: SubCategory, a: Assumptions) -> float:
+    return a.cover_override if a.cover_override is not None else sub.stock_cover_days
+
+
+def is_unproven(band: Band, a: Assumptions) -> bool:
+    """Mid-tail test: assumed low velocity, or mid velocity with high CV."""
+    if band.velocity == VELOCITY_LOW:
+        return True
+    if band.velocity == VELOCITY_MID and band.cv >= a.volatility_cv_threshold:
+        return True
+    return False
+
+
+def money_tests(c1p: float, net3p: float, roc: float, a: Assumptions) -> tuple[bool, bool, bool]:
+    """Returns (1p_wins_both, near_threshold, 1p_wins_margin).
+
+    "Near" means 1P contribution is within 10% of the 3P take, or return on
+    stock is within 10% of the hurdle, and 1P does not clearly win or clearly
+    lose both tests. A clear margin loss (more than 10% below the 3P take)
+    is not treated as near, even if return on stock is high.
     """
-    band = a.near_threshold_band
-    if a.volatility_overrides_decision and cv > a.volatility_cv_threshold:
-        return TEST_3P_FIRST, "volatile_demand"
-    m_pass, r_pass = c1p > net3p, roc > a.hurdle_rate
-    near_m = abs(c1p - net3p) <= band * max(abs(net3p), EPSILON)
-    near_r = abs(roc - a.hurdle_rate) <= band * max(abs(a.hurdle_rate), EPSILON)
-    if m_pass and r_pass:
-        near = near_m or near_r
-    elif r_pass:
-        near = near_m
-    elif m_pass:
-        near = near_r
-    else:
-        near = near_m and near_r
-    if near:
-        return TEST_3P_FIRST, "near_threshold"
-    if m_pass and r_pass:
-        return BRING_IN_HOUSE, "1p_wins"
-    if not m_pass and not r_pass:
-        return KEEP_3P, "3p_wins_margin_and_roc"
-    return KEEP_3P, "3p_wins_margin" if not m_pass else "roc_below_hurdle"
-
-
-def ex_vat(price, vat_rate):
-    return price / (1.0 + vat_rate)
-
-
-def _amazon_cat_series(listings: pd.DataFrame) -> pd.Series:
-    if "amazon_fee_category" in listings.columns:
-        return listings["amazon_fee_category"].astype(str)
-    return listings["category"].map(amazon_category_for)
-
-
-def _commission_series(listings: pd.DataFrame, price: pd.Series, a: Assumptions) -> pd.Series:
-    if not a.use_amazon_referral:
-        return pd.Series(float(a.commission_override), index=listings.index)
-    cats = _amazon_cat_series(listings)
-    rates = [referral_fee(cat, px)["commission_rate"] for cat, px in zip(cats, price)]
-    return pd.Series(rates, index=listings.index)
-
-
-def _fulfilment_series(listings: pd.DataFrame, price: pd.Series, a: Assumptions) -> pd.Series:
-    if a.use_published_fulfilment and "fulfilment_cost" in listings.columns:
-        return listings["fulfilment_cost"].astype(float).fillna(a.fulfilment_cost)
-    if a.jd_fulfilment_pct and a.jd_fulfilment_pct > 0:
-        return price * float(a.jd_fulfilment_pct)
-    return pd.Series(float(a.fulfilment_cost), index=listings.index)
-
-
-def _return_series(listings: pd.DataFrame, a: Assumptions) -> pd.Series:
-    if a.use_observed_returns and "return_rate" in listings.columns:
-        return listings["return_rate"].astype(float).fillna(a.return_rate)
-    return pd.Series(float(a.return_rate), index=listings.index)
-
-
-def _priced(listings: pd.DataFrame, a: Assumptions) -> pd.Series:
-    raw = listings["price"].astype(float)
-    if a.price_markup == 1.0:
-        return raw
-    return raw * float(a.price_markup)
-
-
-def evaluate_portfolio(listings: pd.DataFrame, a: Assumptions | None = None) -> pd.DataFrame:
-    """Evaluate every product. Vectorised so thousands of rows stay fast.
-
-    Diversion uses the item's own 1P contribution as the opportunity cost:
-    there is no matched substitute catalogue in this sample.
-    """
-    a = a or Assumptions()
-    if listings is None or listings.empty:
-        return pd.DataFrame()
-
-    df = listings.copy().reset_index(drop=True)
-    price = _priced(df, a)
-    net = price / (1.0 + a.vat_rate)
-    cogs = net * a.cogs_pct
-    ful = _fulfilment_series(df, net, a)
-    ret = _return_series(df, a)
-    cv = df["weekly_units_cv"].astype(float)
-    wu = df["weekly_units"].astype(float)
-    md = a.markdown_rate + a.markdown_cv_coeff * cv.clip(lower=0.0)
-    cover = pd.Series(
-        [effective_cover_days(float(v), a) for v in cv],
-        index=df.index,
+    margin_win = c1p > net3p
+    roc_win = roc > a.hurdle_rate
+    denom = max(abs(net3p), abs(c1p), 1e-9)
+    near_margin = abs(c1p - net3p) / denom <= a.near_threshold_band
+    near_roc = (
+        abs(roc - a.hurdle_rate) <= a.near_threshold_band * a.hurdle_rate
+        if a.hurdle_rate
+        else False
     )
+    both = margin_win and roc_win and not near_margin and not near_roc
+    if not margin_win and not near_margin:
+        # Clear contribution loss: not a close call.
+        return False, False, False
+    if margin_win and (not roc_win) and not near_roc:
+        # Clear ROC miss: not a close call.
+        return False, False, True
+    near = near_margin or near_roc
+    return both, near, margin_win
+
+
+def decide(c1p, net3p, roc, band: Band, sub: SubCategory, a: Assumptions) -> tuple[str, str]:
+    """Recommendation and a short rule code. Citations live in RULES."""
+    warning = band.cv >= a.volatility_cv_threshold
+    if a.volatility_overrides_decision and warning:
+        return TEST_3P_FIRST, "volatile_demand"
+
+    both, near, margin_win = money_tests(c1p, net3p, roc, a)
+    unproven = is_unproven(band, a)
+
+    if near:
+        # Strategic tilt only in the close band, and only if the toggle is on.
+        if a.apply_strategic_tilt and margin_win and roc >= a.hurdle_rate:
+            if sub.strategic == STRATEGIC_1P:
+                return BRING_IN_HOUSE, "near_strategic_1p"
+            if sub.strategic == STRATEGIC_AUTH and not unproven:
+                return BRING_IN_HOUSE, "near_authenticity"
+            if sub.strategic == STRATEGIC_3P:
+                return TEST_3P_FIRST, "near_strategic_3p"
+        return TEST_3P_FIRST, "near_threshold"
+
+    if both:
+        if a.apply_midtail and band.velocity == VELOCITY_LOW:
+            # Jiang et al.: platforms leave the long tail with sellers.
+            return KEEP_3P, "long_tail_3p"
+        if a.apply_midtail and unproven:
+            # Mid-velocity with high CV: learn from early 3P sales.
+            return TEST_3P_FIRST, "mid_tail_learn"
+        return BRING_IN_HOUSE, "1p_wins"
+
+    if not margin_win and roc <= a.hurdle_rate:
+        return KEEP_3P, "3p_wins_margin_and_roc"
+    if not margin_win:
+        return KEEP_3P, "3p_wins_margin"
+    return KEEP_3P, "roc_below_hurdle"
+
+
+RULE_TEXT = {
+    "1p_wins": (
+        "1P contribution beats the published 3P take, and return on stock "
+        "beats the hurdle. Assumed demand is high-velocity enough that the "
+        "mid-tail learning step does not apply."
+    ),
+    "mid_tail_learn": (
+        "1P would win the money tests at these published average rates, but "
+        "assumed demand is mid-velocity with a high weekly swing. The "
+        "recommendation is to test as 3P first and watch demand, which is "
+        "how platforms treat the mid-tail in Jiang, Jerath and Srinivasan "
+        "(2011): learn from early third-party sales before stocking."
+    ),
+    "long_tail_3p": (
+        "1P would win the money tests at these published average rates, but "
+        "assumed demand is a long tail (low velocity). Jiang, Jerath and "
+        "Srinivasan (2011) document that platforms tend to leave long-tail "
+        "products with independent sellers and stock the high-demand head "
+        "themselves. This is a demand-shape rule, not a money-test failure, "
+        "and you can turn it off."
+    ),
+    "near_threshold": (
+        "A money test is within 10% of the line. The recommendation is to "
+        "test as 3P first rather than force a close call."
+    ),
+    "near_strategic_1p": (
+        "A money test is close, and this is a category JD's 20-F names as "
+        "an online-retail (1P) strength (electronics or home appliances). "
+        "The close call is tilted to 1P. You can turn that tilt off."
+    ),
+    "near_authenticity": (
+        "A money test is close, assumed demand is not a long tail, and "
+        "authenticity and quality control (JD 20-F) support stocking it. "
+        "You can turn that tilt off."
+    ),
+    "near_strategic_3p": (
+        "A money test is close, and this is a general-merchandise area "
+        "(fashion) where JD's 20-F says it intends to attract more "
+        "third-party merchants. The close call stays as test-first."
+    ),
+    "3p_wins_margin": (
+        "1P contribution does not beat the published 3P take, after "
+        "published fulfilment, CV-scaled extra markdown, and holding."
+    ),
+    "roc_below_hurdle": (
+        "1P contribution beats the 3P take, but return on stock is below "
+        "the hurdle, so the capital tied up in inventory is not earning enough."
+    ),
+    "3p_wins_margin_and_roc": (
+        "1P loses on contribution and on return on stock."
+    ),
+    "volatile_demand": (
+        "The volatility-override toggle is on, and assumed weekly CV is "
+        "above the warning bar, so the recommendation is forced to test-first. "
+        "This is off by default."
+    ),
+}
+
+
+# Rule citations, shown in expanders. Plain English, with the source.
+RULE_CITATIONS = {
+    "contribution": {
+        "title": "Compare 1P contribution with the 3P commission take",
+        "basis": ABHISHEK_AGENCY_FINDING,
+        "cite": "Abhishek, Jerath and Zhang (2016), Management Science 62(8), 2259–2280.",
+        "in_this_model": (
+            "1P contribution is selling price, minus cost of goods at the "
+            "published gross margin, minus published fulfilment, minus a "
+            "CV-scaled extra markdown, minus physical holding. The 3P take "
+            "is the published JD Worldwide commission plus the 0.90% "
+            "transaction fee. Bring in-house needs 1P to beat that take."
+        ),
+    },
+    "gmroi": {
+        "title": "Return on inventory has to clear a hurdle",
+        "basis": (
+            "Retailers judge 1P not only on unit contribution but on what "
+            "the stock earns on the capital it ties up (GMROI, or return on "
+            "inventory). JD publishes inventory turnover days for its retail "
+            "business (37.8 days in FY2025, 20-F Item 5.B, page 146), so "
+            "that capital intensity is a real 1P cost. The 25% hurdle itself "
+            "is an assumption: firms set their own bar, and with a 38-day "
+            "cover a modest positive contribution already implies a high "
+            "return, so the hurdle rarely decides on its own."
+        ),
+        "cite": "Published (JD 20-F FY2025), Item 5.B, page 146, inventory turnover days.",
+        "in_this_model": (
+            "Return on stock = (1P contribution × 52) / (cost of goods × "
+            "effective cover in weeks). Effective cover is the published "
+            "37.8 days plus safety stock that scales with assumed CV."
+        ),
+    },
+    "midtail": {
+        "title": "High-volume, predictable lines to 1P; the unproven tail to 3P first",
+        "basis": JIANG_MIDTAIL_FINDING,
+        "cite": "Jiang, Jerath and Srinivasan (2011), Marketing Science 30(5), 757–775.",
+        "in_this_model": (
+            "Assumed weekly velocity is labelled high, mid or low, and is "
+            "an assumption, not observed sales. If 1P wins the money tests "
+            "but assumed demand is a long tail (low velocity), the "
+            "recommendation is Keep 3P: leave it with sellers. If assumed "
+            "demand is mid-velocity with a high weekly swing, the "
+            "recommendation is test as 3P first and watch early sales "
+            "before stocking. High-velocity, money-winning lines go to 1P. "
+            "You can turn this rule off."
+        ),
+    },
+    "strategic": {
+        "title": "Category control, only in close cases",
+        "basis": HAGIU_WRIGHT_FINDING,
+        "cite": (
+            "Hagiu and Wright (2015), Management Science 61(1), 184–203; "
+            "JD 20-F FY2025, Item 4.B page 87 and Item 5 page 134; Item 3.D page 29."
+        ),
+        "in_this_model": (
+            "A documented tilt applies only when a money test is already "
+            "within 10% of the line. Electronics and home appliances, which "
+            "JD's 20-F names as online-retail categories and where JD's own "
+            "fulfilment is a published strength, tilt to 1P. Fashion, which "
+            "the 20-F names as a general-merchandise area where JD intends "
+            "to attract more third-party merchants, and where suppliers often "
+            "have better style and fit information, stays as test-first. "
+            "Beauty, where authenticity is a published JD claim and "
+            "marketplace counterfeit is a published risk, tilts to 1P if "
+            "demand is not a long tail. The tilt never overturns a clear "
+            "money loss, and you can turn it off."
+        ),
+    },
+    "volatility": {
+        "title": "Volatility is a cost and a warning, not an automatic override",
+        "basis": VOLATILITY_THRESHOLD_RATIONALE + " " + SAFETY_STOCK_RATIONALE,
+        "cite": "Operations formula (safety stock) and a conventional CV > 1 warning bar; not a filing figure.",
+        "in_this_model": (
+            "Assumed weekly CV raises safety-stock days and an extra markdown "
+            "of 4% × CV (an assumption). A warning is raised when assumed CV "
+            "is above 1. The warning does not, by default, change the "
+            "recommendation. In this version CVs are assumptions, not "
+            "observed series."
+        ),
+    },
+}
+
+
+def evaluate_band(sub: SubCategory, band: Band, cat: Category | None, a: Assumptions | None = None) -> dict:
+    """Evaluate one assumed price band. Returns a flat record."""
+    a = a or Assumptions()
+    price = float(band.price_rmb)
+    gm = _gm(sub, a)
+    cogs = price * (1.0 - gm)
+    ful_pct = _ful(sub, a)
+    ful = price * ful_pct
+    cover = effective_cover_days(band.cv, _cover_base(sub, a), a)
+    md = extra_markdown_rate(band.cv, a)
     hold = holding_cost(cogs, cover, a.holding_rate)
-    c1p = contribution_1p(net, cogs, ful, ret, md, hold)
-    rate = _commission_series(df, price, a)
-    c3p = contribution_3p(price, rate, a.marketplace_cost_per_unit)
-    net3p = c3p - a.diversion_rate * np.maximum(c1p, 0.0)
-    inv = average_inventory_value(cogs, wu, cover)
-    roc = np.where(inv > 0, (c1p * wu * 52) / inv, 0.0)
-    warned = cv > a.volatility_cv_threshold
-
-    recs, rules = [], []
-    for i in range(len(df)):
-        rec, rule = decide(float(c1p.iloc[i]), float(net3p.iloc[i]),
-                           float(roc[i]), float(cv.iloc[i]), a)
-        recs.append(rec)
-        rules.append(rule)
-
-    def col(name, default=""):
-        return df[name] if name in df.columns else default
-
-    if a.use_published_fulfilment:
-        ful_label = (
-            "Published Amazon UK FBA rate (standard, with 2% fuel surcharge), "
-            "used as a UK per-parcel 1P alternative"
-        )
-        ful_basis = col("fulfilment_basis", ful_label)
-    else:
-        ful_label = FULFILMENT_LABEL_JD
-        ful_basis = ful_label
-
-    out = pd.DataFrame({
-        "sku": df["sku"],
-        "title": col("title", df["sku"]),
-        "category": df["category"],
-        "category_shared": col("category_shared", True),
-        "source": col("source", ""),
-        "source_label": col("source_label", ""),
-        "listing_origin": col("listing_origin", ""),
-        "price": price,
-        "price_ex_vat": net,
-        "price_original": col("price_original", price),
-        "currency_original": col("currency_original", "GBP"),
-        "commission_rate": rate,
-        "commission_label": AMAZON_FEE_LABEL if a.use_amazon_referral else (
-            f"Assumption (flat {a.commission_override:.0%} referral, for sensitivity)"
-        ),
-        "amazon_fee_category": _amazon_cat_series(df),
-        "amazon_category_name": col("amazon_category_name", ""),
-        "referral_rule": col("referral_rule", ""),
+    c1p = contribution_1p(price, cogs, ful, md, hold)
+    net3p = contribution_3p(price, sub.fee.take_rate)
+    roc = return_on_capital(c1p, cogs, band.weekly_units, cover)
+    extra = c1p - net3p  # Extra per unit from stocking it (can be negative)
+    rec, rule = decide(c1p, net3p, roc, band, sub, a)
+    warning = band.cv >= a.volatility_cv_threshold
+    return {
+        "category_id": cat.id if cat else sub.fee.first_level,
+        "category_zh": cat.name_zh if cat else sub.fee.first_level,
+        "category_en": cat.name_en if cat else sub.fee.first_level_en,
+        "sub_id": sub.id,
+        "sub_zh": sub.display_zh,
+        "sub_en": sub.display_en,
+        "band": band.name,
+        "price_rmb": price,
+        "weekly_units": band.weekly_units,
+        "weekly_units_basis": "Assumption",
+        "price_basis": "Assumption",
+        "velocity": band.velocity,
+        "weekly_units_cv": band.cv,
+        "cv_basis": "Assumption",
+        "gross_margin": gm,
+        "gm_label": sub.gm_label if a.gm_override is None else "Assumption (override)",
         "cogs": cogs,
-        "cogs_pct": a.cogs_pct,
-        "cogs_label": COGS_LABEL_DEFAULT if abs(a.cogs_pct - DEFAULT_COGS_PCT) < 1e-9 else (
-            f"Assumption (cost of goods {a.cogs_pct:.1%} of selling price, "
-            f"gross margin {1.0 - a.cogs_pct:.1%})"
-        ),
+        "fulfilment_pct": ful_pct,
         "fulfilment_cost": ful,
-        "fulfilment_basis": ful_basis,
-        "fba_tier": col("fba_tier", ""),
-        "return_rate": ret,
-        "return_rate_basis": (
-            "extra returns on top of published gross margin (default is zero, "
-            "so as not to double-count returns already in that margin)"
+        "fulfilment_label": (
+            "Published (JD 20-F FY2025) 6.7%, applied to every category"
+            if a.use_jd_fulfilment_everywhere and a.fulfilment_override is None
+            else ("Assumption (override)" if a.fulfilment_override is not None else sub.fulfilment_label)
         ),
         "markdown_rate": md,
-        "markdown_basis": (
-            f"Assumption: extra markdown = {a.markdown_cv_coeff:.0%} × weekly CV, "
-            "on top of the published company-average gross margin, which is already "
-            "after routine markdowns"
-        ),
+        "holding_cost": hold,
         "stock_cover_days": cover,
-        "stock_cover_base": a.stock_cover_days,
-        "stock_cover_label": COVER_LABEL_JD,
-        "safety_stock_days": cover - a.stock_cover_days,
-        "weekly_units": wu,
-        "weekly_units_cv": cv,
-        "cv_basis": col("cv_basis", "observed_product"),
-        "volatility_warning": warned,
-        "volatility_warning_threshold": a.volatility_cv_threshold,
-        "holding_cost_unit": hold,
-        "n_orders": col("n_orders", np.nan),
-        "n_sellers": col("n_sellers", np.nan),
-        "review_score_mean": col("review_score_mean", np.nan),
-        "delivery_days_mean": col("delivery_days_mean", np.nan),
-        "weight_kg": col("weight_kg", np.nan),
-        "gmv_annual": price * wu * 52,
+        "stock_cover_base": _cover_base(sub, a),
+        "cover_label": sub.cover_label if a.cover_override is None else "Assumption (override)",
+        "commission_rate": sub.fee.commission,
+        "transaction_fee": sub.fee.transaction_fee,
+        "take_rate": sub.fee.take_rate,
+        "commission_label": sub.fee.label,
+        "deposit_usd": sub.fee.deposit_usd,
         "contrib_1p_unit": c1p,
-        "contrib_3p_unit": c3p,
-        "diversion_rate": a.diversion_rate,
         "net_3p_unit": net3p,
-        "advantage_1p_unit": c1p - net3p,
-        "advantage_1p_annual": (c1p - net3p) * wu * 52,
-        "avg_inventory_value": inv,
+        "extra_per_unit": extra,
         "return_on_capital": roc,
-        "hurdle_rate": a.hurdle_rate,
-        "recommendation": recs,
-        "rule": rules,
-    })
-    out = out.sort_values("advantage_1p_annual", ascending=False).reset_index(drop=True)
-    out.insert(0, "rank", range(1, len(out) + 1))
-    return out
+        "recommendation": rec,
+        "rule": rule,
+        "rule_text": RULE_TEXT[rule],
+        "volatility_warning": warning,
+        "unproven": is_unproven(band, a),
+        "strategic": sub.strategic,
+        "label_kept": LABEL_KEPT,
+        "label_extra": LABEL_EXTRA,
+    }
 
 
-def hurdle_sensitivity(listings, a: Assumptions, hurdles=(0.25, 0.50, 1.00, 1.50, 2.00)):
-    """How recommendations change when only the return-on-stock hurdle moves."""
-    base = evaluate_portfolio(listings, a).set_index("sku")["recommendation"]
-    rows, flipped = [], {}
-    for h in hurdles:
-        name = f"Hurdle {h:.0%}"
-        recs = evaluate_portfolio(listings, a.with_hurdle(h)).set_index("sku")["recommendation"].reindex(base.index)
-        ch = recs[recs != base]
-        flipped[name] = [f"{k}: {base[k]} -> {recs[k]}" for k in ch.index]
-        row = {"scenario": name, "hurdle": h}
-        row.update({rec: int((recs == rec).sum()) for rec in RECOMMENDATIONS})
-        row["flipped_vs_current"] = len(ch)
-        rows.append(row)
-    return pd.DataFrame(rows), flipped, base
-
-
-def gap_sensitivity(listings, a: Assumptions | None = None) -> pd.DataFrame:
-    """Rank remaining gaps by how many recommendations they flip.
-
-    Each scenario moves one input at a time away from the current assumptions.
-    """
+def evaluate_all(a: Assumptions | None = None) -> pd.DataFrame:
     a = a or Assumptions()
-    base = evaluate_portfolio(listings, a).set_index("sku")["recommendation"]
-    n = len(base)
-    scenarios = [
-        ("Gross margin 16.0% (JD FY2025 blended company margin, includes higher-margin services)",
-         a.with_gross_margin(SENSITIVITY_JD_GROSS_MARGIN), "cogs_pct",
-         "JD does not publish a 1P product-only gross margin; the 16% figure is blended"),
-        ("Gross margin 30% (higher 1P merchandise margin)",
-         a.with_gross_margin(0.30), "cogs_pct",
-         "Assumption: a richer product margin than the Best Buy published 22.5%"),
-        ("Gross margin 18%",
-         a.with_gross_margin(0.18), "cogs_pct",
-         "Assumption: between JD's blended 16% and Best Buy's published 22.5%"),
-        ("1P fulfilment at published Amazon UK FBA per-parcel rates (instead of JD 6.7% of price)",
-         a.with_fba_fulfilment(), "fulfilment_cost",
-         "A UK pound-per-parcel alternative; it mixes a UK cost level with this sample's prices"),
-        ("1P fulfilment 6.0% of price (JD FY2023 published ratio)",
-         a.with_jd_fulfilment(0.060), "jd_fulfilment_pct",
-         "Published JD fulfilment ratio for FY2023, as printed in the FY2025 20-F narrative"),
-        ("1P fulfilment 8% of price",
-         a.with_jd_fulfilment(0.080), "jd_fulfilment_pct",
-         "Assumption: a higher fulfilment ratio than JD's published 6.7%"),
-        ("Stock cover 31.5 days (JD FY2024 published inventory days), plus the same safety stock",
-         replace(a, stock_cover_days=JD_INVENTORY_DAYS_2024.value), "stock_cover_days",
-         "Published JD figure for the prior year"),
-        ("Stock cover 50 days, plus the same safety stock",
-         replace(a, stock_cover_days=50.0), "stock_cover_days",
-         "Assumption: slower turns than JD's published 37.8 days"),
-        ("No safety-stock adjustment (cover is the published 37.8 days for every product)",
-         replace(a, apply_safety_stock=False), "safety_stock",
-         "The safety-stock formula is an operations assumption, not a filing figure"),
-        ("No CV-scaled extra markdown",
-         replace(a, markdown_cv_coeff=0.0), "markdown_cv_coeff",
-         "The extra markdown is an assumption for item-level demand risk above the company-average margin"),
-        ("Extra markdown 6% × weekly CV (instead of 4%)",
-         replace(a, markdown_cv_coeff=0.06), "markdown_cv_coeff",
-         "Assumption: a heavier item-level markdown for demand risk"),
-        ("Extra returns 5% on top of the published gross margin",
-         replace(a, return_rate=0.05), "return_rate",
-         "Olist has no product-return field; the default is zero so as not to double-count returns already in published GM"),
-        ("Referral 7% flat (published Amazon UK rate for Computers and Consumer Electronics)",
-         a.with_flat_commission(SENSITIVITY_REFERRAL_LOW), "commission_rate",
-         "Lower published Amazon UK rate, used as a flat contrast to category defaults"),
-        ("Referral 8% flat (published Amazon UK rate in several low-price bands)",
-         a.with_flat_commission(SENSITIVITY_REFERRAL_MID), "commission_rate",
-         "Lower published Amazon UK rate, used as a flat contrast to category defaults"),
-        ("Physical holding 4% a year",
-         replace(a, holding_rate=0.04), "holding_rate",
-         "Assumption: neither filing publishes a physical holding rate"),
-        ("Physical holding 16% a year",
-         replace(a, holding_rate=0.16), "holding_rate",
-         "Assumption: neither filing publishes a physical holding rate"),
-        ("Diversion 0% (no sales would have been 1P)",
-         a.with_diversion(0.0), "diversion_rate",
-         "Assumption: no substitute catalogue, so diversion is not observed"),
-        ("Diversion 50%",
-         a.with_diversion(0.50), "diversion_rate",
-         "Assumption: no substitute catalogue, so diversion is not observed"),
-        ("Hurdle 50%", a.with_hurdle(0.50), "hurdle_rate",
-         "Assumption: firms set their own bar"),
-        ("Hurdle 100%", a.with_hurdle(1.00), "hurdle_rate",
-         "Assumption: firms set their own bar"),
-        ("Hurdle 200%", a.with_hurdle(2.00), "hurdle_rate",
-         "Assumption: firms set their own bar"),
-        ("Marketplace cost 20p a 3P sale",
-         replace(a, marketplace_cost_per_unit=0.20), "marketplace_cost_per_unit",
-         "Assumption: cost to serve a 3P sale is not in either dataset"),
-        ("Marketplace cost £1.00 a 3P sale",
-         replace(a, marketplace_cost_per_unit=1.00), "marketplace_cost_per_unit",
-         "Assumption: cost to serve a 3P sale is not in either dataset"),
-        ("UK 20% VAT stripped from every price",
-         replace(a, vat_rate=0.20), "vat_rate",
-         "Assumption: default treats prices as recorded (Olist is Brazilian, after converting to pounds)"),
-        ("Volatility as an automatic override at CV > 1.0 (the old rule, not the default)",
-         replace(a, volatility_overrides_decision=True, volatility_cv_threshold=1.0),
-         "volatility_overrides_decision",
-         "Shown so you can see what the retired override would have done; it is not the recommendation"),
-        ("Volatility as an automatic override at CV > 0.75",
-         replace(a, volatility_overrides_decision=True, volatility_cv_threshold=0.75),
-         "volatility_overrides_decision",
-         "Shown so you can see the override at a lower bar; it is not the recommendation"),
-        ("Volatility as an automatic override at CV > 1.5",
-         replace(a, volatility_overrides_decision=True, volatility_cv_threshold=1.5),
-         "volatility_overrides_decision",
-         "Shown so you can see the override at a higher bar; it is not the recommendation"),
-        ("Safety-stock z at 1.28 (90% service) instead of 1.65 (95%)",
-         replace(a, safety_stock_z=1.28), "safety_stock_z",
-         "The service-level quantile is an assumption in the safety-stock formula"),
-        ("Safety-stock lead time 4 weeks instead of 2",
-         replace(a, safety_stock_lead_weeks=4.0), "safety_stock_lead_weeks",
-         "Lead time is an assumption in the safety-stock formula"),
-    ]
-    rows = []
-    for name, sc, field, why in scenarios:
-        recs = evaluate_portfolio(listings, sc).set_index("sku")["recommendation"].reindex(base.index)
-        ch = recs[recs != base]
-        row = {
-            "scenario": name,
-            "input": field,
-            "why_this_is_a_gap": why,
-            "flipped": int(len(ch)),
-            "flipped_share": (len(ch) / n) if n else 0.0,
-        }
-        row.update({rec: int((recs == rec).sum()) for rec in RECOMMENDATIONS})
-        rows.append(row)
-    out = pd.DataFrame(rows).sort_values(["flipped", "scenario"], ascending=[False, True]).reset_index(drop=True)
-    out.insert(0, "rank", range(1, len(out) + 1))
-    return out
-
-
-def cv_distribution(listings: pd.DataFrame) -> pd.DataFrame:
-    """Percentiles and share of products above standard CV bars."""
-    cv = listings["weekly_units_cv"].astype(float)
-    n = len(cv)
-    thresholds = [0.50, 0.75, 1.00, 1.25, 1.50, 2.00, 3.00]
-    rows = [{
-        "measure": "Products in the sample",
-        "value": n,
-        "display": f"{n:,}",
-    }, {
-        "measure": "Mean weekly CV",
-        "value": float(cv.mean()),
-        "display": f"{cv.mean():.2f}",
-    }, {
-        "measure": "Median weekly CV",
-        "value": float(cv.median()),
-        "display": f"{cv.median():.2f}",
-    }, {
-        "measure": "25th percentile",
-        "value": float(cv.quantile(0.25)),
-        "display": f"{cv.quantile(0.25):.2f}",
-    }, {
-        "measure": "75th percentile",
-        "value": float(cv.quantile(0.75)),
-        "display": f"{cv.quantile(0.75):.2f}",
-    }, {
-        "measure": "90th percentile",
-        "value": float(cv.quantile(0.90)),
-        "display": f"{cv.quantile(0.90):.2f}",
-    }, {
-        "measure": "Minimum",
-        "value": float(cv.min()),
-        "display": f"{cv.min():.2f}",
-    }, {
-        "measure": "Maximum",
-        "value": float(cv.max()),
-        "display": f"{cv.max():.2f}",
-    }]
-    for t in thresholds:
-        k = int((cv > t).sum())
-        rows.append({
-            "measure": f"Share with CV above {t:.2f}",
-            "value": k / n if n else 0.0,
-            "display": f"{k:,} of {n:,} ({k / n:.1%})" if n else "n/a",
-        })
+    rows = [evaluate_band(sub, band, cat, a) for cat, sub, band in all_bands()]
     return pd.DataFrame(rows)
 
 
-def load_listings(path) -> pd.DataFrame:
-    path = str(path)
-    if path.endswith(".gz"):
-        return pd.read_csv(path, compression="gzip")
-    return pd.read_csv(path)
+def mid_band_table(result: pd.DataFrame) -> pd.DataFrame:
+    """One row per sub-category, at the mid price band (the headline view)."""
+    return result[result["band"] == "mid"].copy()
+
+
+def counts(result: pd.DataFrame) -> dict:
+    return {r: int((result["recommendation"] == r).sum()) for r in RECOMMENDATIONS}
+
+
+def flip_threshold(sub: SubCategory, band: Band, cat: Category, a: Assumptions,
+                   param: str, lo: float, hi: float, steps: int = 80) -> dict | None:
+    """The value of `param` at which the mid-band recommendation first flips.
+
+    param is one of: gm, fulfilment_pct, hurdle, markdown_cv_coeff, cv
+    (cv is applied by temporarily swapping the band).
+    """
+    base = evaluate_band(sub, band, cat, a)["recommendation"]
+    last_x = None
+    last_rec = base
+    for i in range(steps + 1):
+        x = lo + (hi - lo) * i / steps
+        trial = a
+        trial_band = band
+        if param == "gm":
+            trial = replace(a, gm_override=x)
+        elif param == "fulfilment_pct":
+            trial = replace(a, fulfilment_override=x)
+        elif param == "hurdle":
+            trial = replace(a, hurdle_rate=x)
+        elif param == "markdown_cv_coeff":
+            trial = replace(a, markdown_cv_coeff=x)
+        elif param == "cv":
+            trial_band = replace(band, cv=x)
+        else:
+            raise ValueError(param)
+        rec = evaluate_band(sub, trial_band, cat, trial)["recommendation"]
+        if rec != base:
+            return {
+                "param": param,
+                "from": base,
+                "to": rec,
+                "at": x,
+                "lo": lo,
+                "hi": hi,
+                "default_rec": base,
+            }
+        last_x, last_rec = x, rec
+    return {
+        "param": param,
+        "from": base,
+        "to": base,
+        "at": None,
+        "lo": lo,
+        "hi": hi,
+        "default_rec": base,
+    }
+
+
+def sensitivity_for_sub(sub: SubCategory, band: Band, cat: Category,
+                        a: Assumptions | None = None) -> list[dict]:
+    """Headline flip points for one sub-category at one band."""
+    a = a or Assumptions()
+    specs = [
+        ("gm", 0.05, 0.55, "1P gross margin"),
+        ("fulfilment_pct", 0.03, 0.35, "1P fulfilment as a share of price"),
+        ("hurdle", 0.10, 2.00, "Return-on-stock hurdle"),
+        ("markdown_cv_coeff", 0.00, 0.15, "Extra markdown per unit of CV"),
+        ("cv", 0.20, 2.50, "Assumed weekly CV"),
+    ]
+    out = []
+    for param, lo, hi, label in specs:
+        d = flip_threshold(sub, band, cat, a, param, lo, hi)
+        d["label"] = label
+        out.append(d)
+    return out
+
+
+def gap_sensitivity(a: Assumptions | None = None) -> pd.DataFrame:
+    """How many of the 60 band-level recommendations flip under each alternative."""
+    a = a or Assumptions()
+    base = evaluate_all(a)
+    base_rec = base.set_index(["sub_id", "band"])["recommendation"]
+    n = len(base)
+
+    scenarios = [
+        ("Gross margin 16.0% (JD blended company margin) on every archetype",
+         replace(a, gm_override=0.160), "gm",
+         "JD does not publish a 1P product-only margin; 16% includes higher-margin services."),
+        ("Gross margin 22.5% (Best Buy) on every archetype",
+         replace(a, gm_override=0.225), "gm",
+         "Applies the electronics-specialist published GM to apparel and baby as well."),
+        ("Gross margin 39.9% (Zalando) on every archetype",
+         replace(a, gm_override=0.399), "gm",
+         "Applies the fashion-specialist published GM to electronics and appliances as well."),
+        ("1P fulfilment 6.7% (JD) on every archetype, including apparel",
+         replace(a, use_jd_fulfilment_everywhere=True), "fulfilment",
+         "Drops Zalando's 23% fashion fulfilment; mixes JD's blended ratio with a high-return category."),
+        ("1P fulfilment 23.0% (Zalando) on every archetype",
+         replace(a, fulfilment_override=0.230), "fulfilment",
+         "Applies the European fashion fulfilment ratio to JD's core electronics as well."),
+        ("No mid-tail learning rule",
+         replace(a, apply_midtail=False), "midtail",
+         "Without Jiang et al., company-average margins would send almost every money-winning line to 1P."),
+        ("No strategic tilt in close cases",
+         replace(a, apply_strategic_tilt=False), "strategic",
+         "The 20-F / Hagiu-Wright tilt only decides close cases; turning it off isolates that effect."),
+        ("Volatility as an automatic Test-first override at CV > 1.0",
+         replace(a, volatility_overrides_decision=True), "volatility",
+         "Shown so you can see the retired override; it is not the default."),
+        ("Hurdle 100%",
+         replace(a, hurdle_rate=1.00), "hurdle",
+         "Assumption: firms set their own bar. The 25% default rarely binds at 38-day cover."),
+        ("Hurdle 200%",
+         replace(a, hurdle_rate=2.00), "hurdle",
+         "Assumption: a much higher capital bar."),
+        ("Hurdle 50%",
+         replace(a, hurdle_rate=0.50), "hurdle",
+         "Assumption: a slightly higher bar than the default 25%."),
+        ("Extra markdown 8% × CV (instead of 4%)",
+         replace(a, markdown_cv_coeff=0.08), "markdown",
+         "Assumption: a heavier item-level markdown for demand risk."),
+        ("No CV-scaled extra markdown",
+         replace(a, markdown_cv_coeff=0.0), "markdown",
+         "The extra markdown is an assumption for item-level risk above the company-average margin."),
+        ("No safety-stock adjustment",
+         replace(a, apply_safety_stock=False), "safety_stock",
+         "The safety-stock formula is an operations assumption, not a filing figure."),
+        ("Physical holding 16% a year",
+         replace(a, holding_rate=0.16), "holding",
+         "Assumption: neither filing publishes a physical holding rate."),
+        ("Stock cover 31.5 days (JD FY2024) plus the same safety stock",
+         replace(a, cover_override=31.5), "cover",
+         "Published JD figure for the prior year."),
+    ]
+    rows = []
+    for name, trial, inp, why in scenarios:
+        res = evaluate_all(trial)
+        rec = res.set_index(["sub_id", "band"])["recommendation"]
+        flipped = int((rec != base_rec).sum())
+        c = counts(res)
+        rows.append({
+            "scenario": name,
+            "input": inp,
+            "why_this_is_a_gap": why,
+            "flipped": flipped,
+            "flipped_share": flipped / n,
+            BRING_IN_HOUSE: c[BRING_IN_HOUSE],
+            TEST_3P_FIRST: c[TEST_3P_FIRST],
+            KEEP_3P: c[KEEP_3P],
+        })
+    df = pd.DataFrame(rows).sort_values(["flipped", "scenario"], ascending=[False, True]).reset_index(drop=True)
+    df.insert(0, "rank", range(1, len(df) + 1))
+    return df
+
+
+def mid_band_flip_summary(a: Assumptions | None = None) -> pd.DataFrame:
+    """For each sub-category (mid band), the first GM and fulfilment values that flip it."""
+    a = a or Assumptions()
+    rows = []
+    for cat in CATEGORIES:
+        for sub in cat.subs:
+            mid = next(b for b in sub.bands if b.name == "mid")
+            ev = evaluate_band(sub, mid, cat, a)
+            gm_f = flip_threshold(sub, mid, cat, a, "gm", 0.05, 0.55)
+            ful_f = flip_threshold(sub, mid, cat, a, "fulfilment_pct", 0.03, 0.35)
+            cv_f = flip_threshold(sub, mid, cat, a, "cv", 0.20, 2.50)
+            rows.append({
+                "category_zh": cat.name_zh,
+                "sub_zh": sub.display_zh,
+                "price_rmb": mid.price_rmb,
+                "recommendation": ev["recommendation"],
+                "rule": ev["rule"],
+                "contrib_1p_unit": ev["contrib_1p_unit"],
+                "net_3p_unit": ev["net_3p_unit"],
+                "return_on_capital": ev["return_on_capital"],
+                "gm_flip_at": gm_f["at"],
+                "gm_flip_to": gm_f["to"] if gm_f["at"] is not None else None,
+                "ful_flip_at": ful_f["at"],
+                "ful_flip_to": ful_f["to"] if ful_f["at"] is not None else None,
+                "cv_flip_at": cv_f["at"],
+                "cv_flip_to": cv_f["to"] if cv_f["at"] is not None else None,
+                "take_rate": ev["take_rate"],
+                "gross_margin": ev["gross_margin"],
+                "fulfilment_pct": ev["fulfilment_pct"],
+                "velocity": mid.velocity,
+                "weekly_units_cv": mid.cv,
+            })
+    return pd.DataFrame(rows)

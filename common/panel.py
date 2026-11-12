@@ -41,8 +41,10 @@ def company_panel(expanded: bool = True) -> None:
         "These figures come from official filings. They describe how two large "
         "platforms are actually mixed, at company level. They are not a forecast, "
         "and they are not a verdict on any one product. The workflow below asks "
-        "a different question: which items in a real marketplace catalogue would "
-        "clear a 1P test built from these published benchmarks."
+        "a different question: under published 1P cost ratios and published JD "
+        "POP fees, which representative category archetypes would a retailer "
+        "stock, leave with a seller, or test first, using rules grounded in "
+        "how platforms actually decide."
     )
 
     c1, c2, c3, c4 = st.columns(4)
