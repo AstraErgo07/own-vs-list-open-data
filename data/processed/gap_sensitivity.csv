@@ -1,0 +1,29 @@
+rank,scenario,input,why_this_is_a_gap,flipped,flipped_share,Bring in-house,Test as 3P first,Keep 3P
+1,No volatility rule (money tests decide every product),volatility_cv_threshold,Assumption: the 50% bar is a design choice; turning it off shows how much it is doing,7589,0.9710812539987204,2169,182,5464
+2,Volatility threshold 200%,volatility_cv_threshold,Assumption: the 50% bar is a design choice; real weekly series including quiet weeks are usually above it,5525,0.7069737683941139,1771,2246,3798
+3,Volatility threshold 100% (weekly swing can equal the average),volatility_cv_threshold,Assumption: the 50% bar is a design choice; real weekly series including quiet weeks are usually above it,2903,0.3714651311580294,1191,4868,1756
+4,Cost of goods at 65% of price,cogs_pct,Assumption: neither dataset has cost of goods,15,0.0019193857965451055,0,7767,48
+5,Hurdle 200%,hurdle_rate,Assumption: firms set their own bar,15,0.0019193857965451055,0,7771,44
+6,Return rate 20% for every product (ignore observed proxies),return_rate,UCI has a cancellation proxy; Olist has no product-return field,12,0.0015355086372360845,3,7768,44
+7,Markdown 15%,markdown_rate,Assumption: neither dataset has markdowns,11,0.0014075495841330773,4,7770,41
+8,Fulfilment £2.00 a unit (ignore published FBA rates),fulfilment_cost,Published FBA rates are the default; this tests a lower flat figure,10,0.0012795905310300703,21,7767,27
+9,Fulfilment £7.00 a unit (ignore published FBA rates),fulfilment_cost,Published FBA rates are the default; this tests a higher flat figure,10,0.0012795905310300703,5,7767,43
+10,Hurdle 150%,hurdle_rate,Assumption: firms set their own bar,10,0.0012795905310300703,5,7772,38
+11,Fulfilment £5.00 a unit (ignore published FBA rates),fulfilment_cost,Published FBA rates are the default; this tests a higher flat figure,8,0.0010236724248240564,9,7770,36
+12,UK 20% VAT stripped from every price,vat_rate,"Assumption: default treats prices as recorded, because tax systems differ",8,0.0010236724248240564,7,7770,38
+13,Cost of goods at 35% of price,cogs_pct,Assumption: neither dataset has cost of goods,7,0.0008957133717210493,18,7767,30
+14,Diversion 50%,diversion_rate,"Assumption: no substitute catalogue, so diversion is not observed",6,0.0007677543186180423,17,7767,31
+15,Markdown 4%,markdown_rate,Assumption: neither dataset has markdowns,6,0.0007677543186180423,17,7767,31
+16,Marketplace cost £1.00 a 3P sale,marketplace_cost_per_unit,Assumption: cost to serve a 3P sale is not in either dataset,6,0.0007677543186180423,16,7768,31
+17,Referral 7% flat (published Amazon UK rate for Computers and Consumer Electronics),commission_rate,"Lower published Amazon UK rate, used as a flat contrast to category defaults",6,0.0007677543186180423,17,7767,31
+18,Referral 8% flat (published Amazon UK rate in several low-price bands),commission_rate,"Lower published Amazon UK rate, used as a flat contrast to category defaults",6,0.0007677543186180423,17,7767,31
+19,Return rate 5% for every product (ignore observed proxies),return_rate,UCI has a cancellation proxy; Olist has no product-return field,6,0.0007677543186180423,16,7767,32
+20,Diversion 0% (no sales would have been 1P),diversion_rate,"Assumption: no substitute catalogue, so diversion is not observed",5,0.0006397952655150352,10,7768,37
+21,Physical holding 4% a year,holding_rate,Assumption: neither dataset has warehouse cost,5,0.0006397952655150352,14,7770,31
+22,Stock cover 40 days,stock_cover_days,Assumption: neither dataset has inventory,5,0.0006397952655150352,14,7770,31
+23,Marketplace cost 20p a 3P sale,marketplace_cost_per_unit,Assumption: cost to serve a 3P sale is not in either dataset,2,0.0002559181062060141,11,7769,35
+24,UCI prices marked up 2x (trade-to-retail caveat),price_markup,UCI customers are often wholesalers; recorded prices may be trade prices,2,0.0002559181062060141,12,7771,32
+25,Hurdle 100%,hurdle_rate,Assumption: firms set their own bar,1,0.00012795905310300704,11,7770,34
+26,Physical holding 16% a year,holding_rate,Assumption: neither dataset has warehouse cost,1,0.00012795905310300704,11,7770,34
+27,Hurdle 50%,hurdle_rate,Assumption: firms set their own bar,0,0.0,11,7771,33
+28,Stock cover 120 days,stock_cover_days,Assumption: neither dataset has inventory,0,0.0,11,7771,33
