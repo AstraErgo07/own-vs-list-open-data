@@ -1,29 +1,30 @@
 rank,scenario,input,why_this_is_a_gap,flipped,flipped_share,Bring in-house,Test as 3P first,Keep 3P
-1,No volatility rule (money tests decide every product),volatility_cv_threshold,Assumption: the 50% bar is a design choice; turning it off shows how much it is doing,7589,0.9710812539987204,2169,182,5464
-2,Volatility threshold 200%,volatility_cv_threshold,Assumption: the 50% bar is a design choice; real weekly series including quiet weeks are usually above it,5525,0.7069737683941139,1771,2246,3798
-3,Volatility threshold 100% (weekly swing can equal the average),volatility_cv_threshold,Assumption: the 50% bar is a design choice; real weekly series including quiet weeks are usually above it,2903,0.3714651311580294,1191,4868,1756
-4,Cost of goods at 65% of price,cogs_pct,Assumption: neither dataset has cost of goods,15,0.0019193857965451055,0,7767,48
-5,Hurdle 200%,hurdle_rate,Assumption: firms set their own bar,15,0.0019193857965451055,0,7771,44
-6,Return rate 20% for every product (ignore observed proxies),return_rate,UCI has a cancellation proxy; Olist has no product-return field,12,0.0015355086372360845,3,7768,44
-7,Markdown 15%,markdown_rate,Assumption: neither dataset has markdowns,11,0.0014075495841330773,4,7770,41
-8,Fulfilment £2.00 a unit (ignore published FBA rates),fulfilment_cost,Published FBA rates are the default; this tests a lower flat figure,10,0.0012795905310300703,21,7767,27
-9,Fulfilment £7.00 a unit (ignore published FBA rates),fulfilment_cost,Published FBA rates are the default; this tests a higher flat figure,10,0.0012795905310300703,5,7767,43
-10,Hurdle 150%,hurdle_rate,Assumption: firms set their own bar,10,0.0012795905310300703,5,7772,38
-11,Fulfilment £5.00 a unit (ignore published FBA rates),fulfilment_cost,Published FBA rates are the default; this tests a higher flat figure,8,0.0010236724248240564,9,7770,36
-12,UK 20% VAT stripped from every price,vat_rate,"Assumption: default treats prices as recorded, because tax systems differ",8,0.0010236724248240564,7,7770,38
-13,Cost of goods at 35% of price,cogs_pct,Assumption: neither dataset has cost of goods,7,0.0008957133717210493,18,7767,30
-14,Diversion 50%,diversion_rate,"Assumption: no substitute catalogue, so diversion is not observed",6,0.0007677543186180423,17,7767,31
-15,Markdown 4%,markdown_rate,Assumption: neither dataset has markdowns,6,0.0007677543186180423,17,7767,31
-16,Marketplace cost £1.00 a 3P sale,marketplace_cost_per_unit,Assumption: cost to serve a 3P sale is not in either dataset,6,0.0007677543186180423,16,7768,31
-17,Referral 7% flat (published Amazon UK rate for Computers and Consumer Electronics),commission_rate,"Lower published Amazon UK rate, used as a flat contrast to category defaults",6,0.0007677543186180423,17,7767,31
-18,Referral 8% flat (published Amazon UK rate in several low-price bands),commission_rate,"Lower published Amazon UK rate, used as a flat contrast to category defaults",6,0.0007677543186180423,17,7767,31
-19,Return rate 5% for every product (ignore observed proxies),return_rate,UCI has a cancellation proxy; Olist has no product-return field,6,0.0007677543186180423,16,7767,32
-20,Diversion 0% (no sales would have been 1P),diversion_rate,"Assumption: no substitute catalogue, so diversion is not observed",5,0.0006397952655150352,10,7768,37
-21,Physical holding 4% a year,holding_rate,Assumption: neither dataset has warehouse cost,5,0.0006397952655150352,14,7770,31
-22,Stock cover 40 days,stock_cover_days,Assumption: neither dataset has inventory,5,0.0006397952655150352,14,7770,31
-23,Marketplace cost 20p a 3P sale,marketplace_cost_per_unit,Assumption: cost to serve a 3P sale is not in either dataset,2,0.0002559181062060141,11,7769,35
-24,UCI prices marked up 2x (trade-to-retail caveat),price_markup,UCI customers are often wholesalers; recorded prices may be trade prices,2,0.0002559181062060141,12,7771,32
-25,Hurdle 100%,hurdle_rate,Assumption: firms set their own bar,1,0.00012795905310300704,11,7770,34
-26,Physical holding 16% a year,holding_rate,Assumption: neither dataset has warehouse cost,1,0.00012795905310300704,11,7770,34
-27,Hurdle 50%,hurdle_rate,Assumption: firms set their own bar,0,0.0,11,7771,33
-28,Stock cover 120 days,stock_cover_days,Assumption: neither dataset has inventory,0,0.0,11,7771,33
+1,Hurdle 200%,hurdle_rate,Assumption: firms set their own bar,3188,0.7758578729617912,0,0,4109
+2,1P fulfilment at published Amazon UK FBA per-parcel rates (instead of JD 6.7% of price),fulfilment_cost,A UK pound-per-parcel alternative; it mixes a UK cost level with this sample's prices,3102,0.7549282063762472,201,167,3741
+3,"Gross margin 16.0% (JD FY2025 blended company margin, includes higher-margin services)",cogs_pct,JD does not publish a 1P product-only gross margin; the 16% figure is blended,2578,0.6274032611340958,610,105,3394
+4,Extra returns 5% on top of the published gross margin,return_rate,Olist has no product-return field; the default is zero so as not to double-count returns already in published GM,2374,0.5777561450474568,814,174,3121
+5,Gross margin 18%,cogs_pct,Assumption: between JD's blended 16% and Best Buy's published 22.5%,2305,0.5609637381357995,883,215,3011
+6,Volatility as an automatic override at CV > 0.75,volatility_overrides_decision,Shown so you can see the override at a lower bar; it is not the recommendation,2248,0.5470917498174739,1277,2832,0
+7,Diversion 0% (no sales would have been 1P),diversion_rate,"Assumption: no substitute catalogue, so diversion is not observed",1763,0.4290581650036505,1414,881,1814
+8,UK 20% VAT stripped from every price,vat_rate,"Assumption: default treats prices as recorded (Olist is Brazilian, after converting to pounds)",1602,0.3898758822097834,1574,901,1634
+9,Extra markdown 6% × weekly CV (instead of 4%),markdown_cv_coeff,Assumption: a heavier item-level markdown for demand risk,1545,0.3760038938914578,1553,888,1668
+10,No CV-scaled extra markdown,markdown_cv_coeff,The extra markdown is an assumption for item-level demand risk above the company-average margin,1505,0.36626916524701875,4109,0,0
+11,Gross margin 30% (higher 1P merchandise margin),cogs_pct,Assumption: a richer product margin than the Best Buy published 22.5%,1488,0.36213190557313213,4036,56,17
+12,"Volatility as an automatic override at CV > 1.0 (the old rule, not the default)",volatility_overrides_decision,Shown so you can see what the retired override would have done; it is not the recommendation,1475,0.35896811876368945,2050,2059,0
+13,Hurdle 100%,hurdle_rate,Assumption: firms set their own bar,1364,0.3319542467753711,1435,1045,1629
+14,Referral 7% flat (published Amazon UK rate for Computers and Consumer Electronics),commission_rate,"Lower published Amazon UK rate, used as a flat contrast to category defaults",1354,0.3295205646142614,3892,80,137
+15,Referral 8% flat (published Amazon UK rate in several low-price bands),commission_rate,"Lower published Amazon UK rate, used as a flat contrast to category defaults",1313,0.31954246775371137,3842,89,178
+16,1P fulfilment 8% of price,jd_fulfilment_pct,Assumption: a higher fulfilment ratio than JD's published 6.7%,1192,0.2900949136042833,1775,1024,1310
+17,Marketplace cost 20p a 3P sale,marketplace_cost_per_unit,Assumption: cost to serve a 3P sale is not in either dataset,1141,0.2776831345826235,1647,1225,1237
+18,Volatility as an automatic override at CV > 1.5,volatility_overrides_decision,Shown so you can see the override at a higher bar; it is not the recommendation,1056,0.2569968362131906,2336,1640,133
+19,Diversion 50%,diversion_rate,"Assumption: no substitute catalogue, so diversion is not observed",838,0.2039425651009978,3225,231,653
+20,Physical holding 16% a year,holding_rate,Assumption: neither filing publishes a physical holding rate,809,0.1968848868337795,2009,942,1158
+21,Marketplace cost £1.00 a 3P sale,marketplace_cost_per_unit,Assumption: cost to serve a 3P sale is not in either dataset,722,0.1757118520321246,3160,318,631
+22,1P fulfilment 6.0% of price (JD FY2023 published ratio),jd_fulfilment_pct,"Published JD fulfilment ratio for FY2023, as printed in the FY2025 20-F narrative",478,0.11633000730104648,2951,368,790
+23,Physical holding 4% a year,holding_rate,Assumption: neither filing publishes a physical holding rate,350,0.08517887563884156,2853,436,820
+24,No safety-stock adjustment (cover is the published 37.8 days for every product),safety_stock,"The safety-stock formula is an operations assumption, not a filing figure",242,0.05889510829885617,2770,507,832
+25,Hurdle 50%,hurdle_rate,Assumption: firms set their own bar,209,0.05086395716719396,2419,645,1045
+26,"Stock cover 50 days, plus the same safety stock",stock_cover_days,Assumption: slower turns than JD's published 37.8 days,201,0.04891701143830616,2460,671,978
+27,Safety-stock lead time 4 weeks instead of 2,safety_stock_lead_weeks,Lead time is an assumption in the safety-stock formula,140,0.034071550255536626,2515,616,978
+28,"Stock cover 31.5 days (JD FY2024 published inventory days), plus the same safety stock",stock_cover_days,Published JD figure for the prior year,93,0.022633244098320758,2675,535,899
+29,Safety-stock z at 1.28 (90% service) instead of 1.65 (95%),safety_stock_z,The service-level quantile is an assumption in the safety-stock formula,71,0.01727914334387929,2654,555,900

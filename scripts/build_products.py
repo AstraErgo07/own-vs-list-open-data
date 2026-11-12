@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-"""Build the product-level table from the official UCI and Olist raw files.
+"""Build the product-level table from the official Olist raw files.
 
-UCI Online Retail II is the 1P (own-stock retailer) side.
-Olist is the 3P (marketplace sellers) side.
+Olist is the 3P (marketplace sellers) catalogue. 1P per-unit costs are
+applied later, from published retailer benchmarks, in the decision engine.
+UCI Online Retail II is no longer included: its wholesale gift-retailer
+prices are not a credible 1P cost basis. The UCI helpers in this file
+are unused by main() and are kept only so a local raw copy can still be
+inspected if needed.
 
 Outputs, small enough for Streamlit Cloud:
   data/processed/products.csv.gz
@@ -391,13 +395,13 @@ def attach_fees(df: pd.DataFrame) -> pd.DataFrame:
 
 def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
-    print("Building UCI (1P) products...")
-    uci = build_uci(_load_uci())
-    print(f"  UCI products: {len(uci)}")
-    print("Building Olist (3P) products...")
+    # UCI Online Retail II is no longer in the processed table: its wholesale
+    # giftware prices are not a credible 1P cost basis. 1P costs now come from
+    # published retailer filings, applied to these Olist products.
+    print("Building Olist marketplace products...")
     olist = build_olist(_load_olist())
     print(f"  Olist products: {len(olist)}")
-    combined = pd.concat([uci, olist], ignore_index=True)
+    combined = olist
     print("Attaching Amazon UK published fees...")
     combined = attach_fees(combined)
     # Default return rate fill is left as NaN for Olist; the engine uses the
@@ -415,8 +419,8 @@ def main() -> int:
         }
 
     summary = {
-        "uci": counts(combined[combined["source"] == "uci_retail"]),
-        "olist": counts(combined[combined["source"] == "olist_marketplace"]),
+        "olist": counts(combined),
+        "uci": "removed: UK gift-retailer wholesale prices are not a credible 1P cost basis",
         "total": int(len(combined)),
         "shared_categories": sorted(
             combined.loc[combined["category_shared"], "category"].dropna().unique().tolist()
@@ -428,14 +432,14 @@ def main() -> int:
             "label": FX_LABEL,
         },
         "filters": {
-            "uci_min_sales_weeks": MIN_SALES_WEEKS_UCI,
             "olist_min_orders": MIN_ORDERS_OLIST,
             "product_cv_min_weeks": MIN_WEEKS_FOR_PRODUCT_CV,
+            "uci_included": False,
         },
     }
     (OUT / "build_summary.json").write_text(json.dumps(summary, indent=2))
-    print(json.dumps({k: summary[k] if k != "uci" and k != "olist" else {**summary[k], "categories": "…"}
-                      for k in summary}, indent=2)[:2000])
+    olist_brief = {**summary["olist"], "categories": "…"}
+    print(json.dumps({**summary, "olist": olist_brief}, indent=2)[:2000])
     print("category counts:\n", combined.groupby(["source", "category"]).size().to_string())
     return 0
 

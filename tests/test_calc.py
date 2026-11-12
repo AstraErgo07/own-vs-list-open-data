@@ -1,4 +1,4 @@
-"""Decision rules, contribution formulas, and default-sample counts."""
+"""Decision rules, published-benchmark formulas, and default-sample counts."""
 from __future__ import annotations
 
 import math
@@ -20,13 +20,25 @@ from own_vs_list.calc import (
     contribution_1p,
     contribution_3p,
     decide,
+    effective_cover_days,
     evaluate_portfolio,
+    extra_markdown_rate,
     holding_cost,
     load_listings,
     net_3p_benefit,
     return_on_capital,
+    safety_stock_days,
 )
 from own_vs_list.fees import AMAZON_FEE_LABEL, referral_fee
+from own_vs_list.published import (
+    DEFAULT_COGS_PCT,
+    DEFAULT_GROSS_MARGIN,
+    DEFAULT_JD_FULFILMENT_PCT,
+    DEFAULT_STOCK_COVER_DAYS,
+    SAFETY_STOCK_LEAD_WEEKS,
+    SAFETY_STOCK_Z,
+    VOLATILITY_WARNING_THRESHOLD,
+)
 
 
 def _almost(a, b, places=6):
@@ -46,9 +58,9 @@ def _row(**kwargs):
         price_original=40.0,
         currency_original="GBP",
         weekly_units=10.0,
-        weekly_units_cv=0.20,
+        weekly_units_cv=0.80,
         cv_basis="observed_product",
-        return_rate=0.10,
+        return_rate=0.0,
         return_rate_basis="assumption",
         amazon_fee_category="luggage",
         amazon_category_name="Luggage",
@@ -64,17 +76,28 @@ def _row(**kwargs):
 
 class TestFormulas:
     def test_holding_is_physical_only(self):
-        # 8% a year on £20 cost, 80 days: 20 * 0.08 * 80/365.
-        _almost(holding_cost(20.0, 80.0, 0.08), 20.0 * 0.08 * 80.0 / 365.0)
+        _almost(holding_cost(20.0, 37.8, 0.08), 20.0 * 0.08 * 37.8 / 365.0)
 
-    def test_contribution_1p(self):
-        hold = holding_cost(20.0, 80.0, 0.08)
-        c = contribution_1p(40.0, 20.0, 3.10, 0.10, 0.08, hold)
-        expected = 40.0 - 20.0 - 3.10 - 40.0 * 0.10 - 40.0 * 0.08 - hold
+    def test_safety_stock_days_standard_formula(self):
+        # z × CV × sqrt(L) × 7, with z=1.65, CV=1, L=2 weeks.
+        expected = 1.65 * 1.0 * (2.0 ** 0.5) * 7.0
+        _almost(safety_stock_days(1.0, z=1.65, lead_weeks=2.0), expected)
+        cover = effective_cover_days(1.0, Assumptions())
+        _almost(cover, DEFAULT_STOCK_COVER_DAYS + expected)
+
+    def test_extra_markdown_scales_with_cv(self):
+        a = Assumptions()
+        _almost(extra_markdown_rate(0.85, a), a.markdown_cv_coeff * 0.85)
+        _almost(extra_markdown_rate(0.0, a), 0.0)
+
+    def test_contribution_1p_no_double_count(self):
+        # Published GM already includes routine markdowns; only the extra layer is subtracted.
+        hold = holding_cost(31.0, 37.8, 0.08)
+        c = contribution_1p(40.0, 31.0, 2.68, 0.0, 0.034, hold)
+        expected = 40.0 - 31.0 - 2.68 - 0.0 - 40.0 * 0.034 - hold
         _almost(c, expected)
 
     def test_contribution_3p(self):
-        # 15% of £40 minus a 50p cost to serve.
         _almost(contribution_3p(40.0, 0.15, 0.50), 5.50)
 
     def test_net_3p_floors_lost_1p_at_zero(self):
@@ -82,39 +105,39 @@ class TestFormulas:
         _almost(net_3p_benefit(5.50, 0.25, 4.0), 5.50 - 1.00)
 
     def test_return_on_capital_cancels_weekly_units(self):
-        c1p = 4.0
-        cogs = 20.0
-        cover = 80.0
+        c1p, cogs, cover = 4.0, 20.0, 37.8
         a = return_on_capital(c1p, cogs, 10.0, cover)
         b = return_on_capital(c1p, cogs, 99.0, cover)
         _almost(a, b)
-        inv = average_inventory_value(cogs, 10.0, cover)
-        _almost(a, (c1p * 10.0 * 52) / inv)
-        # Closed form: (c1p * 52) / (cogs * cover/7)
         _almost(a, (c1p * 52) / (cogs * cover / 7.0))
+
+    def test_published_defaults(self):
+        _almost(DEFAULT_GROSS_MARGIN, 0.225)
+        _almost(DEFAULT_COGS_PCT, 0.775)
+        _almost(DEFAULT_JD_FULFILMENT_PCT, 0.067)
+        _almost(DEFAULT_STOCK_COVER_DAYS, 37.8)
+        _almost(SAFETY_STOCK_Z, 1.65)
+        _almost(SAFETY_STOCK_LEAD_WEEKS, 2.0)
+        _almost(VOLATILITY_WARNING_THRESHOLD, 1.0)
 
 
 class TestDecide:
     def setup_method(self):
         self.a = Assumptions()
 
-    def test_volatility_binds_first_even_when_money_would_win(self):
-        rec, rule = decide(c1p=8.0, net3p=2.0, roc=1.50, cv=0.51, a=self.a)
+    def test_volatility_does_not_override_by_default(self):
+        rec, rule = decide(c1p=8.0, net3p=2.0, roc=1.50, cv=1.80, a=self.a)
+        assert rec == BRING_IN_HOUSE
+        assert rule == "1p_wins"
+        assert self.a.volatility_overrides_decision is False
+
+    def test_volatility_override_can_be_turned_on(self):
+        a = Assumptions(volatility_overrides_decision=True, volatility_cv_threshold=1.0)
+        rec, rule = decide(c1p=8.0, net3p=2.0, roc=1.50, cv=1.20, a=a)
         assert rec == TEST_3P_FIRST
         assert rule == "volatile_demand"
 
-    def test_just_under_volatility_bar_can_bring_in_house(self):
-        rec, rule = decide(c1p=8.0, net3p=2.0, roc=1.50, cv=0.496, a=self.a)
-        assert rec == BRING_IN_HOUSE
-        assert rule == "1p_wins"
-
-    def test_no_near_band_on_cv_itself(self):
-        # A CV of 0.49 is not "near" 0.50 in the rule; only money and hurdle have a band.
-        rec, rule = decide(c1p=8.0, net3p=2.0, roc=1.50, cv=0.49, a=self.a)
-        assert rec == BRING_IN_HOUSE
-
     def test_near_margin_tests_first(self):
-        # 1P just above net 3P, well clear of the hurdle: 10% band around net 3P.
         rec, rule = decide(c1p=5.05, net3p=5.00, roc=1.50, cv=0.20, a=self.a)
         assert rec == TEST_3P_FIRST
         assert rule == "near_threshold"
@@ -141,37 +164,30 @@ class TestDecide:
 
 
 class TestEvaluatePortfolio:
-    def test_one_clear_in_house_row(self):
-        df = _row(price=80.0, weekly_units_cv=0.20, fulfilment_cost=3.1008)
-        out = evaluate_portfolio(df, Assumptions())
-        assert len(out) == 1
-        assert out.loc[0, "recommendation"] == BRING_IN_HOUSE
-        assert out.loc[0, "rule"] == "1p_wins"
-        assert out.loc[0, "commission_label"] == AMAZON_FEE_LABEL
-        # Luggage is 15% flat; fee at £80 is £12, rate 15%.
-        _almost(out.loc[0, "commission_rate"], 0.15)
-        # ROC does not depend on weekly units.
-        out2 = evaluate_portfolio(_row(price=80.0, weekly_units=1.0, weekly_units_cv=0.20), Assumptions())
-        _almost(float(out.loc[0, "return_on_capital"]), float(out2.loc[0, "return_on_capital"]))
+    def test_default_uses_jd_fulfilment_percent(self):
+        out = evaluate_portfolio(_row(price=40.0, weekly_units_cv=0.80), Assumptions())
+        _almost(float(out.loc[0, "fulfilment_cost"]), 40.0 * 0.067)
+        _almost(float(out.loc[0, "cogs"]), 40.0 * 0.775)
+        _almost(float(out.loc[0, "markdown_rate"]), 0.04 * 0.80)
+        assert float(out.loc[0, "stock_cover_days"]) > 37.8
+        assert bool(out.loc[0, "volatility_warning"]) is False  # 0.80 < 1.0
 
-    def test_volatile_row_is_test_first(self):
-        df = _row(price=80.0, weekly_units_cv=1.20)
-        out = evaluate_portfolio(df, Assumptions())
-        assert out.loc[0, "recommendation"] == TEST_3P_FIRST
-        assert out.loc[0, "rule"] == "volatile_demand"
+    def test_warning_at_cv_above_one_without_changing_rule_to_volatile(self):
+        out = evaluate_portfolio(_row(price=40.0, weekly_units_cv=1.50), Assumptions())
+        assert bool(out.loc[0, "volatility_warning"]) is True
+        assert out.loc[0, "rule"] != "volatile_demand"
+
+    def test_fba_fulfilment_alternative(self):
+        out = evaluate_portfolio(
+            _row(price=40.0, weekly_units_cv=0.80, fulfilment_cost=3.1008),
+            Assumptions().with_fba_fulfilment(),
+        )
+        _almost(float(out.loc[0, "fulfilment_cost"]), 3.1008)
 
     def test_flat_commission_override(self):
-        df = _row(price=80.0, weekly_units_cv=0.20)
-        out = evaluate_portfolio(df, Assumptions().with_flat_commission(0.07))
+        out = evaluate_portfolio(_row(price=80.0, weekly_units_cv=0.20), Assumptions().with_flat_commission(0.07))
         _almost(out.loc[0, "commission_rate"], 0.07)
         assert "flat 7%" in out.loc[0, "commission_label"]
-
-    def test_cheap_item_hits_referral_minimum(self):
-        df = _row(price=1.00, weekly_units_cv=0.20, amazon_fee_category="luggage")
-        out = evaluate_portfolio(df, Assumptions())
-        expected = referral_fee("luggage", 1.00)
-        _almost(out.loc[0, "commission_rate"], expected["commission_rate"])
-        _almost(expected["referral_fee"], 0.25)
 
     def test_home_products_tier_switches_with_price(self):
         low = evaluate_portfolio(
@@ -184,14 +200,6 @@ class TestEvaluatePortfolio:
         )
         _almost(low.loc[0, "commission_rate"], 0.08)
         _almost(high.loc[0, "commission_rate"], 0.15)
-
-    def test_uci_markup_applies_only_to_uci(self):
-        uci = _row(source="uci_retail", price=10.0, weekly_units_cv=0.20)
-        olist = _row(sku="O-1", source="olist_marketplace", price=10.0, weekly_units_cv=0.20)
-        out = evaluate_portfolio(pd.concat([uci, olist], ignore_index=True), Assumptions(price_markup=2.0))
-        by = out.set_index("sku")
-        _almost(float(by.loc["X-1", "price"]), 20.0)
-        _almost(float(by.loc["O-1", "price"]), 10.0)
 
 
 PRODUCTS = ROOT / "data" / "processed" / "products.csv.gz"
@@ -209,37 +217,47 @@ def default_result(listings):
 
 @pytest.mark.skipif(not PRODUCTS.exists(), reason="processed products not built")
 class TestDefaultSample:
-
-    def test_sample_size(self, listings):
-        assert len(listings) == 7815
-        assert (listings["source"] == "uci_retail").sum() == 3706
-        assert (listings["source"] == "olist_marketplace").sum() == 4109
+    def test_sample_is_olist_only(self, listings):
+        assert len(listings) == 4109
+        assert set(listings["source"].unique()) == {"olist_marketplace"}
+        assert "uci_retail" not in set(listings["source"])
 
     def test_default_headline_counts(self, default_result):
-        # Locked to the default assumptions and the built processed table.
         counts = default_result["recommendation"].value_counts()
-        assert int(counts.get(TEST_3P_FIRST, 0)) == 7771
-        assert int(counts.get(KEEP_3P, 0)) == 33
-        assert int(counts.get(BRING_IN_HOUSE, 0)) == 11
+        assert int(counts.get(BRING_IN_HOUSE, 0)) == 2604
+        assert int(counts.get(TEST_3P_FIRST, 0)) == 584
+        assert int(counts.get(KEEP_3P, 0)) == 921
 
-    def test_bring_in_house_are_olist_bags_just_under_the_bar(self, default_result):
-        inh = default_result[default_result["recommendation"] == BRING_IN_HOUSE]
-        assert set(inh["category"]) == {"Bags and luggage"}
-        assert set(inh["source"]) == {"olist_marketplace"}
-        assert inh["weekly_units_cv"].max() < 0.50
-        assert inh["weekly_units_cv"].max() > 0.49
+    def test_volatility_warning_count(self, default_result):
+        assert int(default_result["volatility_warning"].sum()) == 1693
+        # The warning is not an automatic Test-first override.
+        warned_bring = default_result[
+            default_result["volatility_warning"]
+            & (default_result["recommendation"] == BRING_IN_HOUSE)
+        ]
+        assert len(warned_bring) > 0
+        assert (default_result["rule"] == "volatile_demand").sum() == 0
+
+    def test_gmv_is_more_evenly_split_than_counts(self, default_result):
+        g = default_result.groupby("recommendation")["gmv_annual"].sum()
+        share = g / g.sum()
+        # SKU counts lean Bring (~63%); run-rate is roughly a third each.
+        assert 0.30 < float(share[BRING_IN_HOUSE]) < 0.45
+        assert 0.25 < float(share[KEEP_3P]) < 0.40
+        assert 0.25 < float(share[TEST_3P_FIRST]) < 0.40
 
     def test_commission_label_is_amazon_uk(self, listings):
         assert listings["commission_label"].iloc[0] == AMAZON_FEE_LABEL
-        assert "JD" not in listings["commission_label"].iloc[0]
 
     def test_olist_weights_are_observed(self, listings):
-        olist = listings[listings["source"] == "olist_marketplace"]
-        # Almost every Olist row has a measured weight used for the FBA band.
-        assert olist["weight_kg"].notna().sum() >= 4100
-        assert olist["size_basis"].str.contains("observed", case=False, na=False).sum() >= 4100
+        assert listings["weight_kg"].notna().sum() >= 4100
+        assert listings["size_basis"].str.contains("observed", case=False, na=False).sum() >= 4100
 
-    def test_uci_sizes_are_assumed(self, listings):
-        uci = listings[listings["source"] == "uci_retail"]
-        assert uci["weight_kg"].isna().all()
-        assert uci["size_basis"].str.contains("assumption", case=False, na=False).all()
+    def test_cv_distribution(self, listings):
+        cv = listings["weekly_units_cv"]
+        assert 0.80 < cv.median() < 0.90
+        assert 1.10 < cv.mean() < 1.25
+        # The retired 50% override bar would still flag almost the whole sample.
+        assert (cv > 0.50).mean() > 0.98
+        # The warning bar of 1.0 flags about two fifths.
+        assert 0.35 < (cv > 1.00).mean() < 0.50

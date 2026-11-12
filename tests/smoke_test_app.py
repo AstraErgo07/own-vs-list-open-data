@@ -37,18 +37,20 @@ def test_main_page_loads_without_exception():
     assert "Test as 3P first" in metric_labels
     assert "Keep 3P" in metric_labels
     metric_values = {m.label: str(m.value) for m in at.metric}
-    assert metric_values["Bring in-house"] == "11"
-    assert metric_values["Test as 3P first"] == "7,771"
-    assert metric_values["Keep 3P"] == "33"
+    assert metric_values["Bring in-house"] == "2,604"
+    assert metric_values["Test as 3P first"] == "584"
+    assert metric_values["Keep 3P"] == "921"
     # Expanders we rely on.
     expander_labels = [e.label for e in at.expander]
-    assert any("What the data can't tell us" in x for x in expander_labels)
-    assert any("money tests" in x.lower() for x in expander_labels)
-    assert any("worked" in x.lower() or "recommendation" in x.lower() for x in expander_labels)
+    assert any("cannot tell us" in x.lower() or "can't tell us" in x.lower() or "gaps" in x.lower() for x in expander_labels)
+    assert any("risk adjustment" in x.lower() or "demand swing" in x.lower() for x in expander_labels)
+    assert any("worked" in x.lower() or "recommendation" in x.lower() or "sample shows" in x.lower() for x in expander_labels)
+    assert any("published figure" in x.lower() or "published company" in x.lower() or "filing" in x.lower() for x in expander_labels)
     # Fee disclaimer is present.
     all_text = blob + " " + " ".join(str(getattr(m, "value", m)) for m in at.markdown)
     assert "Amazon UK" in all_text
-    assert "JD" not in all_text
+    # JD is named as the source of published 20-F company figures.
+    assert "JD" in all_text
     assert "Joybuy" not in all_text
     assert "OnBuy" not in all_text
     assert "Walmart" not in all_text
@@ -69,19 +71,20 @@ def test_method_page_loads_and_credits_licences():
     assert not at.exception, f"Method page raised: {at.exception}"
     assert "Data and method" in _titles(at)
     text = _titles(at) + " " + _captions(at) + " " + " ".join(str(m.value) for m in at.markdown)
-    assert "CC BY 4.0" in text or "Creative Commons Attribution 4.0" in text
     assert "CC BY-NC-SA" in text or "NonCommercial" in text
-    assert "Chen" in text
     assert "Olist" in text
     assert "Amazon UK" in text
     assert "European Central Bank" in text or "ECB" in text
     assert "Made by Ami Sata" in text or "Made by Ami Sata" in _captions(at)
-    assert "JD" not in text
+    assert "JD" in text
+    assert "20-F" in text
+    assert "Best Buy" in text
+    assert "gross margin" in text.lower() or "22.5%" in text
     assert "Joybuy" not in text
 
 
 def test_no_forbidden_retailer_names_in_source():
-    banned = ("joybuy", "onbuy", "walmart", "jdw-rule", "jd worldwide", "jd logistics", "jd.com")
+    banned = ("joybuy", "onbuy", "walmart", "jdw-rule")
     # "the range" is too generic to ban as a substring of ordinary English.
     skip = {".pyc", "__pycache__", ".gz", ".pdf"}
     hits = []
