@@ -1,4 +1,4 @@
-"""Build the peer-review PDF overview for Joybuy own-vs-list v3.0."""
+"""Build the peer-review PDF overview for Joybuy own-vs-list v3.1."""
 from __future__ import annotations
 
 import sys
@@ -34,6 +34,7 @@ from reportlab.platypus import (
 
 from own_vs_list.calc import (
     BRING_IN_HOUSE,
+    DO_NOT_RANGE,
     KEEP_3P,
     TEST_3P_FIRST,
     RULE_CITATIONS,
@@ -49,20 +50,29 @@ from own_vs_list.insights import insights, nuance_findings, mix_narrative
 from own_vs_list.maturity import (
     ENTRANT_AD_TAKE,
     ENTRANT_AD_TAKE_REASON,
-    ENTRANT_FULFILMENT_MULTIPLIER,
-    ENTRANT_FULFILMENT_REASON,
     ENTRANT_GM_HAIRCUT,
     ENTRANT_GM_HAIRCUT_REASON,
     ENTRANT_INTRO_COMMISSION,
     ENTRANT_INTRO_REASON,
     ENTRANT_LOGISTICS_MARGIN,
     ENTRANT_LOGISTICS_MARGIN_REASON,
+    ENTRANT_SELLER_COVERAGE,
+    ENTRANT_SELLER_COVERAGE_REASON,
     ENTRANT_WAREHOUSE_SHARE,
     ENTRANT_WAREHOUSE_SHARE_REASON,
+    ENTRANT_WAREHOUSE_UTILISATION,
+    ENTRANT_WAREHOUSE_UTILISATION_REASON,
     ESTABLISHED_AD_TAKE,
     ESTABLISHED_AD_TAKE_REASON,
     ESTABLISHED_LOGISTICS_MARGIN,
+    ESTABLISHED_SELLER_COVERAGE,
     ESTABLISHED_WAREHOUSE_SHARE,
+    FULFILMENT_VARIABLE_SHARE,
+    FULFILMENT_VARIABLE_SHARE_REASON,
+    SAME_DAY_SUBSIDY,
+    SAME_DAY_SUBSIDY_REASON,
+    SPILLOVER_PCT,
+    SPILLOVER_REASON,
     OPEN_QUESTIONS,
     SCENARIO_A_BLURB,
     SCENARIO_A_NAME,
@@ -93,7 +103,7 @@ from common.text import BENCHMARK_STANDIN, FOOTER, VERSION
 
 OUT = Path("/workspace/joybuy_own_vs_list_overview.pdf")
 REPO_OUT = ROOT / "docs" / "joybuy_own_vs_list_overview.pdf"
-CHART_DIR = Path("/tmp/v3_pdf_charts")
+CHART_DIR = Path("/tmp/v31_pdf_charts")
 CHART_DIR.mkdir(parents=True, exist_ok=True)
 
 NAVY = colors.HexColor("#1f4e79")
@@ -156,19 +166,26 @@ def header_footer(canvas, doc):
 
 
 def _rec_colour(rec):
-    return {"Bring in-house": NAVY, "Test as 3P first": GOLD, "Keep 3P": SLATE}.get(rec, SLATE)
+    return {
+        "Bring in-house": NAVY,
+        "Test as 3P first": GOLD,
+        "Keep 3P": SLATE,
+        "Do not range": colors.HexColor("#a9b3b9"),
+    }.get(rec, SLATE)
 
 
 def mix_chart(curve: pd.DataFrame, path: Path) -> Path:
     fig, ax = plt.subplots(figsize=(7.4, 3.1))
-    ax.plot(curve["maturity"] * 100, curve["share_subs_1p"] * 100, "o-", color="#1f4e79", label="1P share of sub-categories", linewidth=2)
-    ax.plot(curve["maturity"] * 100, curve["share_sales_1p"] * 100, "s--", color="#c47b17", label="1P share of modelled sales", linewidth=2)
+    ax.plot(curve["maturity"] * 100, curve["share_subs_1p"] * 100, "o-", color="#1f4e79", label="Operating: 1P share of sub-categories", linewidth=2)
+    ax.plot(curve["maturity"] * 100, curve["share_sales_1p"] * 100, "s--", color="#c47b17", label="Operating: 1P share of modelled sales", linewidth=2)
+    ax.plot(curve["maturity"] * 100, curve["unit_share_subs_1p"] * 100, "o:", color="#5b6770", label="Unit economics: 1P share of sub-categories", linewidth=1.6)
+    ax.plot(curve["maturity"] * 100, curve["unit_share_sales_1p"] * 100, "s:", color="#8a6a3a", label="Unit economics: 1P share of modelled sales", linewidth=1.6)
     ax.set_xlabel("Platform maturity, %  (0 = entrant, 100 = established)")
     ax.set_ylabel("1P mix, %")
     ax.set_xlim(0, 100)
-    ax.set_ylim(0, 100)
+    ax.set_ylim(0, 105)
     ax.set_title("Implied 1P mix as the platform matures", loc="left", color="#1f4e79", fontsize=11, fontweight="bold")
-    ax.legend(frameon=False, fontsize=8)
+    ax.legend(frameon=False, fontsize=7, loc="lower left")
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.grid(axis="y", color="#e6e6e6")
@@ -180,13 +197,13 @@ def mix_chart(curve: pd.DataFrame, path: Path) -> Path:
 
 def counts_chart(mix_a, mix_b, path: Path) -> Path:
     fig, axes = plt.subplots(1, 2, figsize=(7.4, 2.8), sharey=True)
-    labels = [BRING_IN_HOUSE, TEST_3P_FIRST, KEEP_3P]
-    cols = ["#1f4e79", "#c47b17", "#5b6770"]
+    labels = [BRING_IN_HOUSE, TEST_3P_FIRST, KEEP_3P, DO_NOT_RANGE]
+    cols = ["#1f4e79", "#c47b17", "#5b6770", "#a9b3b9"]
     for ax, mix, title in (
         (axes[0], mix_a, SCENARIO_A_NAME),
         (axes[1], mix_b, SCENARIO_B_NAME),
     ):
-        vals = [mix["n_1p"], mix["n_test"], mix["n_keep"]]
+        vals = [mix["n_1p"], mix["n_test"], mix["n_keep"], mix.get("n_unranged", 0)]
         bars = ax.bar(labels, vals, color=cols)
         ax.set_title(title, loc="left", color="#1f4e79", fontsize=9, fontweight="bold")
         ax.set_ylim(0, 20)
@@ -194,7 +211,7 @@ def counts_chart(mix_a, mix_b, path: Path) -> Path:
         ax.spines["right"].set_visible(False)
         for b, v in zip(bars, vals):
             ax.text(b.get_x() + b.get_width() / 2, v + 0.3, str(v), ha="center", fontsize=8)
-        ax.tick_params(axis="x", labelsize=7)
+        ax.tick_params(axis="x", labelsize=6)
         ax.set_ylabel("Mid-band sub-categories")
     fig.tight_layout()
     fig.savefig(path, dpi=140, facecolor="white")
@@ -204,7 +221,7 @@ def counts_chart(mix_a, mix_b, path: Path) -> Path:
 
 def breakeven_chart(cmp_: pd.DataFrame, path: Path) -> Path:
     fig, ax = plt.subplots(figsize=(7.4, 3.6))
-    rec_col = {BRING_IN_HOUSE: "#1f4e79", TEST_3P_FIRST: "#c47b17", KEEP_3P: "#5b6770"}
+    rec_col = {BRING_IN_HOUSE: "#1f4e79", TEST_3P_FIRST: "#c47b17", KEEP_3P: "#5b6770", DO_NOT_RANGE: "#a9b3b9"}
     for rec, colour in rec_col.items():
         a = cmp_[cmp_["rec_a"] == rec]
         b = cmp_[cmp_["rec_b"] == rec]
@@ -282,10 +299,12 @@ def build():
     res_a = evaluate_entrant()
     res_b = evaluate_established()
     mid_a, mid_b = mid_band_table(res_a), mid_band_table(res_b)
-    mix_a, mix_b = mix_summary(res_a), mix_summary(res_b)
+    mix_a, mix_b = mix_summary(res_a, "operating"), mix_summary(res_b, "operating")
+    unit_a, unit_b = mix_summary(res_a, "unit"), mix_summary(res_b, "unit")
     cmp_ = comparison_mid_table()
     curve = mix_curve()
     ca, cb = counts(mid_a), counts(mid_b)
+    cua, cub = counts(mid_a, "unit_recommendation"), counts(mid_b, "unit_recommendation")
 
     p_counts = counts_chart(mix_a, mix_b, CHART_DIR / "counts.png")
     p_curve = mix_chart(curve, CHART_DIR / "curve.png")
@@ -313,13 +332,20 @@ def build():
     story.append(P(
         "The central lens is a <b>scale-up entrant</b> (Joybuy-like) versus an "
         "<b>established marketplace</b> (Amazon UK-like), and the 1P versus 3P "
-        "mix that follows. Scenario A uses assumed lower 1P margins, higher "
-        "per-unit fulfilment (low warehouse utilisation and a subsidised same-day "
-        "promise), little advertising income, and a possibly lower introductory "
-        "commission. Scenario B uses published retailer cost benchmarks, Amazon UK "
-        "published referral fees as a labelled stand-in, scale fulfilment, and a "
-        "material model-estimated ad take. A platform-maturity slider interpolates "
-        "between them. All entrant parameters are Assumptions with stated reasoning."
+        "mix that follows. v3.1 is a principled fix, not a refit: v3.0 recommended "
+        "0% 1P at the entrant, while Joybuy launched ~100% 1P. The model was "
+        "wrong, not Joybuy. <b>JD China’s 78.2% 1P revenue share is a parent-company "
+        "figure, not Joybuy’s mix, and is not a target.</b> Scenario A treats 3P as "
+        "available only where sellers can actually supply (default coverage 0%, so "
+        "the real alternative is ‘not ranged’); uses a 5% relative margin haircut "
+        "(0–10% band; 25% is a stress test), justified by JD’s published supplier "
+        "scale; and charges only variable fulfilment to the unit, because already-built "
+        "warehouse fixed cost is sunk. A land-grab layer, shown separately from unit "
+        "economics, values range completeness. Scenario B uses high seller coverage, "
+        "published retailer benchmarks, fully loaded fulfilment, Amazon UK published "
+        "referral as a labelled stand-in, and a material ad take. A maturity slider "
+        "moves the mix from 1P-led toward more 3P as seller depth and ads grow. "
+        "All entrant parameters are Assumptions with stated reasoning."
     ))
 
     story.append(P("The two scenarios, side by side", "H1"))
@@ -328,20 +354,25 @@ def build():
     left = box(
         SCENARIO_A_NAME,
         SCENARIO_A_BLURB
-        + f"<br/><br/><b>Mid-band recommendations (20 sub-categories).</b> "
-        f"Bring in-house {ca[BRING_IN_HOUSE]}  ·  Test as 3P first {ca[TEST_3P_FIRST]}  ·  "
-        f"Keep 3P {ca[KEEP_3P]}.<br/>"
-        f"<b>Implied 1P mix.</b> {mix_a['share_subs_1p']:.0%} of sub-categories, "
-        f"{mix_a['share_sales_1p']:.0%} of modelled mid-band sales "
+        + f"<br/><br/><b>Operating (strategic) mid-band.</b> "
+        f"Bring in-house {ca[BRING_IN_HOUSE]}  ·  Test {ca[TEST_3P_FIRST]}  ·  "
+        f"Keep 3P {ca[KEEP_3P]}  ·  Do not range {ca.get(DO_NOT_RANGE, 0)}. "
+        f"Implied 1P mix: {mix_a['share_subs_1p']:.0%} of sub-categories, "
+        f"{mix_a['share_sales_1p']:.0%} of modelled sales.<br/>"
+        f"<b>Unit-economics mid-band.</b> "
+        f"Bring in-house {cua[BRING_IN_HOUSE]}  ·  Test {cua[TEST_3P_FIRST]}  ·  "
+        f"Keep 3P {cua[KEEP_3P]}  ·  Do not range {cua.get(DO_NOT_RANGE, 0)}. "
+        f"1P mix: {unit_a['share_subs_1p']:.0%} of sub-categories, "
+        f"{unit_a['share_sales_1p']:.0%} of modelled sales "
         f"(Assumption: ex-VAT price × assumed weekly units).",
         width=half,
     )
     right = box(
         SCENARIO_B_NAME,
         SCENARIO_B_BLURB
-        + f"<br/><br/><b>Mid-band recommendations (20 sub-categories).</b> "
-        f"Bring in-house {cb[BRING_IN_HOUSE]}  ·  Test as 3P first {cb[TEST_3P_FIRST]}  ·  "
-        f"Keep 3P {cb[KEEP_3P]}.<br/>"
+        + f"<br/><br/><b>Operating mid-band</b> (unit and strategic coincide). "
+        f"Bring in-house {cb[BRING_IN_HOUSE]}  ·  Test {cb[TEST_3P_FIRST]}  ·  "
+        f"Keep 3P {cb[KEEP_3P]}  ·  Do not range {cb.get(DO_NOT_RANGE, 0)}.<br/>"
         f"<b>Implied 1P mix.</b> {mix_b['share_subs_1p']:.0%} of sub-categories, "
         f"{mix_b['share_sales_1p']:.0%} of modelled mid-band sales.",
         width=half,
@@ -357,7 +388,7 @@ def build():
     story.append(Image(str(p_counts), width=usable, height=usable * 2.8 / 7.4 * 0.95))
     story.append(P(
         "Figure 1. Mid-band recommendations under the default assumptions. "
-        "Bring in-house is the 1P path; Test as 3P first and Keep 3P are the 3P path. "
+        "Operating (strategic) recommendations. Bring in-house is the 1P path; Test as 3P first and Keep 3P are the 3P path; Do not range is a hole, not 3P. "
         "These are model estimates, not Joybuy decisions.",
         "Caption",
     ))
@@ -370,11 +401,13 @@ def build():
         story.append(P(f"<b>{i}. {title}.</b> {body}", "BulletBody"))
     story.append(P(WHY_SHIFT_TO_3P))
     story.append(P(
-        "The unit-economics test is a separate question. If, at the assumed "
-        "entrant margins, 1P contribution is thin or negative on some lines, "
-        "that tension is shown honestly in the findings and in the decision "
-        "table. Joybuy’s 1P-only launch is published context; it is not a "
-        "result this model is forced to reproduce."
+        "The unit-economics verdict and the strategic verdict are reported "
+        "separately, on purpose. Under the default entrant assumptions the "
+        "core mid-band range is 1P-led on <b>both</b> layers, because the real "
+        "alternative to 1P is ‘not ranged’ and variable-only fulfilment with a "
+        "5% haircut leaves a thin but positive contribution. That is consistent "
+        "with Joybuy’s 1P-only launch, and the model is not fitted to it. "
+        "JD China’s 78.2% 1P revenue share is not Joybuy’s mix."
     ))
 
     # ----- Findings -----
@@ -391,21 +424,27 @@ def build():
     story.append(P("Platform maturity and the mix shift", "H1"))
     story.append(P(
         "The optional platform-maturity slider in the app interpolates linearly "
-        "from A to B: the 1P margin haircut fades, fulfilment falls toward the "
-        "established rate, commission blends from the assumed introductory rate "
-        "toward Amazon UK published referral, and advertising and the warehouse "
-        "margin move toward their established values. The chart below is the "
-        "implied 1P mix along that path, under the default assumptions."
+        "from A to B: seller coverage rises, the 1P margin haircut fades, "
+        "fulfilment moves from variable-only toward a fully loaded at-scale "
+        "rate, commission blends toward Amazon UK published referral, and "
+        "advertising and the warehouse margin move toward their established "
+        "values. The chart below is the implied 1P mix along that path — "
+        "operating (strategic) and unit-economics — under the default assumptions. "
+        "The mix starts 1P-led and moves toward more 3P as seller depth and "
+        "ad income grow."
     ))
     story.append(KeepTogether([
         Image(str(p_curve), width=usable, height=usable * 2.6 / 7.4 * 0.95),
         P(
-            "Figure 2. Implied 1P mix along the platform-maturity slider. The "
-            "sales-weighted share can sit well below the sub-category share when "
-            "1P recommendations are in lower-priced categories (beauty, baby care) "
-            "and higher-priced durables stay on the 3P path. Both series are model "
-            "outputs on assumed prices and weekly units, not observed GMV, and not "
-            "fitted to Amazon’s disclosed 61% third-party share of paid units.",
+            "Figure 2. Implied 1P mix along the platform-maturity slider. Solid "
+            "and short-dash lines are the operating (strategic) mix — what an "
+            "entrant would run. Dotted lines are the unit-economics mix. The two "
+            "converge as seller coverage crosses the 50% Assumption threshold. "
+            "The sales-weighted share can sit well below the sub-category share "
+            "when 1P recommendations are in lower-priced categories. All series "
+            "are model outputs on assumed prices and weekly units, not observed "
+            "GMV, and not fitted to Amazon’s disclosed 61% third-party share of "
+            "paid units or to JD China’s 78.2% 1P revenue share.",
             "Caption",
         ),
     ]))
@@ -414,14 +453,17 @@ def build():
     story.append(P("Decisions per sub-category, under each scenario", "H1"))
     story.append(P(
         "One mid-price band per sub-category. Prices are Assumptions in GBP, "
-        "ex-VAT. Contribution and the 3P take are shares of that ex-VAT price. "
-        "A flip means the recommendation changes between A and B."
+        "ex-VAT. Contribution is a share of that ex-VAT price. Each scenario "
+        "has a <b>unit-economics verdict</b> and a <b>strategic verdict</b>. "
+        "The operating recommendation is the strategic one while seller "
+        "coverage is thin. A flip means the operating recommendation changes "
+        "between A and B."
     ))
     header = [
         P(h, "Th") for h in (
-            "Category", "Sub-category", "Mid price (ex-VAT)",
-            "A 1P contrib.", "A 3P take", "A rec.",
-            "B 1P contrib.", "B 3P take", "B rec.", "Flip",
+            "Category", "Sub-category",
+            "A 1P contrib.", "A unit", "A strategic",
+            "B 1P contrib.", "B unit", "B strategic", "Flip",
         )
     ]
     rows = [header]
@@ -429,23 +471,23 @@ def build():
         rows.append([
             P(r["category_en"], "Td"),
             P(r["sub_en"], "Td"),
-            P(f"£{r['price_gbp']:.0f}", "TdC"),
             P(f"{r['c1p_pct_a']:.1%}", "TdC"),
-            P(f"{r['take_a']:.1%}", "TdC"),
-            P(r["rec_a"], "Td"),
+            P(r["rec_unit_a"], "Td"),
+            P(r["rec_strategic_a"], "Td"),
             P(f"{r['c1p_pct_b']:.1%}", "TdC"),
-            P(f"{r['take_b']:.1%}", "TdC"),
-            P(r["rec_b"], "Td"),
+            P(r["rec_unit_b"], "Td"),
+            P(r["rec_strategic_b"], "Td"),
             P("Yes" if r["flipped"] else "—", "TdC"),
         ])
-    widths = [24*mm, 38*mm, 16*mm, 16*mm, 15*mm, 26*mm, 16*mm, 15*mm, 26*mm, 10*mm]
-    # sum check: 24+38+16+16+15+26+16+15+26+10 = 202, a bit over 178. Shrink.
-    widths = [22*mm, 36*mm, 15*mm, 15*mm, 14*mm, 22*mm, 15*mm, 14*mm, 22*mm, 9*mm]
+    # 20+36+14+22+24+14+22+24+10 = 186; shrink to 178.
+    widths = [20*mm, 31*mm, 14*mm, 21*mm, 23*mm, 14*mm, 21*mm, 23*mm, 11*mm]
     story.append(styled_table(rows, widths))
     n_flip = int(cmp_["flipped"].sum())
+    n_flip_u = int(cmp_["flipped_unit"].sum())
     story.append(P(
         f"Table 1. {n_flip} of {len(cmp_)} mid-band sub-categories change "
-        "recommendation between the entrant and the established scenario. "
+        f"operating recommendation between the entrant and the established "
+        f"scenario ({n_flip_u} flip on the unit-economics verdict). "
         "Model estimates on assumed price points, not Joybuy decisions.",
         "Caption",
     ))
@@ -472,8 +514,10 @@ def build():
         ])
     story.append(styled_table(crow, [36*mm, 22*mm, 26*mm, 26*mm, 22*mm, 26*mm, 26*mm]))
     story.append(P(
-        "Table 2. 1P path share of sub-categories and of modelled mid-band sales, "
-        "by category. Modelled sales are an Assumption.",
+        "Table 2. Operating (strategic) 1P path share of sub-categories and of "
+        "modelled mid-band sales, by category. Under the default entrant "
+        "assumptions the unit-economics mix on the mid-band agrees (20 of 20 "
+        "Bring in-house). Modelled sales are an Assumption.",
         "Caption",
     ))
 
@@ -494,11 +538,16 @@ def build():
     # ----- KPIs and rules -----
     story.append(P("The four tests, and the decision rules", "H1"))
     story.append(P(
-        "<b>1. Contribution per unit.</b> What is kept if we stock it, versus "
-        "the 3P take if we list it. 1P has to beat the take. 1P contribution "
-        "is ex-VAT price, minus cost of goods at the (maturity-adjusted) gross "
-        "margin, minus fulfilment, minus a CV-scaled extra markdown, minus "
-        "physical holding. The 3P take is commission (introductory Assumption "
+        "<b>1. Contribution per unit, availability-adjusted.</b> What is kept "
+        "if we stock it (plus a labelled basket/traffic spillover), versus the "
+        "3P take only where sellers can actually supply. Where they cannot, "
+        "the alternative is ‘not ranged’ (payoff zero, plus a lost-assortment "
+        "value), not a 3P take. 1P contribution is ex-VAT price, minus cost of "
+        "goods at the (maturity-adjusted) gross margin, minus <b>variable</b> "
+        "fulfilment at the entrant (or fully loaded fulfilment at scale), minus "
+        "a CV-scaled extra markdown, minus physical holding. Already-built "
+        "warehouse fixed cost and the same-day subsidy are memo lines, not in "
+        "the unit verdict. The 3P take is commission (introductory Assumption "
         "at the entrant end; Amazon UK published referral as a benchmark "
         "stand-in at the established end, applied on the VAT-inclusive price) "
         "plus advertising and the platform’s warehouse margin, only for the "
@@ -518,11 +567,13 @@ def build():
         "<b>4. Demand predictability.</b> Assumed weekly velocity and CV drive "
         "the mid-tail rule (Jiang, Jerath and Srinivasan, 2011) and a "
         "safety-stock add-on. Volatility is a cost and a warning, not an "
-        "automatic override. A strategic tilt (Hagiu and Wright, 2015; "
-        "Joybuy’s 1P-only launch) applies only in close cases, and never "
-        "overturns a clear money loss."
+        "automatic override. Long-tail lines with no sellers are left as a "
+        "hole. A land-grab layer, clearly separated from unit economics, "
+        "ranges mid- and high-velocity lines as 1P while seller coverage is "
+        "below 50%. A close-case strategic tilt (Hagiu and Wright, 2015) "
+        "never overturns a clear money loss on the unit layer."
     ))
-    for key in ("contribution", "gmroi", "midtail", "strategic", "volatility", "maturity"):
+    for key in ("contribution", "gmroi", "midtail", "strategic", "volatility", "maturity", "coverage", "sunk", "landgrab"):
         rule = RULE_CITATIONS[key]
         story.append(P(rule["title"], "H2"))
         story.append(P(f"{rule['basis']} <i>{rule['cite']}</i>"))
@@ -572,6 +623,12 @@ def build():
         ("Amazon UK referral fees", "7% to 15% by category, with clothing and beauty tiers; minimum £0.25",
          "sell.amazon.co.uk/pricing. Used as a labelled stand-in, not as Joybuy’s fees. Applied on the VAT-inclusive price.",
          "Benchmark: Amazon UK published fees"),
+        ("JD supplier / manufacturer scale", "Qualitative (not a model input number)",
+         "JD 20-F FY2025, Item 4.B, page 88 (supplier, brand and partner relationships) and page 95 (direct manufacturer relationships; better procurement terms). Supports a small default entrant haircut. Joybuy is not named in the 20-F.",
+         "Published (parent company)"),
+        ("JD 1P product revenue share", "78.2% of JD net revenues",
+         "JD 20-F FY2025. Parent-company China revenue share (1P gross, 3P net), clearly separated. Not Joybuy’s mix, and not a target this model is fitted to.",
+         "Published (parent company; not a Joybuy figure)"),
     ]
     for name, val, where, lab in sources:
         src_rows.append([P(name, "TdBd"), P(val, "Td"), P(where, "Td"), P(lab, "Td")])
@@ -589,8 +646,12 @@ def build():
     ass_h = [P(h, "Th") for h in ("Parameter", "Default", "Reasoning")]
     ass = [ass_h]
     for name, val, reason in (
-        ("1P gross-margin haircut (relative)", f"{ENTRANT_GM_HAIRCUT:.0%}", ENTRANT_GM_HAIRCUT_REASON),
-        ("1P fulfilment multiple", f"{ENTRANT_FULFILMENT_MULTIPLIER:.1f}×", ENTRANT_FULFILMENT_REASON),
+        ("Seller coverage, entrant / established", f"{ENTRANT_SELLER_COVERAGE:.0%} / {ESTABLISHED_SELLER_COVERAGE:.0%}", ENTRANT_SELLER_COVERAGE_REASON),
+        ("Basket / traffic spillover", f"{SPILLOVER_PCT:.0%} of ex-VAT price", SPILLOVER_REASON),
+        ("1P gross-margin haircut (relative)", f"{ENTRANT_GM_HAIRCUT:.0%} (0–10% band; 25% stress test)", ENTRANT_GM_HAIRCUT_REASON),
+        ("Fulfilment variable-cost share", f"{FULFILMENT_VARIABLE_SHARE:.0%} of the established rate, at the entrant", FULFILMENT_VARIABLE_SHARE_REASON),
+        ("Entrant warehouse utilisation (memo)", f"{ENTRANT_WAREHOUSE_UTILISATION:.0%}", ENTRANT_WAREHOUSE_UTILISATION_REASON),
+        ("Same-day subsidy (CAC, memo)", f"{SAME_DAY_SUBSIDY:.0%} of ex-VAT price", SAME_DAY_SUBSIDY_REASON),
         ("Advertising take, entrant", f"{ENTRANT_AD_TAKE:.1%}", ENTRANT_AD_TAKE_REASON),
         ("Advertising take, established", f"{ESTABLISHED_AD_TAKE:.1%} (range 1.5–5%)", ESTABLISHED_AD_TAKE_REASON),
         ("Introductory commission", f"{ENTRANT_INTRO_COMMISSION:.0%} (sensitivity 5–8%)", ENTRANT_INTRO_REASON),
@@ -600,8 +661,6 @@ def build():
         ass.append([P(name, "TdBd"), P(val, "TdC"), P(reason, "Td")])
     story.append(styled_table(ass, [40*mm, 32*mm, 106*mm]))
     story.append(P("Table 4. Entrant (and some established) parameters. All Assumptions or model estimates, with reasoning.", "Caption"))
-
-    story.append(PageBreak())
 
     # ----- Open questions -----
     story.append(P("Open questions for reviewers", "H1"))
@@ -628,18 +687,22 @@ def build():
             "Currys’ 18.3% is group gross margin, including services and the Nordics. "
             "Zalando figures are EU. THG Beauty is multi-geography. Established "
             "online electronics fulfilment (12%) is a model estimate. Mother and "
-            "baby uses adjacent proxies (THG, Zalando, Currys). The 25% inventory "
-            "hurdle is an Assumption. The model compares contribution on a single "
-            "representative unit; it does not model competitive response, buy-box "
-            "rules, or a seller’s decision to leave. Amazon’s disclosed 61% "
-            "third-party share of worldwide paid units (Q4 2025) is published "
-            "context for a mature mix; this model is not fitted to it."
+            "baby uses adjacent proxies (THG, Zalando, Currys). Seller coverage, "
+            "the 8% spillover, the 70/30 variable/fixed fulfilment split, the 5% "
+            "margin haircut and the 25% inventory hurdle are Assumptions. The "
+            "model compares contribution on a single representative unit; it does "
+            "not model competitive response, buy-box rules, or a seller’s decision "
+            "to leave. Amazon’s disclosed 61% third-party share of worldwide paid "
+            "units (Q4 2025) is published context for a mature mix; this model is "
+            "not fitted to it. JD China’s 78.2% 1P revenue share is a parent "
+            "figure, not Joybuy’s mix, and is not a target."
         ),
         Spacer(1, 4 * mm),
         P(
             "The interactive model (Streamlit) lets you move the platform-maturity "
-            "slider, change the entrant haircut, fulfilment multiple, introductory "
-            "commission and advertising takes, and inspect a worked example for "
+            "slider, change seller coverage, the margin haircut, spillover, the "
+            "variable-fulfilment share, introductory commission and advertising "
+            "takes, turn the strategic layer off, and inspect a worked example for "
             "any sub-category. Run <font face='Lib'>streamlit run streamlit_app.py</font> "
             "from the repository."
         ),
@@ -656,7 +719,7 @@ def build():
         rightMargin=16 * mm,
         topMargin=16 * mm,
         bottomMargin=16 * mm,
-        title="Joybuy UK: own stock vs marketplace listing (v3.0)",
+        title="Joybuy UK: own stock vs marketplace listing (v3.1)",
         author="Ami Sata",
         subject="Decision-support overview for peer review",
     )

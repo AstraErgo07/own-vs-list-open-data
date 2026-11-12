@@ -58,6 +58,16 @@ def test_main_page_loads_without_exception():
     assert "Olist" not in blob  # dropped, not on the main page
     assert "breakeven" in blob.lower() or "Break-even" in blob or "Breakeven" in blob
     assert "Made by Ami Sata" in blob
+    # v3.1 surface: both verdicts, seller coverage, sunk cost, version.
+    assert "v3.1" in blob or "v3.1" in _titles(at) or "v3.1" in _captions(at)
+    assert "unit" in blob.lower() and "strategic" in blob.lower()
+    assert "seller coverage" in blob.lower() or "Seller coverage" in blob
+    assert "sunk" in blob.lower() or "variable" in blob.lower()
+    assert "Do not range" in blob or "not ranged" in blob.lower() or "Do not range" in metric_labels
+    # 78.2% must not be presented as Joybuy's mix.
+    if "78.2" in blob or "78%" in blob:
+        assert "parent" in blob.lower() or "JD China" in blob or "not Joybuy" in blob
+    assert "land-grab" in blob.lower() or "strategic verdict" in blob.lower() or "strategic / land-grab" in blob.lower()
 
 
 def test_method_page_loads_and_credits_sources():
@@ -91,10 +101,13 @@ def test_method_page_loads_and_credits_sources():
     assert "Assumption" in text
     assert "open question" in text.lower() or "Open question" in text
     assert "GMV" in text or "gmv" in text.lower()
+    assert "seller coverage" in text.lower() or "Seller coverage" in text or "coverage" in text.lower()
+    assert "variable" in text.lower() or "sunk" in text.lower()
+    assert "v3.1" in text or "v3.1" in _captions(at)
 
 
 def test_joybuy_is_the_subject_and_old_bans_do_not_apply():
-    """v3.0 is about Joybuy; the old source-ban on that name is retired."""
+    """v3.1 is about Joybuy; the old source-ban on that name is retired."""
     # OnBuy and Walmart still should not appear as if they were this model.
     banned = ("onbuy", "walmart")
     skip = {".pyc", "__pycache__", ".gz", ".pdf"}

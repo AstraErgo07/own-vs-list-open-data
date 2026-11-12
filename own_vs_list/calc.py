@@ -28,15 +28,21 @@ from .archetypes import (
 )
 from .maturity import (
     ENTRANT_AD_TAKE,
-    ENTRANT_FULFILMENT_MULTIPLIER,
     ENTRANT_GM_HAIRCUT,
     ENTRANT_INTRO_COMMISSION,
     ENTRANT_LOGISTICS_MARGIN,
+    ENTRANT_SELLER_COVERAGE,
     ENTRANT_WAREHOUSE_SHARE,
+    ENTRANT_WAREHOUSE_UTILISATION,
     ESTABLISHED_AD_TAKE,
     ESTABLISHED_LOGISTICS_MARGIN,
+    ESTABLISHED_SELLER_COVERAGE,
     ESTABLISHED_WAREHOUSE_SHARE,
+    FULFILMENT_VARIABLE_SHARE,
     LOGISTICS_FEE_PROXY,
+    SAME_DAY_SUBSIDY,
+    SPILLOVER_PCT,
+    STRATEGIC_COVERAGE_THRESHOLD,
     SCENARIO_A_NAME,
     SCENARIO_B_NAME,
     MaturityState,
@@ -77,7 +83,8 @@ from .uk_sources import (
 BRING_IN_HOUSE = "Bring in-house"
 TEST_3P_FIRST = "Test as 3P first"
 KEEP_3P = "Keep 3P"
-RECOMMENDATIONS = (BRING_IN_HOUSE, TEST_3P_FIRST, KEEP_3P)
+DO_NOT_RANGE = "Do not range"
+RECOMMENDATIONS = (BRING_IN_HOUSE, TEST_3P_FIRST, KEEP_3P, DO_NOT_RANGE)
 
 LABEL_KEPT = "Kept per unit if we stock it"
 LABEL_EXTRA = "Extra per unit from stocking it"
@@ -110,7 +117,6 @@ class Assumptions:
     # Platform maturity: 0 = entrant (A), 1 = established (B).
     maturity: float = 0.0
     gm_haircut_entrant: float = ENTRANT_GM_HAIRCUT
-    fulfilment_multiplier_entrant: float = ENTRANT_FULFILMENT_MULTIPLIER
     ad_take_entrant: float = ENTRANT_AD_TAKE
     ad_take_established: float = ESTABLISHED_AD_TAKE
     intro_commission: float = ENTRANT_INTRO_COMMISSION
@@ -119,6 +125,14 @@ class Assumptions:
     logistics_margin_entrant: float = ENTRANT_LOGISTICS_MARGIN
     logistics_margin_established: float = ESTABLISHED_LOGISTICS_MARGIN
     logistics_fee_proxy: float = LOGISTICS_FEE_PROXY
+    fulfilment_multiplier_entrant: float = 1.0  # retired; kept so old replace() calls do not fail
+    seller_coverage_entrant: float = ENTRANT_SELLER_COVERAGE
+    seller_coverage_established: float = ESTABLISHED_SELLER_COVERAGE
+    spillover_pct: float = SPILLOVER_PCT
+    same_day_subsidy: float = SAME_DAY_SUBSIDY
+    fulfilment_variable_share: float = FULFILMENT_VARIABLE_SHARE
+    warehouse_utilisation_entrant: float = ENTRANT_WAREHOUSE_UTILISATION
+    apply_strategic_layer: bool = True
 
     vat_rate: float = UK_VAT_RATE
     apply_referral_on_vat_inc: bool = True
@@ -129,6 +143,7 @@ class Assumptions:
     ad_take: float | None = None
     warehouse_share: float | None = None
     logistics_margin: float | None = None
+    seller_coverage: float | None = None
 
     def to_json(self) -> str:
         return json.dumps(asdict(self), sort_keys=True, default=str)
@@ -145,6 +160,12 @@ class Assumptions:
             established_wh=self.warehouse_share_established,
             entrant_log_m=self.logistics_margin_entrant,
             established_log_m=self.logistics_margin_established,
+            entrant_coverage=self.seller_coverage_entrant,
+            established_coverage=self.seller_coverage_established,
+            spillover_pct=self.spillover_pct,
+            same_day_subsidy=self.same_day_subsidy,
+            variable_share=self.fulfilment_variable_share,
+            warehouse_utilisation=self.warehouse_utilisation_entrant,
         )
 
     def resolved_ad_take(self) -> float:
@@ -165,6 +186,11 @@ class Assumptions:
         if self.logistics_margin is not None:
             return float(self.logistics_margin)
         return self.state().logistics_margin
+
+    def resolved_coverage(self) -> float:
+        if self.seller_coverage is not None:
+            return min(max(float(self.seller_coverage), 0.0), 1.0)
+        return min(max(self.state().seller_coverage, 0.0), 1.0)
 
     def logistics_contrib_pct(self) -> float:
         if not self.use_full_3p_take:
@@ -280,9 +306,15 @@ def _gm(sub: SubCategory, a: Assumptions) -> float:
 
 
 def _ful(sub: SubCategory, a: Assumptions) -> float:
+    """1P fulfilment used in unit contribution.
+
+    At the entrant end this is the variable share only (pick, pack,
+    last-mile). Already-built warehouse fixed cost is sunk and is not
+    in this rate. At the established end the full at-scale rate is used.
+    """
     if a.fulfilment_override is not None:
         return a.fulfilment_override
-    return sub.fulfilment_pct * a.state().fulfilment_multiplier
+    return sub.fulfilment_pct * a.state().unit_fulfilment_share
 
 
 def _cover_base(sub: SubCategory, a: Assumptions) -> float:
@@ -317,15 +349,88 @@ def money_tests(c1p: float, net3p: float, roc: float, a: Assumptions) -> tuple[b
     return both, near, margin_win
 
 
-def decide(c1p, net3p, roc, band: Band, sub: SubCategory, a: Assumptions) -> tuple[str, str]:
-    """Recommendation and a short rule code. Citations live in RULES."""
+def decide_unit(
+    c1p, payoff_1p, payoff_3p, roc, band: Band, sub: SubCategory,
+    a: Assumptions, coverage: float,
+) -> tuple[str, str]:
+    """Unit-economics verdict, with 3P weighted by seller coverage.
+
+    Payoffs already include basket spillover. When coverage is near zero,
+    payoff_3p is near zero (not ranged), and a loss versus that alternative
+    is 'Do not range', not 'Keep 3P'. Mid-tail learning from 3P sales is
+    only available when coverage is material. Close-case category tilt is
+    left to the strategic layer; this function is the money test.
+    """
     warning = band.cv >= a.volatility_cv_threshold
     if a.volatility_overrides_decision and warning:
         return TEST_3P_FIRST, "volatile_demand"
 
+    # Reuse money_tests on the availability-adjusted payoffs.
+    both, near, margin_win = money_tests(payoff_1p, payoff_3p, roc, a)
+    unproven = is_unproven(band, a)
+    sellers_real = coverage >= 0.15  # Assumption: below this, 3P is not a real path
+
+    if near:
+        if not sellers_real:
+            # Close against 'not ranged': still range if payoff_1p is clearly positive.
+            if payoff_1p > 0 and roc >= a.hurdle_rate:
+                return BRING_IN_HOUSE, "1p_beats_not_ranged_close"
+            return DO_NOT_RANGE, "near_not_ranged"
+        return TEST_3P_FIRST, "near_threshold"
+
+    if both:
+        if a.apply_midtail and band.velocity == VELOCITY_LOW:
+            if sellers_real:
+                return KEEP_3P, "long_tail_3p"
+            return DO_NOT_RANGE, "long_tail_no_sellers"
+        if a.apply_midtail and unproven:
+            if sellers_real:
+                return TEST_3P_FIRST, "mid_tail_learn"
+            return DO_NOT_RANGE, "unproven_no_sellers"
+        return BRING_IN_HOUSE, "1p_wins"
+
+    # 1P does not clearly win the availability-adjusted test.
+    if not sellers_real:
+        return DO_NOT_RANGE, "1p_loses_vs_not_ranged"
+    if not margin_win and roc <= a.hurdle_rate:
+        return KEEP_3P, "3p_wins_margin_and_roc"
+    if not margin_win:
+        return KEEP_3P, "3p_wins_margin"
+    return KEEP_3P, "roc_below_hurdle"
+
+
+def decide_strategic(
+    unit_rec: str, unit_rule: str, band: Band, sub: SubCategory,
+    a: Assumptions, coverage: float,
+) -> tuple[str, str]:
+    """Land-grab / strategic verdict, clearly separated from unit economics.
+
+    When seller coverage is below the threshold, mid- and high-velocity
+    lines are ranged as 1P for completeness, warehouse fill and the
+    absence of 3P ads — even if unit contribution is thin. Long-tail
+    lines may be left as a hole. When coverage is at or above the
+    threshold, this follows the unit verdict. The layer can be turned off.
+    """
+    if not a.apply_strategic_layer:
+        return unit_rec, "strategic_off_" + unit_rule
+    if coverage >= STRATEGIC_COVERAGE_THRESHOLD:
+        return unit_rec, "follow_unit_economics"
+    # Thin seller base: land-grab.
+    if a.apply_midtail and band.velocity == VELOCITY_LOW:
+        return DO_NOT_RANGE, "strategic_leave_long_tail"
+    return BRING_IN_HOUSE, "strategic_range_completeness"
+
+
+def decide(c1p, net3p, roc, band: Band, sub: SubCategory, a: Assumptions) -> tuple[str, str]:
+    """Back-compat wrapper: unit verdict with coverage treated as 1 (full 3P available).
+
+    The v3.1 evaluate_band path uses decide_unit / decide_strategic directly.
+    Tests that call decide() still get the classic money test.
+    """
     both, near, margin_win = money_tests(c1p, net3p, roc, a)
     unproven = is_unproven(band, a)
-
+    if a.volatility_overrides_decision and band.cv >= a.volatility_cv_threshold:
+        return TEST_3P_FIRST, "volatile_demand"
     if near:
         if a.apply_strategic_tilt and margin_win and roc >= a.hurdle_rate:
             if sub.strategic == STRATEGIC_1P:
@@ -335,14 +440,12 @@ def decide(c1p, net3p, roc, band: Band, sub: SubCategory, a: Assumptions) -> tup
             if sub.strategic == STRATEGIC_3P:
                 return TEST_3P_FIRST, "near_strategic_3p"
         return TEST_3P_FIRST, "near_threshold"
-
     if both:
         if a.apply_midtail and band.velocity == VELOCITY_LOW:
             return KEEP_3P, "long_tail_3p"
         if a.apply_midtail and unproven:
             return TEST_3P_FIRST, "mid_tail_learn"
         return BRING_IN_HOUSE, "1p_wins"
-
     if not margin_win and roc <= a.hurdle_rate:
         return KEEP_3P, "3p_wins_margin_and_roc"
     if not margin_win:
@@ -406,6 +509,52 @@ RULE_TEXT = {
         "The volatility-override toggle is on, and assumed weekly CV is "
         "above the warning bar, so the recommendation is forced to test-first. "
         "This is off by default."
+    ),
+    "1p_beats_not_ranged_close": (
+        "Seller coverage is too thin for 3P to be a real alternative. "
+        "The 1P payoff (contribution plus a labelled basket spillover) is "
+        "ahead of 'not ranged', but close. The unit verdict is still to "
+        "stock it."
+    ),
+    "near_not_ranged": (
+        "Seller coverage is too thin for 3P to be a real alternative, and "
+        "the 1P payoff is close to 'not ranged'. The unit verdict is not "
+        "to force a close ranging decision."
+    ),
+    "long_tail_no_sellers": (
+        "1P would win the money test against 'not ranged', but assumed "
+        "demand is a long tail. With no sellers to leave it with, the "
+        "unit verdict is to leave a hole rather than stock a low-velocity "
+        "line. The strategic layer may agree."
+    ),
+    "unproven_no_sellers": (
+        "1P would win the money test against 'not ranged', but assumed "
+        "demand is unproven. There are not enough sellers to learn from "
+        "early 3P sales, so the unit verdict is not to range it yet."
+    ),
+    "1p_loses_vs_not_ranged": (
+        "Seller coverage is too thin for 3P to be a real alternative, and "
+        "the 1P payoff (contribution plus spillover) does not beat 'not "
+        "ranged'. The unit verdict is not to stock it. The strategic "
+        "layer may still range it as 1P for completeness."
+    ),
+    "strategic_range_completeness": (
+        "Strategic verdict, separate from unit economics. Seller coverage "
+        "is below the threshold, so 3P cannot complete the offer. This "
+        "mid- or high-velocity line is ranged as 1P for assortment "
+        "completeness, to put volume through already-open warehouses, and "
+        "because 3P ads are not yet a material income. Unit contribution "
+        "may be thin; that is shown in the unit verdict."
+    ),
+    "strategic_leave_long_tail": (
+        "Strategic verdict. Even in a land-grab, a low-velocity long tail "
+        "can be left as a hole rather than stocked. Seller coverage is "
+        "too thin to leave it with 3P."
+    ),
+    "follow_unit_economics": (
+        "Strategic verdict. Seller coverage is deep enough that 3P is a "
+        "real alternative, so the land-grab layer follows the unit-"
+        "economics verdict."
     ),
 }
 
@@ -504,12 +653,92 @@ RULE_CITATIONS = {
             "Amazon seller unit mix: Q4 2025 earnings release, 5 February 2026."
         ),
         "in_this_model": (
-            "Scenario A (entrant) applies assumed lower 1P margins, higher "
-            "fulfilment, a near-zero ad take and an introductory commission. "
-            "Scenario B (established) uses published retailer benchmarks, "
-            "Amazon UK published referral fees as a stand-in, and a material "
-            "model-estimated ad take. A maturity slider interpolates between "
-            "them. All entrant numbers are Assumptions with stated reasoning."
+            "Scenario A (entrant) uses a small margin haircut, variable-only "
+            "fulfilment (sunk warehouse fixed costs shown separately), a "
+            "near-zero ad take, an introductory commission, and — the "
+            "central v3.1 fix — seller coverage that is near zero, so the "
+            "real alternative to 1P is 'not ranged'. Scenario B uses "
+            "published retailer benchmarks, fully loaded fulfilment, "
+            "Amazon UK published referral as a stand-in, a material ad "
+            "take, and high seller coverage. A maturity slider interpolates "
+            "between them. A land-grab layer, shown separately from unit "
+            "economics, ranges the core offer as 1P while coverage is thin. "
+            "All entrant numbers are Assumptions with stated reasoning."
+        ),
+    },
+    "coverage": {
+        "title": "3P is only a real alternative where sellers can supply the range",
+        "basis": (
+            "A 3P take is not the opportunity cost of 1P if there is no "
+            "seller to take the listing. Joybuy launched 1P-only in March "
+            "2026; a curated marketplace test was planned from H2 2026. "
+            "At that point the alternative to stocking a line is a hole "
+            "in the range, which also risks a lost basket."
+        ),
+        "cite": (
+            "Joybuy launch: Operator One, September 2026; ChannelX, 15 June 2026. "
+            "The coverage ratios themselves are Assumptions."
+        ),
+        "in_this_model": (
+            "Seller coverage is the assumed share of the sub-category "
+            "range that third-party sellers can actually supply (default "
+            "0% at the entrant end, 90% at the established end). The "
+            "unit-economics 3P payoff is coverage × (3P take + spillover). "
+            "The uncovered share is valued as 'not ranged': the platform "
+            "gets no take and loses a labelled basket/traffic spillover "
+            "(default 8% of the ex-VAT price). 1P payoff is 1P contribution "
+            "plus the same spillover (the item is ranged). This is unit "
+            "economics done with the right alternative, not a strategic fudge."
+        ),
+    },
+    "sunk": {
+        "title": "Already-built warehouse fixed cost is sunk",
+        "basis": (
+            "Joybuy has opened warehouses at Milton Keynes and Luton. "
+            "Their occupancy and base-staff cost is incurred whether a "
+            "given SKU is stocked or not. The incremental 1P decision "
+            "should use variable fulfilment (pick, pack, last-mile). "
+            "Under-utilisation is a network-level scale-up investment. "
+            "JD's 20-F discusses improving overall utilisation through "
+            "economies of scale as a network goal, not a SKU penalty."
+        ),
+        "cite": (
+            "Warehouses: ChannelX, June 2026; Operator One, September 2026. "
+            "JD 20-F FY2025, Item 5, utilisation through economies of scale. "
+            "The 70/30 variable/fixed split is an Assumption."
+        ),
+        "in_this_model": (
+            "Entrant unit contribution uses 70% of the established "
+            "fulfilment rate. The remaining 30%, and any extra from "
+            "under-utilisation, is reported as a scale-up investment "
+            "memo, not subtracted from the per-SKU contribution. A "
+            "same-day subsidy is a customer-acquisition cost, also "
+            "shown separately and not in the unit verdict. At the "
+            "established end, fulfilment is fully loaded at scale."
+        ),
+    },
+    "landgrab": {
+        "title": "A land-grab layer, separate from unit economics",
+        "basis": (
+            "An entrant may range as 1P to complete the offer, fill "
+            "already-open warehouses, and build traffic before ads can "
+            "monetise 3P — even when unit contribution is thin. That "
+            "is a strategic choice, and it is reported as such."
+        ),
+        "cite": (
+            "Joybuy launched as 1P-only in March 2026 (Operator One; ChannelX). "
+            "That launch is published context for a sanity check, not a "
+            "target this model is fitted to. JD China's 78.2% 1P revenue "
+            "share is a parent-company figure, not Joybuy's mix."
+        ),
+        "in_this_model": (
+            "When seller coverage is below 50% (an Assumption), the "
+            "strategic verdict for mid- and high-velocity lines is "
+            "Range as 1P (Bring in-house). Low-velocity long-tail "
+            "lines may be left unranged. When coverage is at or above "
+            "50%, the strategic verdict follows unit economics. Both "
+            "verdicts are shown. The operating mix — what an entrant "
+            "would run — uses the strategic verdict."
         ),
     },
 }
@@ -562,7 +791,24 @@ def evaluate_band(sub: SubCategory, band: Band, cat: Category | None, a: Assumpt
     serve_unit = price * (a.serving_cost_pct if a.use_full_3p_take else 0.0)
     roc = return_on_capital(c1p, cogs, band.weekly_units, cover)
     extra = c1p - net3p
-    rec, rule = decide(c1p, net3p, roc, band, sub, a)
+    coverage = a.resolved_coverage()
+    spillover = price * float(st.spillover_pct)
+    # Availability-adjusted payoffs: 3P only exists where sellers can supply.
+    # On the uncovered share the real alternative is 'not ranged' (payoff 0,
+    # plus the lost spillover). 1P ranges the whole line and captures spillover.
+    payoff_1p = c1p + spillover
+    payoff_3p = coverage * (net3p + spillover)
+    lost_assortment = (1.0 - coverage) * (max(c1p, 0.0) + spillover)
+    same_day_cac = price * float(st.same_day_subsidy)
+    fixed_memo = price * sub.fulfilment_pct * st.unallocated_fixed_memo_multiplier
+    unit_rec, unit_rule = decide_unit(
+        c1p, payoff_1p, payoff_3p, roc, band, sub, a, coverage,
+    )
+    strat_rec, strat_rule = decide_strategic(
+        unit_rec, unit_rule, band, sub, a, coverage,
+    )
+    # The operating recommendation — what an entrant would run — is strategic.
+    rec, rule = strat_rec, strat_rule
     warning = band.cv >= a.volatility_cv_threshold
     breakeven = (c1p / price) if price else float("nan")
     modelled_weekly_sales = price * float(band.weekly_units)
@@ -570,13 +816,16 @@ def evaluate_band(sub: SubCategory, band: Band, cat: Category | None, a: Assumpt
         "Assumption (override)" if a.gm_override is not None
         else (sub.gm_label if st.gm_haircut == 0 else f"Assumption (entrant: {st.gm_haircut:.0%} haircut on {sub.gm_label})")
     )
-    ful_label = (
-        "Assumption (override)" if a.fulfilment_override is not None
-        else (
-            sub.fulfilment_label if st.fulfilment_multiplier == 1.0
-            else f"Assumption (entrant: {st.fulfilment_multiplier:.2f}× {sub.fulfilment_label})"
+    if a.fulfilment_override is not None:
+        ful_label = "Assumption (override)"
+    elif st.unit_fulfilment_share >= 0.999:
+        ful_label = f"{sub.fulfilment_label} (fully loaded at scale)"
+    else:
+        ful_label = (
+            f"Assumption (entrant: variable fulfilment only, "
+            f"{st.unit_fulfilment_share:.0%} of the established rate; "
+            f"{sub.fulfilment_label})"
         )
-    )
     if a.maturity <= 0.0:
         commission_label = (
             f"Assumption (introductory commission {a.intro_commission:.0%}, "
@@ -669,7 +918,29 @@ def evaluate_band(sub: SubCategory, band: Band, cat: Category | None, a: Assumpt
         "return_on_capital": roc,
         "recommendation": rec,
         "rule": rule,
-        "rule_text": RULE_TEXT[rule],
+        "rule_text": RULE_TEXT.get(rule, rule),
+        "unit_recommendation": unit_rec,
+        "unit_rule": unit_rule,
+        "unit_rule_text": RULE_TEXT.get(unit_rule, unit_rule),
+        "strategic_recommendation": strat_rec,
+        "strategic_rule": strat_rule,
+        "strategic_rule_text": RULE_TEXT.get(strat_rule, strat_rule),
+        "seller_coverage": coverage,
+        "spillover_pct": st.spillover_pct,
+        "spillover_unit": spillover,
+        "payoff_1p": payoff_1p,
+        "payoff_3p": payoff_3p,
+        "payoff_1p_pct": (payoff_1p / price) if price else float("nan"),
+        "payoff_3p_pct": (payoff_3p / price) if price else float("nan"),
+        "lost_assortment_unit": lost_assortment,
+        "lost_assortment_pct": (lost_assortment / price) if price else float("nan"),
+        "same_day_subsidy": st.same_day_subsidy,
+        "same_day_cac_unit": same_day_cac,
+        "same_day_cac_pct": (same_day_cac / price) if price else float("nan"),
+        "unit_fulfilment_share": st.unit_fulfilment_share,
+        "unallocated_fixed_memo_unit": fixed_memo,
+        "unallocated_fixed_memo_pct": (fixed_memo / price) if price else float("nan"),
+        "warehouse_utilisation": st.warehouse_utilisation,
         "volatility_warning": warning,
         "unproven": is_unproven(band, a),
         "strategic": sub.strategic,
@@ -678,7 +949,7 @@ def evaluate_band(sub: SubCategory, band: Band, cat: Category | None, a: Assumpt
         "maturity": a.maturity,
         "scenario_name": st.name,
         "gm_haircut": st.gm_haircut,
-        "fulfilment_multiplier": st.fulfilment_multiplier,
+        "fulfilment_multiplier": st.unit_fulfilment_share,  # alias; not a cost multiple
     }
 
 
@@ -700,35 +971,28 @@ def mid_band_table(result: pd.DataFrame) -> pd.DataFrame:
     return result[result["band"] == "mid"].copy()
 
 
-def counts(result: pd.DataFrame) -> dict:
-    return {r: int((result["recommendation"] == r).sum()) for r in RECOMMENDATIONS}
+def counts(result: pd.DataFrame, col: str = "recommendation") -> dict:
+    if col not in result.columns:
+        col = "recommendation"
+    return {r: int((result[col] == r).sum()) for r in RECOMMENDATIONS}
 
 
-def mix_summary(result: pd.DataFrame) -> dict:
-    """Implied 1P / 3P mix: share of sub-categories and of modelled sales.
-
-    'Bring in-house' is the 1P path. 'Test as 3P first' and 'Keep 3P'
-    are the 3P path (not yet, or not, stocked by the platform). Modelled
-    sales are assumed ex-VAT price × assumed weekly units, at the mid
-    band unless the frame is already filtered. This is an Assumption,
-    not observed GMV.
-    """
-    mid = mid_band_table(result) if "band" in result.columns and set(result["band"].unique()) != {"mid"} else result
-    if mid.empty:
-        return {}
+def _mix_from_col(mid: pd.DataFrame, col: str) -> dict:
     sales = mid["price_gbp"] * mid["weekly_units"]
-    is_1p = mid["recommendation"] == BRING_IN_HOUSE
-    is_test = mid["recommendation"] == TEST_3P_FIRST
-    is_keep = mid["recommendation"] == KEEP_3P
+    is_1p = mid[col] == BRING_IN_HOUSE
+    is_test = mid[col] == TEST_3P_FIRST
+    is_keep = mid[col] == KEEP_3P
+    is_hole = mid[col] == DO_NOT_RANGE
     n = len(mid)
     total_sales = float(sales.sum())
     sales_1p = float(sales[is_1p].sum())
     sales_test = float(sales[is_test].sum())
     sales_keep = float(sales[is_keep].sum())
+    sales_hole = float(sales[is_hole].sum())
     by_cat = []
     for cat, g in mid.groupby("category_en", sort=False):
         cs = g["price_gbp"] * g["weekly_units"]
-        c1 = g["recommendation"] == BRING_IN_HOUSE
+        c1 = g[col] == BRING_IN_HOUSE
         by_cat.append({
             "category": cat,
             "n": int(len(g)),
@@ -741,48 +1005,98 @@ def mix_summary(result: pd.DataFrame) -> dict:
         "n_1p": int(is_1p.sum()),
         "n_test": int(is_test.sum()),
         "n_keep": int(is_keep.sum()),
+        "n_unranged": int(is_hole.sum()),
         "share_subs_1p": float(is_1p.mean()),
         "share_subs_test": float(is_test.mean()),
         "share_subs_keep": float(is_keep.mean()),
-        "share_subs_3p_path": float((~is_1p).mean()),
+        "share_subs_unranged": float(is_hole.mean()),
+        "share_subs_3p_path": float((is_test | is_keep).mean()),
         "sales_total": total_sales,
         "sales_1p": sales_1p,
         "sales_test": sales_test,
         "sales_keep": sales_keep,
+        "sales_unranged": sales_hole,
         "share_sales_1p": sales_1p / total_sales if total_sales else 0.0,
         "share_sales_3p_path": (sales_test + sales_keep) / total_sales if total_sales else 0.0,
+        "share_sales_unranged": sales_hole / total_sales if total_sales else 0.0,
         "share_sales_test": sales_test / total_sales if total_sales else 0.0,
         "share_sales_keep": sales_keep / total_sales if total_sales else 0.0,
-        "sales_basis": "Assumption (ex-VAT price × assumed weekly units, mid band)",
-        "scenario_name": mid["scenario_name"].iloc[0] if "scenario_name" in mid.columns else "",
-        "maturity": float(mid["maturity"].iloc[0]) if "maturity" in mid.columns else None,
         "by_category": by_cat,
-        "counts_all_bands": counts(result) if "band" in result.columns else counts(mid),
     }
 
 
+def mix_summary(result: pd.DataFrame, verdict: str = "operating") -> dict:
+    """Implied 1P / 3P mix: share of sub-categories and of modelled sales.
+
+    verdict='operating' (default) uses the strategic / land-grab
+    recommendation — the mix an entrant would run. verdict='unit' uses
+    the unit-economics recommendation, which may prefer a hole to a
+    thin 1P contribution. 'Bring in-house' is the 1P path. 'Test as
+    3P first' and 'Keep 3P' are the 3P path. 'Do not range' is a hole
+    (not 3P). Modelled sales are assumed ex-VAT price × assumed weekly
+    units, mid band. This is an Assumption, not observed GMV.
+    """
+    mid = mid_band_table(result) if "band" in result.columns and set(result["band"].unique()) != {"mid"} else result
+    if mid.empty:
+        return {}
+    col = "unit_recommendation" if verdict == "unit" and "unit_recommendation" in mid.columns else "recommendation"
+    out = _mix_from_col(mid, col)
+    out.update({
+        "verdict": "unit" if col == "unit_recommendation" else "operating",
+        "sales_basis": "Assumption (ex-VAT price × assumed weekly units, mid band)",
+        "scenario_name": mid["scenario_name"].iloc[0] if "scenario_name" in mid.columns else "",
+        "maturity": float(mid["maturity"].iloc[0]) if "maturity" in mid.columns else None,
+        "counts_all_bands": counts(result, col) if "band" in result.columns else counts(mid, col),
+    })
+    if "unit_recommendation" in mid.columns and verdict != "unit":
+        # Attach the companion unit mix so callers can show both layers.
+        out["unit_mix"] = _mix_from_col(mid, "unit_recommendation")
+    return out
+
+
 def mix_curve(base: Assumptions | None = None, steps: tuple[float, ...] = (0.0, 0.25, 0.5, 0.75, 1.0)) -> pd.DataFrame:
-    """1P / 3P mix at points along the platform-maturity slider."""
+    """1P / 3P mix at points along the platform-maturity slider.
+
+    Reports both the operating (strategic) mix and the unit-economics mix,
+    so the slider can show a 1P-led land-grab moving toward more 3P as
+    seller coverage and ad income grow.
+    """
     a = base or Assumptions()
     rows = []
-    for t in steps:
-        res = evaluate_all(assumptions_at(t, a))
-        m = mix_summary(res)
+    for t_ in steps:
+        res = evaluate_all(assumptions_at(t_, a))
+        m = mix_summary(res, verdict="operating")
+        mu = mix_summary(res, verdict="unit")
         mid = mid_band_table(res)
-        c = counts(mid)
+        c = counts(mid, "recommendation")
+        cu = counts(mid, "unit_recommendation")
         rows.append({
-            "maturity": t,
+            "maturity": t_,
             "scenario_name": m["scenario_name"],
             "share_subs_1p": m["share_subs_1p"],
             "share_subs_3p_path": m["share_subs_3p_path"],
+            "share_subs_unranged": m["share_subs_unranged"],
             "share_sales_1p": m["share_sales_1p"],
             "share_sales_3p_path": m["share_sales_3p_path"],
+            "share_sales_unranged": m["share_sales_unranged"],
             "n_1p": m["n_1p"],
             "n_test": m["n_test"],
             "n_keep": m["n_keep"],
+            "n_unranged": m["n_unranged"],
+            "unit_share_subs_1p": mu["share_subs_1p"],
+            "unit_share_subs_3p_path": mu["share_subs_3p_path"],
+            "unit_share_subs_unranged": mu["share_subs_unranged"],
+            "unit_share_sales_1p": mu["share_sales_1p"],
+            "unit_share_sales_3p_path": mu["share_sales_3p_path"],
+            "unit_n_1p": mu["n_1p"],
+            "unit_n_test": mu["n_test"],
+            "unit_n_keep": mu["n_keep"],
+            "unit_n_unranged": mu["n_unranged"],
+            "seller_coverage": float(mid["seller_coverage"].iloc[0]) if len(mid) else None,
             BRING_IN_HOUSE: c[BRING_IN_HOUSE],
             TEST_3P_FIRST: c[TEST_3P_FIRST],
             KEEP_3P: c[KEEP_3P],
+            DO_NOT_RANGE: c[DO_NOT_RANGE],
         })
     return pd.DataFrame(rows)
 
@@ -828,11 +1142,28 @@ def comparison_mid_table(base: Assumptions | None = None) -> pd.DataFrame:
             "roc_b": ev_b["return_on_capital"],
             "breakeven_a": ev_a["breakeven_take"],
             "breakeven_b": ev_b["breakeven_take"],
+            "coverage_a": ev_a["seller_coverage"],
+            "coverage_b": ev_b["seller_coverage"],
+            "payoff_1p_a": ev_a["payoff_1p"],
+            "payoff_3p_a": ev_a["payoff_3p"],
+            "payoff_1p_b": ev_b["payoff_1p"],
+            "payoff_3p_b": ev_b["payoff_3p"],
+            "spillover_a": ev_a["spillover_unit"],
+            "fixed_memo_a": ev_a["unallocated_fixed_memo_unit"],
+            "same_day_cac_a": ev_a["same_day_cac_unit"],
+            "c1p_pct_a_unit": ev_a["contrib_1p_pct"],
             "rec_a": ev_a["recommendation"],
             "rec_b": ev_b["recommendation"],
+            "rec_unit_a": ev_a["unit_recommendation"],
+            "rec_unit_b": ev_b["unit_recommendation"],
+            "rec_strategic_a": ev_a["strategic_recommendation"],
+            "rec_strategic_b": ev_b["strategic_recommendation"],
             "rule_a": ev_a["rule"],
             "rule_b": ev_b["rule"],
+            "rule_unit_a": ev_a["unit_rule"],
+            "rule_unit_b": ev_b["unit_rule"],
             "flipped": ev_a["recommendation"] != ev_b["recommendation"],
+            "flipped_unit": ev_a["unit_recommendation"] != ev_b["unit_recommendation"],
         })
     return pd.DataFrame(rows)
 
@@ -869,7 +1200,15 @@ def flip_threshold(sub: SubCategory, band: Band, cat: Category, a: Assumptions,
         elif param == "gm_haircut_entrant":
             trial = replace(a, gm_haircut_entrant=x)
         elif param == "fulfilment_multiplier_entrant":
-            trial = replace(a, fulfilment_multiplier_entrant=x)
+            # Retired: map a multiple onto the variable-share so old callers
+            # do not crash. Prefer fulfilment_variable_share.
+            trial = replace(a, fulfilment_variable_share=min(max(1.0 / max(x, 0.5), 0.3), 1.0))
+        elif param == "fulfilment_variable_share":
+            trial = replace(a, fulfilment_variable_share=x)
+        elif param == "seller_coverage":
+            trial = replace(a, seller_coverage=x)
+        elif param == "spillover_pct":
+            trial = replace(a, spillover_pct=x)
         elif param == "maturity":
             trial = replace(a, maturity=x)
         else:
@@ -932,18 +1271,39 @@ def gap_sensitivity(a: Assumptions | None = None) -> pd.DataFrame:
         ("Commission only (no ads, no warehouse margin)",
          fees_only(a), "take",
          "Drops advertising and the warehouse margin."),
-        ("Entrant GM haircut 10% (instead of 25%)",
+        ("Entrant GM haircut 0% (instead of 5%)",
+         replace(a, gm_haircut_entrant=0.00), "entrant",
+         "No residual UK gap: 1P margin equals the published benchmark."),
+        ("Entrant GM haircut 10% (instead of 5%)",
          replace(a, gm_haircut_entrant=0.10), "entrant",
-         "A kinder picture of a scaling 1P margin."),
-        ("Entrant GM haircut 40% (instead of 25%)",
-         replace(a, gm_haircut_entrant=0.40), "entrant",
-         "A harsher picture of a scaling 1P margin."),
-        ("Entrant fulfilment 1.3× (instead of 1.5×)",
-         replace(a, fulfilment_multiplier_entrant=1.30), "entrant",
-         "A milder utilisation and same-day penalty."),
-        ("Entrant fulfilment 2.0× (instead of 1.5×)",
-         replace(a, fulfilment_multiplier_entrant=2.00), "entrant",
-         "A heavier utilisation and same-day penalty."),
+         "The top of the default 0–10% haircut band."),
+        ("Entrant GM haircut 25% (stress test; not the default)",
+         replace(a, gm_haircut_entrant=0.25), "entrant",
+         "v3.0's default, kept as a stress test. JD sources at global scale, so 25% is no longer the central case."),
+        ("Seller coverage 5% (instead of 0%)",
+         replace(a, seller_coverage_entrant=0.05, seller_coverage=0.05), "coverage",
+         "A small early 3P presence. Still well below the 50% strategic-layer threshold."),
+        ("Seller coverage 15% (instead of 0%)",
+         replace(a, seller_coverage_entrant=0.15, seller_coverage=0.15), "coverage",
+         "The top of the low-coverage sensitivity. At 15%, 3P starts to be treated as a real path in the unit test."),
+        ("Seller coverage 50% (strategic layer starts to follow unit economics)",
+         replace(a, seller_coverage=0.50), "coverage",
+         "At the 50% Assumption threshold the land-grab layer follows the unit verdict."),
+        ("Basket spillover 0% (instead of 8%)",
+         replace(a, spillover_pct=0.00), "spillover",
+         "No traffic/basket value for a lost hole in the range."),
+        ("Basket spillover 15% (instead of 8%)",
+         replace(a, spillover_pct=0.15), "spillover",
+         "A richer assumed spillover from ranging the item."),
+        ("Fulfilment variable share 50% (instead of 70%)",
+         replace(a, fulfilment_variable_share=0.50), "entrant",
+         "A lower variable-cost share in unit contribution (more is treated as sunk)."),
+        ("Fulfilment variable share 90% (instead of 70%)",
+         replace(a, fulfilment_variable_share=0.90), "entrant",
+         "Almost all fulfilment is treated as variable — closer to a loaded per-SKU cost."),
+        ("Strategic / land-grab layer off (unit economics only)",
+         replace(a, apply_strategic_layer=False), "strategic",
+         "The operating recommendation follows the unit verdict only."),
         ("Established advertising take 1.5% (low)",
          replace(assumptions_at(1.0, a), ad_take_established=0.015, ad_take=None), "take",
          "The low end of the established ad-take range."),
@@ -993,6 +1353,7 @@ def gap_sensitivity(a: Assumptions | None = None) -> pd.DataFrame:
             BRING_IN_HOUSE: c[BRING_IN_HOUSE],
             TEST_3P_FIRST: c[TEST_3P_FIRST],
             KEEP_3P: c[KEEP_3P],
+            DO_NOT_RANGE: c[DO_NOT_RANGE],
         })
     df = pd.DataFrame(rows).sort_values(["flipped", "scenario"], ascending=[False, True]).reset_index(drop=True)
     df.insert(0, "rank", range(1, len(df) + 1))
@@ -1017,8 +1378,15 @@ def mid_band_flip_summary(a: Assumptions | None = None) -> pd.DataFrame:
                 "price_rmb": mid.price_gbp,
                 "recommendation": ev["recommendation"],
                 "rule": ev["rule"],
+                "unit_recommendation": ev["unit_recommendation"],
+                "unit_rule": ev["unit_rule"],
+                "strategic_recommendation": ev["strategic_recommendation"],
+                "strategic_rule": ev["strategic_rule"],
+                "seller_coverage": ev["seller_coverage"],
                 "contrib_1p_unit": ev["contrib_1p_unit"],
                 "net_3p_unit": ev["net_3p_unit"],
+                "payoff_1p": ev["payoff_1p"],
+                "payoff_3p": ev["payoff_3p"],
                 "return_on_capital": ev["return_on_capital"],
                 "gm_flip_at": gm_f["at"],
                 "gm_flip_to": gm_f["to"] if gm_f["at"] is not None else None,

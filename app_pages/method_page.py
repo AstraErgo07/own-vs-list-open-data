@@ -1,4 +1,4 @@
-"""Data and method page for the Joybuy UK v3.0 model."""
+"""Data and method page for the Joybuy UK v3.1 model."""
 from __future__ import annotations
 
 import sys
@@ -16,13 +16,17 @@ from common.text import BENCHMARK_STANDIN, VERSION
 from own_vs_list.calc import RULE_CITATIONS
 from own_vs_list.maturity import (
     ENTRANT_AD_TAKE_REASON,
-    ENTRANT_FULFILMENT_REASON,
     ENTRANT_GM_HAIRCUT_REASON,
     ENTRANT_INTRO_REASON,
     ENTRANT_LOGISTICS_MARGIN_REASON,
+    ENTRANT_SELLER_COVERAGE_REASON,
     ENTRANT_WAREHOUSE_SHARE_REASON,
+    ENTRANT_WAREHOUSE_UTILISATION_REASON,
     ESTABLISHED_AD_TAKE_REASON,
+    FULFILMENT_VARIABLE_SHARE_REASON,
     OPEN_QUESTIONS,
+    SAME_DAY_SUBSIDY_REASON,
+    SPILLOVER_REASON,
 )
 from own_vs_list.published import (
     ZALANDO_FULFILMENT_PCT_2025,
@@ -91,6 +95,12 @@ def render() -> None:
         "- The central lens is a scale-up **entrant** (Joybuy-like) versus "
         "an **established** marketplace (Amazon UK-like), and the implied "
         "1P / 3P mix.\n"
+        "- Each sub-category has a **unit-economics verdict** and an "
+        "**entrant strategic verdict**, shown separately. 3P is only a "
+        "real alternative where seller coverage is material; otherwise "
+        "the alternative is 'not ranged'. Already-built warehouse fixed "
+        "cost is sunk. JD China's 78.2% 1P revenue share is a parent "
+        "figure, not Joybuy's mix, and is not a target.\n"
         "- It is **not** a forecast, **not** a profit claim, and **not** "
         "Joybuy's actual numbers.\n"
         "- Prices and weekly demand are Assumptions in GBP, exclusive of "
@@ -141,8 +151,10 @@ def render() -> None:
         "stand-in until Joybuy publishes its own. Clearly not Joybuy's fees.\n"
         "- **Assumption** — a stated modelling choice, with reasoning. "
         "Every entrant parameter is an Assumption. So are prices, weekly "
-        "units, CVs, the 25% inventory hurdle, the introductory commission, "
-        "warehouse share and logistics margins.\n"
+        "units, CVs, seller coverage, the 8% spillover, the 70/30 "
+        "variable/fixed fulfilment split, the 5% margin haircut, the "
+        "25% inventory hurdle, the introductory commission, warehouse "
+        "share and logistics margins.\n"
         "- **Model estimate** — a ranged figure that cannot be read off a "
         "filing (established advertising take; electronics fulfilment 12%; "
         "the 8% fulfilment-fee proxy)."
@@ -150,7 +162,11 @@ def render() -> None:
 
     st.header("Entrant assumptions, with reasoning")
     st.markdown(f"**1P margin haircut.** {ENTRANT_GM_HAIRCUT_REASON}")
-    st.markdown(f"**Fulfilment multiple.** {ENTRANT_FULFILMENT_REASON}")
+    st.markdown(f"**Seller coverage.** {ENTRANT_SELLER_COVERAGE_REASON}")
+    st.markdown(f"**Lost-assortment spillover.** {SPILLOVER_REASON}")
+    st.markdown(f"**Variable fulfilment (sunk fixed cost).** {FULFILMENT_VARIABLE_SHARE_REASON}")
+    st.markdown(f"**Warehouse utilisation (memo only).** {ENTRANT_WAREHOUSE_UTILISATION_REASON}")
+    st.markdown(f"**Same-day subsidy (CAC).** {SAME_DAY_SUBSIDY_REASON}")
     st.markdown(f"**Advertising take, entrant.** {ENTRANT_AD_TAKE_REASON}")
     st.markdown(f"**Advertising take, established.** {ESTABLISHED_AD_TAKE_REASON}")
     st.markdown(f"**Introductory commission.** {ENTRANT_INTRO_REASON}")
@@ -168,6 +184,10 @@ def render() -> None:
         st.markdown(rule["in_this_model"])
 
     st.header("Open questions for reviewers")
+    st.markdown(
+        "These are open questions for reviewers. The entrant parameters "
+        "are Assumptions. Please challenge them."
+    )
     for title, body in OPEN_QUESTIONS:
         st.markdown(f"**{title}.** {body}")
 
