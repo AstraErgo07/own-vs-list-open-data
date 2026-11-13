@@ -63,6 +63,18 @@ with st.expander("Adjust model assumptions · optional stress test", expanded=Fa
     with col_b:
         coverage_adjust = st.slider("Seller availability adjustment (percentage points)",-40,40,0,5)/100
         one_p_capture = st.slider("1P share of expected demand fulfilled (%)",50,100,95,5)/100
+    st.markdown("**Cannibalisation of existing owned-inventory sales — optional sensitivity**")
+    cannibalisation_rate = st.slider(
+        "Share of 3P sales displacing sales of existing 1P substitute products (%)",
+        0,100,0,5)/100
+    displaced_1p_contribution = st.number_input(
+        "Lost contribution on each displaced existing 1P sale (£)",
+        min_value=0.0,max_value=2000.0,value=0.0,step=5.0)
+    st.caption("Default is zero because no matched-product substitution data are available. "
+        "Enter a measured substitution rate and the contribution lost on an existing owned-stock sale. "
+        "These inputs represent additional cannibalisation caused by the 3P option relative to 1P, "
+        "not sales switching between 1P and 3P for the evaluated SKU. "
+        "The same inputs currently apply to all products; category/SKU-specific evidence is preferable.")
         st.caption("1P and 3P draw from the same customer pool; sales switching is not charged twice.")
     st.caption("Assumptions are illustrative and apply to all profiles. Selling prices and costs are net of tax.")
     st.markdown("**Product setup and annual administration costs — editable**")
@@ -166,7 +178,12 @@ def economics(r, model, scenario, sales_factor=1.0):
     fulfil=r["fulfil"]*fulfil_factor*(1-fulfil_discount)
     one_margin=(r["price"]-buy-fulfil-r["returns"]
                 -r["price"]*r["markdown"]*demand_adjust-buy*capital*days/365)
-    three_margin=r["price"]*(r["take"]+take_delta)-r["service3"]
+    three_fee_margin=r["price"]*(r["take"]+take_delta)-r["service3"]
+    # Opportunity cost of 3P sales displacing a separate, existing 1P substitute.
+    # Assumed incremental to the evaluated SKU's 1P option; zero by default.
+    cannibalisation_per_3p_sale=cannibalisation_rate*displaced_1p_contribution
+    three_margin=three_fee_margin-cannibalisation_per_3p_sale
+    annual_cannibalisation_loss=three_units*cannibalisation_per_3p_sale
     fixed=fixed_cost_1p if model=="1P" else fixed_cost_3p
     profit=(one_units*one_margin+three_units*three_margin)-fixed
     turns=365/days if model=="1P" and days>0 else None
@@ -174,7 +191,10 @@ def economics(r, model, scenario, sales_factor=1.0):
     gross_margin=one_units*(r["price"]-buy-r["price"]*r["markdown"]*demand_adjust)
     gmroi=gross_margin/avg_inventory if avg_inventory>0 else None
     return dict(profit=profit,coverage=cov,one_margin=one_margin,
-        three_margin=three_margin,one_units=one_units,three_units=three_units,
+        three_margin=three_margin,three_fee_margin=three_fee_margin,
+        cannibalisation_per_3p_sale=cannibalisation_per_3p_sale,
+        annual_cannibalisation_loss=annual_cannibalisation_loss,
+        one_units=one_units,three_units=three_units,
         turns=turns,gmroi=gmroi,days=days,discount=discount,
         fulfil_discount=fulfil_discount,fixed_cost=fixed,volume=q,
         avg_inventory=avg_inventory,gross_margin=gross_margin,
@@ -244,6 +264,11 @@ def recommend(r,scenario,sales_factor=1.0):
         gain_if_current_3p=round(max(0,one["profit"]-three["profit"]),2),
         one_p_contribution_per_sale=round(one["one_margin"],2),
         three_p_contribution_per_sale=round(three["three_margin"],2),
+        three_p_net_fee_per_sale=round(three["three_fee_margin"],2),
+        three_p_cannibalisation_loss_per_sale=round(three["cannibalisation_per_3p_sale"],2),
+        three_p_annual_cannibalisation_loss=round(three["annual_cannibalisation_loss"],2),
+        one_p_advantage_per_unit=round(
+            one["one_margin"]-three["three_margin"],2),
         best_annual_contribution=round(val,2),
         contribution_per_sale=round(val/total_units,2) if total_units>0 else None,
         extra_profit=round(extra,2),
@@ -284,6 +309,7 @@ def category_summary(results):
              three_p_skus=("model",lambda x:int((x=="3P").sum())),
              one_p_units=("one_units","sum"),
              three_p_units=("three_units","sum"),
+             annual_3p_cannibalisation_loss=("three_p_annual_cannibalisation_loss","sum"),
              one_p_gmv=("one_p_gmv","sum"),
              three_p_gmv=("three_p_gmv","sum"),
              annual_profit=("contribution","sum"),
@@ -341,6 +367,7 @@ category_cols={
     "all_one_p_profit":"If every SKU is 1P (£)",
     "all_three_p_profit":"If every SKU is 3P (£)",
     "category_mix_advantage":"Gain vs best all-1P/all-3P (£)",
+    "annual_3p_cannibalisation_loss":"3P cannibalisation loss in chosen mix (£)",
     "avg_inventory":"Average 1P inventory investment (£)",
     "category_turns":"Category 1P inventory turns/year",
     "category_gmroi":"Category 1P GMROI (£/£)"}
@@ -366,7 +393,10 @@ main_cols={
     "action_if_current_3p":"If currently 3P",
     "one_p_cogs_per_unit":"1P COGS/unit (£)",
     "one_p_contribution_per_sale":"1P contribution/sale (£)",
-    "three_p_contribution_per_sale":"3P contribution/sale (£)",
+    "three_p_net_fee_per_sale":"3P net fee/sale (£)",
+    "three_p_cannibalisation_loss_per_sale":"3P cannibalisation loss/sale (£)",
+    "one_p_advantage_per_unit":"1P advantage/unit (£)",
+    "three_p_contribution_per_sale":"3P contribution/sale after cannibalisation (£)",
     "pure1p":"Annual contribution if 1P (£)",
     "pure3p":"Annual contribution if 3P (£)",
     "best_annual_contribution":"Chosen annual contribution (£)",
@@ -398,7 +428,11 @@ with st.expander("See SKU-level costs and assumptions",expanded=False):
         "gain_if_current_1p":"Gain from switching if currently 1P (£)",
         "gain_if_current_3p":"Gain from switching if currently 3P (£)",
         "one_p_contribution_per_sale":"1P contribution per fulfilled sale (£)",
-        "three_p_contribution_per_sale":"3P contribution per fulfilled sale (£)",
+        "three_p_net_fee_per_sale":"3P commission less service cost/sale (£)",
+        "three_p_cannibalisation_loss_per_sale":"3P cannibalisation loss/sale (£)",
+        "three_p_annual_cannibalisation_loss":"Annual 3P cannibalisation loss if 3P (£)",
+        "one_p_advantage_per_unit":"1P advantage per unit (£)",
+        "three_p_contribution_per_sale":"3P net contribution per fulfilled sale (£)",
         "coverage":"Share of demand 3P sellers can fulfil",
         "one_p_demand_fulfilment_pct":"1P demand fulfilled (%)",
         "one_units":"Chosen 1P units/year",
@@ -421,8 +455,11 @@ with st.expander("See SKU-level costs and assumptions",expanded=False):
         "rationale":"Why this model wins"}
     st.dataframe(display[list(details)].rename(columns=details),
         use_container_width=True,hide_index=True)
-    st.caption("Each SKU is evaluated under exclusive 1P and exclusive 3P. "
-        "No artificial intra-SKU hybrid uplift is assumed.")
+    st.caption("1P advantage per unit = 1P contribution per sale minus "
+        "(3P net commission per sale minus incremental cannibalisation loss per 3P sale). "
+        "It is a like-for-like unit economics comparison, not the annual switching decision. "
+        "Annual contributions account separately for different fulfilled volumes and fixed costs. "
+        "No intra-SKU hybrid uplift is assumed.")
 
 st.download_button("Download all 300 SKU evaluations (CSV)",
     all_results.to_csv(index=False).encode("utf-8"),
@@ -451,7 +488,9 @@ with st.expander("Assumptions and limitations",expanded=False):
 
 **Switching threshold:** The earliest tested annual sales volume where all-1P contribution overtakes all-3P contribution, scanning 10%–300% of the original sales estimate. "No crossover" means none within that tested range, not that 1P can never win.
 
-**COGS and contribution:** For 1P, COGS per unit = synthetic base supplier buying cost × operating-model procurement factor × (1 + manual procurement adjustment) × (1 - applicable 1P volume discount). Annual 1P COGS = 1P units fulfilled × adjusted unit COGS. 1P contribution per sale = selling price - adjusted unit COGS - fulfilment - expected returns - markdown allowance - inventory financing. Annual 1P contribution = 1P units × 1P contribution per sale - annualised product setup and administration. For 3P, contribution per fulfilled sale = price × marketplace referral rate - seller service cost; annual 3P contribution = fulfilled 3P units × per-sale contribution - annualised product administration. Marketplace COGS is zero under 3P because sellers own the goods; that does not mean sellers have zero COGS. Contribution is not company net profit after overhead and tax.
+**COGS and contribution:** For 1P, COGS per unit = synthetic base supplier buying cost × operating-model procurement factor × (1 + manual procurement adjustment) × (1 - applicable 1P volume discount). Annual 1P COGS = 1P units fulfilled × adjusted unit COGS. 1P contribution per sale = selling price - adjusted unit COGS - fulfilment - expected returns - markdown allowance - inventory financing. Annual 1P contribution = 1P units × 1P contribution per sale - annualised product setup and administration. For 3P, net fee per sale = price × marketplace referral rate - seller service cost; net 3P contribution per fulfilled sale = net fee - incremental cannibalisation loss per 3P sale; annual 3P contribution = fulfilled 3P units × net contribution per sale - annualised product administration. Marketplace COGS is zero under 3P because sellers own the goods; that does not mean sellers have zero COGS. Contribution is not company net profit after overhead and tax.
+
+**1P advantage and cannibalisation:** 1P advantage per unit = 1P contribution per sale - (3P commission income per sale - 3P cost to serve per sale - expected lost contribution from cannibalised sales of existing owned-stock substitute products per 3P sale). Expected lost contribution per 3P sale = substitution rate × contribution on a displaced existing 1P sale. Annual 3P contribution subtracts the corresponding annual cannibalisation loss. Both inputs default to zero and must be supported by observed substitute-product sales or a controlled estimate before relying on the results. This assumes the specified loss is incremental to 3P versus the evaluated SKU being 1P; it does not model cannibalisation caused equally by both alternatives. Per-unit advantage is not a switching rule because 1P and 3P can fulfil different numbers of units and incur different annual fixed costs.
 
 **Keep or switch:** The two action columns are conditional on the SKU's current model. If the SKU is currently 1P, use the "If currently 1P" column; if currently 3P, use the other. Without a real current-SKU channel mapping, it is incorrect to assert that a recommendation requires switching.
 
