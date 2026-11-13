@@ -27,6 +27,26 @@ SCENARIOS = {
     "Marketplace C — omnichannel hybrid": (.98,.025,0,.84,.90),
 }
 
+# Illustrative annual hours per product, not observed labour standards.
+# These are annual SKU-level activities; per-sale fulfilment and service costs
+# are modelled separately.
+ADMIN_ACTIVITIES = {
+    "1P": [
+        ("Supplier purchasing and purchase orders", 8.0),
+        ("Replenishment planning", 10.0),
+        ("Stock and ageing reviews", 8.0),
+        ("Product records and inventory reconciliation", 4.0),
+    ],
+    "3P": [
+        ("Seller onboarding and setup", 2.0),
+        ("Listing and catalogue quality checks", 2.0),
+        ("Ongoing seller-account oversight", 3.0),
+        ("Annual seller compliance review", 1.0),
+    ],
+}
+BASE_1P_HOURS = sum(hours for _,hours in ADMIN_ACTIVITIES["1P"])
+BASE_3P_HOURS = sum(hours for _,hours in ADMIN_ACTIVITIES["3P"])
+
 with st.expander("Adjust model assumptions · optional stress test", expanded=False):
     col_a, col_b = st.columns(2)
     with col_a:
@@ -37,6 +57,46 @@ with st.expander("Adjust model assumptions · optional stress test", expanded=Fa
         coverage_adjust = st.slider("Seller availability adjustment (percentage points)",-40,40,0,5)/100
         st.caption("Customer switching between 1P and 3P is calculated from the recommended sales split, not a separate cannibalisation penalty.")
     st.caption("Adjustments are illustrative and apply to all profiles. Costs and selling prices are treated on a consistent net-of-tax basis.")
+    st.markdown("**Annual product administration costs — editable assumptions**")
+    rate=st.number_input("Staff cost per hour (£, including employer costs)",min_value=0.0,
+        max_value=150.0,value=25.0,step=5.0)
+    hours_a,hours_b=st.columns(2)
+    with hours_a:
+        one_p_admin_hours=st.number_input("1P admin hours per product / year",
+            min_value=0.0,max_value=200.0,value=30.0,step=1.0)
+    with hours_b:
+        three_p_admin_hours=st.number_input("3P admin hours per product / year",
+            min_value=0.0,max_value=200.0,value=8.0,step=1.0)
+    st.caption("Default 1P: 30 hours × £25 = £750. Default 3P: 8 hours × £25 = £200. "
+        "These are illustrative labour allocations, not verified industry averages.")
+fixed_cost_1p=one_p_admin_hours*rate
+fixed_cost_3p=three_p_admin_hours*rate
+
+with st.expander("How the £750 and £200 annual costs are calculated",expanded=False):
+    rows=[]
+    for channel,annual_hours,baseline_hours in (
+        ("1P",one_p_admin_hours,BASE_1P_HOURS),
+        ("3P",three_p_admin_hours,BASE_3P_HOURS)):
+        for activity,base_hours in ADMIN_ACTIVITIES[channel]:
+            activity_hours=annual_hours*base_hours/baseline_hours
+            rows.append({
+                "Selling model":channel,
+                "Activity":activity,
+                "Hours per product/year":round(activity_hours,2),
+                "Cost per hour (£)":rate,
+                "Annual cost (£)":round(activity_hours*rate,2)})
+    st.dataframe(pd.DataFrame(rows),use_container_width=True,hide_index=True)
+    st.markdown(
+        f"**Total 1P: £{fixed_cost_1p:,.0f} per product/year** "
+        f"({one_p_admin_hours:g} hours × £{rate:g}/hour).  "
+        f"**Total 3P: £{fixed_cost_3p:,.0f} per product/year** "
+        f"({three_p_admin_hours:g} hours × £{rate:g}/hour)."
+    )
+    st.caption("Hours are allocated across activities in the proportions shown. "
+        "These costs cover recurring purchasing, stock and seller administration, "
+        "not per-sale delivery, payment processing or seller-service costs already "
+        "included elsewhere. Actual labour costs and time requirements need validation.")
+
 
 def make_profiles():
     rows=[]
@@ -62,8 +122,6 @@ VOLUME_TIERS = (
     (1500, 0.02, 0.04),
     (3000, 0.03, 0.06),
 )
-ONE_P_FIXED_COST = 750.0  # illustrative annual SKU procurement/stock admin
-THREE_P_FIXED_COST = 200.0  # illustrative annual SKU seller-support admin
 
 def scale_terms(annual_one_p_units):
     tier=VOLUME_TIERS[0]
@@ -87,7 +145,7 @@ def economics(r, share, scenario, sales_factor=1.0):
     one_margin=(r["price"]-buy-fulfil-r["returns"]
                 -r["price"]*r["markdown"]*demand_adjust-buy*capital*days/365)
     three_margin=r["price"]*(r["take"]+take_delta)-r["service3"]
-    fixed=(ONE_P_FIXED_COST if share>0 else 0)+(THREE_P_FIXED_COST if share<1 else 0)
+    fixed=(fixed_cost_1p if share>0 else 0)+(fixed_cost_3p if share<1 else 0)
     profit=one_units*one_margin+three_units*three_margin-fixed
     displaced=min(q*cov*share,one_units)
     additional=max(0.0,one_units+three_units-q*cov)
@@ -174,6 +232,11 @@ def recommend(r,scenario,sales_factor=1.0):
         buying_discount_pct=round(detail["discount"]*100,1),
         fulfil_saving_pct=round(detail["fulfil_discount"]*100,1),
         annual_fixed_cost=round(detail["fixed_cost"],2),
+        one_p_annual_admin_cost=round(fixed_cost_1p,2),
+        three_p_annual_admin_cost=round(fixed_cost_3p,2),
+        one_p_admin_hours=one_p_admin_hours,
+        three_p_admin_hours=three_p_admin_hours,
+        admin_hourly_cost=rate,
         one_p_threshold=crossover_volume(r,scenario),
         risk=r["markdown"]*demand_adjust,
         procurement_ratio=round(r["cost"]*SCENARIOS[scenario][0]*(1+procurement_adjust)/r["price"],3))
@@ -255,6 +318,11 @@ with st.expander("See costs, scale savings and customer switching",expanded=Fals
         "buying_discount_pct":"1P bulk buying discount (%)",
         "fulfil_saving_pct":"1P fulfilment saving (%)",
         "annual_fixed_cost":"Annual product operating cost (£)",
+        "one_p_annual_admin_cost":"1P annual admin cost (£)",
+        "three_p_annual_admin_cost":"3P annual admin cost (£)",
+        "one_p_admin_hours":"1P annual admin hours",
+        "three_p_admin_hours":"3P annual admin hours",
+        "admin_hourly_cost":"Admin staff cost/hour (£)",
         "stock_days":"1P stock held (days)",
         "risk":"Assumed markdown rate",
         "procurement_ratio":"1P buying cost / selling price (before volume discount)",
@@ -277,7 +345,7 @@ with st.expander("Assumptions and limitations",expanded=False):
     st.markdown("""
 **Volume discounts are illustrative, not an industry benchmark.** Assumed annual 1P units: below 500 = 0% buying discount and 0% fulfilment saving; 500–1,499 = 1% and 2%; 1,500–2,999 = 2% and 4%; 3,000+ = 3% and 6%. These are assumptions for sensitivity testing. Actual supplier rebates depend on negotiated purchase commitments, order quantities and product mix. Discounts apply to 1P only.
 
-**Annual operating costs:** £750 per product for 1P buying/stock administration and £200 for 3P seller administration, each charged when that channel is used. Both are illustrative. No fixed company-wide overhead is allocated.
+**Annual product administration costs:** Defaults are built bottom-up: 1P 30 hours/year × £25/hour = £750; 3P 8 hours/year × £25/hour = £200. See the activity-level cost breakdown above. Change the hourly rate or hours in Adjust model assumptions; the calculations, decision and CSV update automatically. These are illustrative labour allocations, not published industry averages. Only the relevant channel's annual admin cost is charged; a hybrid incurs both. No fixed company-wide overhead is allocated.
 
 **Switching threshold:** The earliest tested annual sales volume where all-1P contribution overtakes all-3P contribution, scanning 10%–300% of the original sales estimate. A hybrid can still be better. "No crossover" means none within that tested range, not that 1P can never win.
 
