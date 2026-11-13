@@ -145,7 +145,7 @@ st.dataframe(summary[["category","profiles","annual_units","Better pure model","
     use_container_width=True,hide_index=True)
 
 st.subheader("Product-level recommendations")
-st.caption("100 profiles below. The advantage column compares the recommended allocation with the BETTER of pure 1P and pure 3P, not automatically with 3P.")
+st.caption("Pure winner advantage measures the difference between 1P and 3P. Extra hybrid gain measures additional value beyond the better pure model.")
 display=selected.copy()
 display["1P vs 3P (£)"]=(display["pure1p"]-display["pure3p"]).round(2)
 display["1P vs 3P (%)"]=display.apply(
@@ -164,10 +164,14 @@ columns={"product":"Product ID","category":"Category","model":"Recommendation",
     "advantage_pct":"Advantage vs best pure (%)",
     "rationale":"Qualitative reason","coverage":"Seller availability",
     "stock_days":"Days inventory held","risk":"Markdown risk proxy",
-    "procurement_ratio":"Procurement cost / retail"}
-ordered=["product","category","model","share1p","1P vs 3P (£)","advantage_gbp",
-    "advantage_pct","Pure-model seller coverage crossover","rationale",
-    "pure1p","pure3p","contribution","coverage","stock_days","risk","procurement_ratio"]
+    "procurement_ratio":"Procurement cost / retail",
+    "annual_demand_units":"Estimated annual demand (units)","demand_index":"Demand index (median=100)",
+    "pure_winner":"Better pure model","pure_advantage_gbp":"Pure winner advantage (£)",
+    "pure_advantage_pct":"Pure winner advantage (%)","pure_delta_gbp":"1P minus 3P (£)"}
+ordered=["product","category","annual_demand_units","demand_index","pure_winner",
+    "pure_advantage_gbp","pure_advantage_pct","pure_delta_gbp","model","share1p",
+    "advantage_gbp","coverage","rationale","pure1p","pure3p","contribution",
+    "Pure-model seller coverage crossover","stock_days","risk","procurement_ratio"]
 st.dataframe(display[ordered].rename(columns=columns),use_container_width=True,hide_index=True,
     column_config={"1P allocation":st.column_config.ProgressColumn("1P allocation",min_value=0,max_value=1,format="%.0f%%")})
 st.download_button("Download all 300 scenario evaluations (CSV)",
@@ -188,6 +192,12 @@ with st.expander("Method, interpretation and limitations",expanded=False):
 **Unit economics:** 1P contribution deducts buying cost, fulfilment, returns, assumed markdown loss and cost of stock capital. 3P contribution uses fee income net of assumed seller servicing, adjusted for seller availability. The model searches 1P allocation from 0 to 100% in one-percentage-point steps.
 
 **Financial advantage:** The recommended allocation's annual contribution minus the larger contribution from pure 1P or pure 3P. A result of £0 means a pure strategy is optimal; it does not imply no benefit relative to the weaker pure strategy.
+
+**Demand:** Annual demand is a synthetic unit assumption. Demand index 100 equals the median annual demand across 100 profiles; it is not a demand-predictability score.
+
+**Seller availability:** A value of 0.70 means 70% of hypothetical demand is serviceable by capable 3P sellers, not seven sellers or 70% of listings.
+
+**Pure-model advantage:** The absolute annual contribution difference between pure 1P and pure 3P, with the percentage measured relative to the absolute weaker contribution. Signed 1P minus 3P identifies the direction. Extra hybrid gain is distinct and equals zero when a pure model wins.
 
 **Pure-model seller coverage crossover:** Seller availability needed for pure 3P contribution to equal pure 1P contribution under fixed economics. It is NOT a full hybrid-optimum switching threshold. Where the crossover exceeds feasible availability or is undefined it is marked as such.
 
