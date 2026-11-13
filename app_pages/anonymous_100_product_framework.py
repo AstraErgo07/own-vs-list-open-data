@@ -163,49 +163,79 @@ summary = (selected.groupby("category",sort=False)
          incremental_vs_pure=("advantage_gbp","sum"),
          category_pure_delta=("pure_delta_gbp","sum"),
          annual_units=("annual_demand_units","sum"),
+         downside_switches=("downside_changes_decision","sum"),
+         sum_pure1p=("pure1p","sum"),sum_pure3p=("pure3p","sum"),
          mean_1p_share=("share1p","mean"))
     .reset_index())
-summary["Indicative mix"] = summary["mean_1p_share"].map(lambda x:f"{x:.0%} 1P")
-summary["Better pure model"] = summary["category_pure_delta"].map(lambda x:"1P" if x>0 else "3P" if x<0 else "Tie")
-summary["Pure-model advantage (£)"] = summary["category_pure_delta"].abs().round(2)
-st.dataframe(summary[["category","profiles","annual_units","Better pure model","Pure-model advantage (£)",
-    "one_p","three_p","hybrid","Indicative mix","incremental_vs_pure","total_contribution"]].rename(columns={
-    "category":"Electronics category","profiles":"Profiles","annual_units":"Est. annual demand (units)","one_p":"1P wins",
-    "three_p":"3P wins","hybrid":"Hybrid wins",
-    "total_contribution":"Optimised annual contribution (£)",
-    "incremental_vs_pure":"Extra hybrid gain (£)"}),
-    use_container_width=True,hide_index=True)
 
-st.subheader("Product-level recommendations")
-st.caption("Pure winner advantage measures the difference between 1P and 3P. Extra hybrid gain measures additional value beyond the better pure model.")
+summary["Category decision"] = summary.apply(
+    lambda r: (f'{int(r["one_p"])} 1P / {int(r["three_p"])} 3P / {int(r["hybrid"])} hybrid'
+               if r["one_p"] not in (0,r["profiles"]) or r["three_p"] not in (0,r["profiles"])
+               else ("1P" if r["one_p"]==r["profiles"] else "3P" if r["three_p"]==r["profiles"] else "Hybrid")),
+    axis=1)
+summary["Better pure model"] = summary.apply(
+    lambda r:"1P" if r["sum_pure1p"]>r["sum_pure3p"] else "3P" if r["sum_pure1p"]<r["sum_pure3p"] else "Tie",axis=1)
+summary["Pure-model advantage (£)"] = (summary["sum_pure1p"]-summary["sum_pure3p"]).abs().round(2)
+summary["Contribution per potential unit (£)"] = (summary["total_contribution"]/summary["annual_units"]).round(2)
+st.dataframe(summary[["category","annual_units","Category decision","total_contribution",
+    "Contribution per potential unit (£)","Better pure model","Pure-model advantage (£)",
+    "downside_switches"]].rename(columns={
+    "category":"Electronics category",
+    "annual_units":"Forecast annual demand (units)",
+    "total_contribution":"Best annual contribution (£)",
+    "downside_switches":"Products switching under demand shock (of 10)"}),
+    use_container_width=True,hide_index=True)
+st.caption("Category decision reports the number of the ten product profiles recommended for 1P, 3P or hybrid. "
+    "Contribution per potential unit divides annual contribution by assumed customer demand; it is not margin per completed sale.")
+
+
+st.subheader("Product-level decisions")
+st.caption("Best annual contribution is for the recommended strategy. Per-unit 1P/3P contribution is earned on a completed sale, "
+    "before seller-availability adjustment. Demand stress is a hypothetical 20% volume shortfall with unsold 1P stock.")
 display=selected.copy()
-display["1P vs 3P (£)"]=(display["pure1p"]-display["pure3p"]).round(2)
-display["1P vs 3P (%)"]=display.apply(
-    lambda r: round(100*(r["pure1p"]-r["pure3p"])/abs(r["pure3p"]),1)
-    if abs(r["pure3p"])>0.01 else None,axis=1)
 display["Pure-model seller coverage crossover"]=display.apply(
     lambda r: (
         f'{(r["pure1p"] / (r["pure3p"] / r["coverage"])):.0%}'
         if r["coverage"]>0 and r["pure3p"]>0 and 0<=r["pure1p"]/(r["pure3p"]/r["coverage"])<=1
-        else "Outside 0–100% / none"
+        else "Not feasible / undefined"
     ),axis=1)
-columns={"product":"Product ID","category":"Category","model":"Recommendation",
-    "share1p":"1P allocation","contribution":"Optimised annual contribution (£)",
-    "pure1p":"Pure 1P contribution (£)","pure3p":"Pure 3P contribution (£)",
-    "advantage_gbp":"Advantage vs best pure (£)",
-    "advantage_pct":"Advantage vs best pure (%)",
-    "rationale":"Qualitative reason","coverage":"Seller availability",
-    "stock_days":"Days inventory held","risk":"Markdown risk proxy",
-    "procurement_ratio":"Procurement cost / retail",
-    "annual_demand_units":"Estimated annual demand (units)","demand_index":"Demand index (median=100)",
-    "pure_winner":"Better pure model","pure_advantage_gbp":"Pure winner advantage (£)",
-    "pure_advantage_pct":"Pure winner advantage (%)","pure_delta_gbp":"1P minus 3P (£)"}
-ordered=["product","category","annual_demand_units","demand_index","pure_winner",
-    "pure_advantage_gbp","pure_advantage_pct","pure_delta_gbp","model","share1p",
-    "advantage_gbp","coverage","rationale","pure1p","pure3p","contribution",
-    "Pure-model seller coverage crossover","stock_days","risk","procurement_ratio"]
-st.dataframe(display[ordered].rename(columns=columns),use_container_width=True,hide_index=True,
-    column_config={"1P allocation":st.column_config.ProgressColumn("1P allocation",min_value=0,max_value=1,format="%.0f%%")})
+display["Decision under -20% demand"] = display["downside_winner"]
+display["Downside change?"] = display["downside_changes_decision"].map({True:"Yes",False:"No"})
+display["Pure winner advantage"] = display.apply(
+    lambda r:f'{r["pure_advantage_gbp"]:,.0f} ({r["pure_advantage_pct"]:.1f}%)'
+    if pd.notna(r["pure_advantage_pct"]) else f'{r["pure_advantage_gbp"]:,.0f} (n/a)',axis=1)
+main_cols={
+    "product":"Product","category":"Category","annual_demand_units":"Forecast units/year",
+    "model":"Recommended model","best_annual_contribution":"Best annual contribution (£)",
+    "best_per_potential_unit":"Contribution / potential unit (£)",
+    "pure_winner":"Better pure model","Pure winner advantage":"Pure winner advantage £ (%)",
+    "one_p_contribution_per_sale":"1P contribution / sale (£)",
+    "three_p_contribution_per_sale":"3P contribution / sale (£)",
+    "Decision under -20% demand":"Winner at -20% demand",
+    "Downside change?":"Switches under shock?"}
+st.dataframe(display[list(main_cols)].rename(columns=main_cols),use_container_width=True,hide_index=True)
+st.caption("Demand shock: 20% fewer units than forecast, with baseline 1P stock committed and 70% of procurement cost "
+    "recovered on newly unsold inventory. Assumptions are illustrative; this is not a measured forecast error.")
+with st.expander("Show detailed economics, seller coverage and inventory assumptions",expanded=False):
+    details={
+        "product":"Product","category":"Category",
+        "demand_index":"Demand index (median=100)","coverage":"3P seller availability",
+        "share1p":"Recommended 1P allocation",
+        "pure1p":"Pure 1P annual contribution (£)",
+        "pure3p":"Pure 3P annual contribution (£)",
+        "pure_delta_gbp":"1P minus 3P (£)",
+        "advantage_gbp":"Extra hybrid gain (£)",
+        "downside_annual_contribution":"Recommended model contribution at -20% demand (£)",
+        "downside_annual_drop_pct":"Downside contribution loss (%)",
+        "Pure-model seller coverage crossover":"Seller coverage crossover",
+        "stock_days":"1P stock days",
+        "risk":"Markdown-risk assumption",
+        "procurement_ratio":"1P buying cost / price",
+        "rationale":"Qualitative rationale"}
+    st.dataframe(display[list(details)].rename(columns=details),use_container_width=True,hide_index=True)
+    st.caption("Seller availability 0.70 means capable 3P sellers can fulfil 70% of potential demand. "
+        "The demand index measures volume, NOT predictability.")
+
 st.download_button("Download all 300 scenario evaluations (CSV)",
     all_results.to_csv(index=False).encode("utf-8"),
     file_name="1p_3p_300_illustrative_evaluations.csv",mime="text/csv")
@@ -225,7 +255,9 @@ with st.expander("Method, interpretation and limitations",expanded=False):
 
 **Financial advantage:** The recommended allocation's annual contribution minus the larger contribution from pure 1P or pure 3P. A result of £0 means a pure strategy is optimal; it does not imply no benefit relative to the weaker pure strategy.
 
-**Demand:** Annual demand is a synthetic unit assumption. Demand index 100 equals the median annual demand across 100 profiles; it is not a demand-predictability score.
+**Demand:** Annual demand is a synthetic unit assumption. Demand index 100 equals the median annual demand across 100 profiles; it is not a demand-predictability score. The -20% stress test assumes forecast-level 1P inventory is already committed, that 70% of incremental excess-stock buying cost is recoverable, and that 3P sellers absorb their own unsold inventory. These are illustrative assumptions, not measured forecast errors.
+
+**Contribution per unit:** The displayed 1P and 3P per-sale contributions are calculated before seller availability affects how many transactions occur. "Contribution / potential unit" divides the optimal annual contribution by assumed total addressable demand; it is not the same as contribution per completed transaction.
 
 **Seller availability:** A value of 0.70 means 70% of hypothetical demand is serviceable by capable 3P sellers, not seven sellers or 70% of listings.
 
