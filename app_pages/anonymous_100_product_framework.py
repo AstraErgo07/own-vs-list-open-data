@@ -68,6 +68,24 @@ def calc(r, share, scenario):
     contrib=one_units*one_margin + three_units*three_margin
     return contrib, cov, one_margin, three_margin
 
+
+def downside_contribution(r, share, scenario, demand_drop=0.20, salvage_fraction=0.70):
+    """Illustrative demand downside with inventory bought to baseline forecast.
+
+    1P commits to baseline forecast volume and recovers salvage_fraction of
+    procurement cost for incremental unsold units. 3P inventory risk is borne
+    by sellers. This is a stress assumption, not a measured forecast error.
+    """
+    stressed = dict(r)
+    stressed["demand"] = r["demand"] * (1 - demand_drop)
+    operating_contribution = calc(stressed, share, scenario)[0]
+    cogs_factor = SCENARIOS[scenario][0]
+    buy = r["cost"] * cogs_factor * (1 + procurement_adjust)
+    baseline_1p_units = r["demand"] * share * (1 + r["uplift"] * (1-share))
+    incremental_unsold = baseline_1p_units * demand_drop
+    excess_stock_loss = incremental_unsold * buy * (1-salvage_fraction)
+    return operating_contribution - excess_stock_loss
+
 def recommend(r,scenario):
     checks=[(round(i/100,2),calc(r,i/100,scenario)[0]) for i in range(101)]
     share,val=max(checks,key=lambda x:x[1])
@@ -76,6 +94,12 @@ def recommend(r,scenario):
     pure=max(pure1,pure3)
     label="1P" if share>=.995 else "3P" if share<=.005 else "Hybrid"
     benefit=val-pure
+    downside_checks = [(i/100, downside_contribution(r,i/100,scenario)) for i in range(101)]
+    downside_share,downside_best = max(downside_checks,key=lambda x:x[1])
+    downside_label = "1P" if downside_share >= .995 else "3P" if downside_share <= .005 else "Hybrid"
+    downside_fixed = downside_contribution(r,share,scenario)
+    unit_1p = calc(r,1,scenario)[2]
+    unit_3p = calc(r,0,scenario)[3]
     pure_delta=pure1-pure3
     losing_pure=min(pure1,pure3)
     win_gap=abs(pure_delta)
@@ -96,6 +120,14 @@ def recommend(r,scenario):
         pure_advantage_gbp=round(win_gap,2),
         pure_advantage_pct=round(100*win_gap/abs(losing_pure),1) if abs(losing_pure)>0.01 else None,
         pure_delta_gbp=round(pure_delta,2),
+        one_p_contribution_per_sale=round(unit_1p,2),
+        three_p_contribution_per_sale=round(unit_3p,2),
+        best_annual_contribution=round(val,2),
+        best_per_potential_unit=round(val/r["demand"],2),
+        downside_annual_contribution=round(downside_fixed,2),
+        downside_annual_drop_pct=round(100*(val-downside_fixed)/abs(val),1) if abs(val)>0.01 else None,
+        downside_winner=downside_label,
+        downside_changes_decision=(downside_label != label),
         stock_days=round(r["days"]*SCENARIOS[scenario][3],1),
         risk=r["markdown"]*demand_adjust,
         procurement_ratio=round(r["cost"]*SCENARIOS[scenario][0]*(1+procurement_adjust)/r["price"],3))
