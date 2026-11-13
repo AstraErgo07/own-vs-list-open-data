@@ -84,12 +84,6 @@ with st.expander("Adjust model assumptions · optional stress test", expanded=Fa
         "an existing 1P substitute and the lost contribution on each displaced sale. "
         "This is incremental cannibalisation relative to the evaluated SKU being 1P. "
         "Do not enter a positive rate for categories without evidence of substitution.")
-cannibalisation_by_category={
-    row["Category"]:(
-        max(0.0,min(100.0,float(row["3P substitution rate (%)"])))/100,
-        max(0.0,float(row["Lost 1P contribution per displaced sale (£)"])))
-    for _,row in cannibalisation_table.iterrows()
-}
         st.caption("1P and 3P draw from the same customer pool; sales switching is not charged twice.")
     st.caption("Assumptions are illustrative and apply to all profiles. Selling prices and costs are net of tax.")
     st.markdown("**Product setup and annual administration costs — editable**")
@@ -108,6 +102,13 @@ cannibalisation_by_category={
             min_value=0.0,max_value=100.0,value=4.0,step=1.0)
         three_p_admin_hours=st.number_input("3P recurring admin hours/year",
             min_value=0.0,max_value=200.0,value=6.0,step=1.0)
+
+cannibalisation_by_category={
+    row["Category"]:(
+        max(0.0,min(100.0,float(row["3P substitution rate (%)"])))/100,
+        max(0.0,float(row["Lost 1P contribution per displaced sale (£)"])))
+    for _,row in cannibalisation_table.iterrows()
+}
 
 fixed_cost_1p=(one_p_admin_hours+one_p_setup_hours/setup_years)*rate
 fixed_cost_3p=(three_p_admin_hours+three_p_setup_hours/setup_years)*rate
