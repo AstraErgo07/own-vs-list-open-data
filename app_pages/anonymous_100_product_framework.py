@@ -38,10 +38,10 @@ ADMIN_ACTIVITIES = {
         ("Product records and inventory reconciliation", 4.0),
     ],
     "3P": [
-        ("Seller onboarding and setup", 2.0),
+        ("Seller-product activation and availability checks", 2.0),
         ("Listing and catalogue quality checks", 2.0),
-        ("Ongoing seller-account oversight", 3.0),
-        ("Annual seller compliance review", 1.0),
+        ("Product-level seller performance follow-up", 3.0),
+        ("Product-level seller compliance checks", 1.0),
     ],
 }
 BASE_1P_HOURS = sum(hours for _,hours in ADMIN_ACTIVITIES["1P"])
