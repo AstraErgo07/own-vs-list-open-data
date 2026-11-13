@@ -99,7 +99,7 @@ def insights(
             f"operating recommendation between A and B: {names}."
         )
 
-    # Sanity check, reported honestly — not fitted to Joybuy's launch.
+    # Sanity check, reported honestly: coverage was set to the launch, parameters were not searched.
     n_1p_op = mix_a["n_1p"]
     n_1p_unit = unit_a["n_1p"]
     neg_a = int((mid_a["contrib_1p_pct"] < 0).sum())
@@ -129,8 +129,11 @@ def insights(
             "thin but positive contribution, around six percent, because "
             "fulfilment in the unit figure is variable-only and the "
             "margin haircut is 5%, not 25%. This is consistent with "
-            "Joybuy's observed 1P-only launch (March 2026), and the "
-            "model was not fitted to that launch. The result is driven "
+            "Joybuy's observed 1P-only launch (March 2026). Parameters "
+            "were not searched to hit that 100% 1P mix, but the 0% "
+            "seller-coverage default was set to the launch-day state, "
+            "and that choice does most of the work on the unit 100% 1P "
+            "result. The rest of the result is driven "
             "by treating 3P as unavailable where seller coverage is "
             "zero (the real alternative is 'not ranged'), by a 5% "
             "relative margin haircut justified by JD's published "
@@ -161,7 +164,7 @@ def insights(
         if not beauty_a.empty and (beauty_a["recommendation"] == BRING_IN_HOUSE).all():
             bullets.append(
                 "Beauty clears the 1P money test in both scenarios under "
-                "these assumptions: THG Beauty's 39.3% adjusted gross "
+                "these default assumptions: THG Beauty's 39.3% adjusted gross "
                 "margin, even after THG's 12.3% group distribution proxy "
                 "and the small entrant haircut, leaves more contribution "
                 "than either 'not ranged' (at the entrant, where coverage "
@@ -169,16 +172,25 @@ def insights(
                 "referral on prices above £10, grossed up for VAT, plus "
                 "a material ad take). Baby care, which uses the same THG "
                 "proxy, follows the same pattern on the established side "
-                "and is 1P at the entrant too."
+                "and is 1P at the entrant too. A stress test of v3.1 found "
+                "that a 5-point cut on the THG and Zalando established "
+                "gross-margin proxies turns all five established 1P lines "
+                "(beauty four and baby care) from Bring in-house to Test "
+                "as 3P first, so the established 25% / 6% 1P headline is "
+                "assumption-driven. THG and Zalando are own-brand and "
+                "DTC-heavy; they may overstate the margin on third-party "
+                "brand resale in a UK 1P programme."
             )
         else:
             bullets.append(
-                "Beauty is the category that most clearly clears the 1P "
-                "money test once the platform is established: THG Beauty's "
-                "39.3% adjusted gross margin, even after THG's 12.3% group "
-                "distribution proxy, leaves more contribution than a mature "
-                "3P take (Amazon UK's 15% beauty referral on prices above "
-                "£10, grossed up for VAT, plus a material ad take)."
+                "Under the default THG Beauty 39.3% proxy, beauty clears "
+                "the 1P money test once the platform is established, even "
+                "after THG's 12.3% group distribution proxy, against a "
+                "mature 3P take (Amazon UK's 15% beauty referral on prices "
+                "above £10, grossed up for VAT, plus a material ad take). "
+                "A 5-point cut on that proxy removes the established 1P "
+                "recommendation, so this is assumption-driven, not a "
+                "clear 1P win."
             )
 
     elec_b = mid_b[mid_b["category_en"].isin(["Home appliances", "Computers and office"])]
@@ -244,8 +256,12 @@ def insights(
         "depth and ad income grow. Beauty tends to stay 1P; durables and "
         "fashion flip toward 3P once 3P is a real alternative. Amazon has "
         "disclosed that third-party sellers accounted for 61% of worldwide "
-        "paid units in Q4 2025; this model is not fitted to that 61%, and "
-        "its modelled-sales mix is an assumption-driven output, not a "
+        "paid units in Q4 2025. That is a worldwide unit share across all "
+        "categories; this model's established mix is five UK categories "
+        "by assumed sales. The model is not fitted to that 61%, and a "
+        "stress test reports only that the established 1P sales share is "
+        "1P-light in direction, not a hard miscalibration. The "
+        "modelled-sales mix is an assumption-driven output, not a "
         "forecast of Joybuy's mix. JD China's 78.2% 1P revenue share is "
         "likewise a parent figure, not a Joybuy target."
     )

@@ -1,0 +1,61 @@
+sub_id,sub_en,band,pool,sku_w,gmv_w,rec,is_1p
+baby_care,"Baby care (toiletries, nappies, feeding)",low,torso,0.3,0.15,Bring in-house,True
+baby_care,"Baby care (toiletries, nappies, feeding)",mid,head,0.2,0.8,Bring in-house,True
+baby_care,"Baby care (toiletries, nappies, feeding)",high,tail,0.5,0.05,Bring in-house,True
+baby_clothing,Baby clothing,low,torso,0.3,0.15,Bring in-house,True
+baby_clothing,Baby clothing,mid,head,0.2,0.8,Bring in-house,True
+baby_clothing,Baby clothing,high,tail,0.5,0.05,Bring in-house,True
+car_seats,Car seats and safety,low,torso,0.3,0.15,Bring in-house,True
+car_seats,Car seats and safety,mid,head,0.2,0.8,Bring in-house,True
+car_seats,Car seats and safety,high,tail,0.5,0.05,Do not range,False
+compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",low,torso,0.3,0.15,Bring in-house,True
+compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",mid,head,0.2,0.8,Bring in-house,True
+compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",high,tail,0.5,0.05,Bring in-house,True
+cooking,"Cooking (ovens, hobs, cookers)",low,torso,0.3,0.15,Bring in-house,True
+cooking,"Cooking (ovens, hobs, cookers)",mid,head,0.2,0.8,Bring in-house,True
+cooking,"Cooking (ovens, hobs, cookers)",high,tail,0.5,0.05,Do not range,False
+everyday,Everyday clothing,low,torso,0.3,0.15,Bring in-house,True
+everyday,Everyday clothing,mid,head,0.2,0.8,Bring in-house,True
+everyday,Everyday clothing,high,tail,0.5,0.05,Bring in-house,True
+footwear,Footwear,low,torso,0.3,0.15,Bring in-house,True
+footwear,Footwear,mid,head,0.2,0.8,Bring in-house,True
+footwear,Footwear,high,tail,0.5,0.05,Bring in-house,True
+fragrance,Fragrance,low,torso,0.3,0.15,Bring in-house,True
+fragrance,Fragrance,mid,head,0.2,0.8,Bring in-house,True
+fragrance,Fragrance,high,tail,0.5,0.05,Bring in-house,True
+haircare,Haircare,low,torso,0.3,0.15,Bring in-house,True
+haircare,Haircare,mid,head,0.2,0.8,Bring in-house,True
+haircare,Haircare,high,tail,0.5,0.05,Bring in-house,True
+laptops,Laptops,low,torso,0.3,0.15,Bring in-house,True
+laptops,Laptops,mid,head,0.2,0.8,Bring in-house,True
+laptops,Laptops,high,tail,0.5,0.05,Bring in-house,True
+laundry,Laundry (washing machines and dryers),low,torso,0.3,0.15,Bring in-house,True
+laundry,Laundry (washing machines and dryers),mid,head,0.2,0.8,Bring in-house,True
+laundry,Laundry (washing machines and dryers),high,tail,0.5,0.05,Bring in-house,True
+makeup,Makeup,low,torso,0.3,0.15,Bring in-house,True
+makeup,Makeup,mid,head,0.2,0.8,Bring in-house,True
+makeup,Makeup,high,tail,0.5,0.05,Bring in-house,True
+office_equipment,"Office equipment (printers, ink, desks)",low,torso,0.3,0.15,Bring in-house,True
+office_equipment,"Office equipment (printers, ink, desks)",mid,head,0.2,0.8,Bring in-house,True
+office_equipment,"Office equipment (printers, ink, desks)",high,tail,0.5,0.05,Do not range,False
+outerwear,Outerwear,low,torso,0.3,0.15,Bring in-house,True
+outerwear,Outerwear,mid,head,0.2,0.8,Bring in-house,True
+outerwear,Outerwear,high,tail,0.5,0.05,Do not range,False
+peripherals,"Peripherals (keyboards, mice, webcams)",low,torso,0.3,0.15,Bring in-house,True
+peripherals,"Peripherals (keyboards, mice, webcams)",mid,head,0.2,0.8,Bring in-house,True
+peripherals,"Peripherals (keyboards, mice, webcams)",high,tail,0.5,0.05,Bring in-house,True
+pushchairs,Pushchairs,low,torso,0.3,0.15,Bring in-house,True
+pushchairs,Pushchairs,mid,head,0.2,0.8,Bring in-house,True
+pushchairs,Pushchairs,high,tail,0.5,0.05,Do not range,False
+refrigeration,Refrigeration,low,torso,0.3,0.15,Bring in-house,True
+refrigeration,Refrigeration,mid,head,0.2,0.8,Bring in-house,True
+refrigeration,Refrigeration,high,tail,0.5,0.05,Bring in-house,True
+skincare,Skincare,low,torso,0.3,0.15,Bring in-house,True
+skincare,Skincare,mid,head,0.2,0.8,Bring in-house,True
+skincare,Skincare,high,tail,0.5,0.05,Bring in-house,True
+sportswear,Sportswear,low,torso,0.3,0.15,Bring in-house,True
+sportswear,Sportswear,mid,head,0.2,0.8,Bring in-house,True
+sportswear,Sportswear,high,tail,0.5,0.05,Bring in-house,True
+tablets,Tablets,low,torso,0.3,0.15,Bring in-house,True
+tablets,Tablets,mid,head,0.2,0.8,Bring in-house,True
+tablets,Tablets,high,tail,0.5,0.05,Bring in-house,True

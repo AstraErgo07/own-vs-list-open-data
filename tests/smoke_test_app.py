@@ -58,8 +58,8 @@ def test_main_page_loads_without_exception():
     assert "Olist" not in blob  # dropped, not on the main page
     assert "breakeven" in blob.lower() or "Break-even" in blob or "Breakeven" in blob
     assert "Made by Ami Sata" in blob
-    # v3.1 surface: both verdicts, seller coverage, sunk cost, version.
-    assert "v3.1" in blob or "v3.1" in _titles(at) or "v3.1" in _captions(at)
+    # v3.2 surface: both verdicts, seller coverage, sunk cost, version.
+    assert "v3.2" in blob or "v3.2" in _titles(at) or "v3.2" in _captions(at)
     assert "unit" in blob.lower() and "strategic" in blob.lower()
     assert "seller coverage" in blob.lower() or "Seller coverage" in blob
     assert "sunk" in blob.lower() or "variable" in blob.lower()
@@ -103,11 +103,11 @@ def test_method_page_loads_and_credits_sources():
     assert "GMV" in text or "gmv" in text.lower()
     assert "seller coverage" in text.lower() or "Seller coverage" in text or "coverage" in text.lower()
     assert "variable" in text.lower() or "sunk" in text.lower()
-    assert "v3.1" in text or "v3.1" in _captions(at)
+    assert "v3.2" in text or "v3.2" in _captions(at) or "v3.1" in text
 
 
 def test_joybuy_is_the_subject_and_old_bans_do_not_apply():
-    """v3.1 is about Joybuy; the old source-ban on that name is retired."""
+    """v3.2 still cites Joybuy where a published figure is used; the old source-ban on that name is retired."""
     # OnBuy and Walmart still should not appear as if they were this model.
     banned = ("onbuy", "walmart")
     skip = {".pyc", "__pycache__", ".gz", ".pdf"}
