@@ -35,7 +35,7 @@ with st.expander("Adjust model assumptions · optional stress test", expanded=Fa
         demand_adjust = st.slider("Inventory markdown-risk multiplier",.5,2.,1.,.1)
     with col_b:
         coverage_adjust = st.slider("Seller availability adjustment (percentage points)",-40,40,0,5)/100
-        substitution = st.slider("1P cannibalisation of third-party demand",.0,1.,.75,.05)
+        st.caption("Customer switching between 1P and 3P is calculated from the recommended sales split, not a separate cannibalisation penalty.")
     st.caption("Adjustments are illustrative and apply to all profiles. Costs and selling prices are treated on a consistent net-of-tax basis.")
 
 def make_profiles():
@@ -52,83 +52,110 @@ def make_profiles():
                 demand=max(1,demand*(1-v*.105))))
     return rows
 
-def calc(r, share, scenario):
+
+def economics(r, share, scenario, sales_factor=1.0, stock_committed=False):
+    """Allocate one customer demand pool between 1P and 3P, avoiding double-counting."""
     cogs_factor, cov_delta, take_delta, stock_factor, fulfil_factor = SCENARIOS[scenario]
-    p=r["price"]; q=r["demand"]; cov=max(0,min(1,r["coverage"]+cov_delta+coverage_adjust))
-    buy=r["cost"]*cogs_factor*(1+procurement_adjust)
-    days=r["days"]*stock_factor
-    one_margin=(p-buy-r["fulfil"]*fulfil_factor-r["returns"]
-                -p*r["markdown"]*demand_adjust-buy*capital*days/365)
-    three_margin=max(0,p*(r["take"]+take_delta)-r["service3"])
-    # 1P allocation is an assortment/customer-demand share, not a percentage
-    # of inventory owned in a specific real marketplace.
-    one_units=q*share*(1+r["uplift"]*(1-share))
-    three_units=q*cov*(1-substitution*share)*(1-share)
-    # Distinct fulfilment arrangements and supplier advertising income excluded.
-    contrib=one_units*one_margin + three_units*three_margin
-    return contrib, cov, one_margin, three_margin
+    q = r["demand"] * sales_factor
+    cov = max(0.0, min(1.0, r["coverage"]+cov_delta+coverage_adjust))
+    buy = r["cost"]*cogs_factor*(1+procurement_adjust)
+    days = r["days"]*stock_factor
+    one_margin = (r["price"]-buy-r["fulfil"]*fulfil_factor-r["returns"]
+                  -r["price"]*r["markdown"]*demand_adjust-buy*capital*days/365)
+    three_margin = r["price"]*(r["take"]+take_delta)-r["service3"]
+    # A single demand pool. Hybrid uplift is incremental demand, not a second full pool.
+    one_capture = 0.95
+    one_units = q*share*one_capture + q*r["uplift"]*share*(1-share)
+    three_units = q*(1-share)*cov
+    profit = one_units*one_margin+three_units*three_margin
+    # If the marketplace bought inventory for expected demand and demand misses,
+    # charge an additional loss for newly unsold 1P stock after salvage recovery.
+    if stock_committed and sales_factor < 1:
+        unsold = r["demand"]*(1-sales_factor)*share*one_capture
+        profit -= unsold*buy*0.30  # illustrative 70% cost recovery
+    displaced_3p_units = min(q*cov*share, one_units)
+    additional_sales = max(0.0,one_units+three_units-q*cov)
+    turns = 365/days if days>0 else 0.0
+    # Gross margin return on average inventory invested (1P only).
+    avg_inventory = one_units*buy*days/365
+    gross_margin = one_units*(r["price"]-buy-r["price"]*r["markdown"]*demand_adjust)
+    gmroi = gross_margin/avg_inventory if avg_inventory>0 else None
+    return dict(profit=profit, coverage=cov, one_margin=one_margin,
+                three_margin=three_margin, one_units=one_units,three_units=three_units,
+                displaced=displaced_3p_units,incremental=additional_sales,
+                turns=turns,gmroi=gmroi,days=days)
 
+def calc(r,share,scenario):
+    x=economics(r,share,scenario)
+    return x["profit"],x["coverage"],x["one_margin"],x["three_margin"]
 
-def downside_contribution(r, share, scenario, demand_drop=0.20, salvage_fraction=0.70):
-    """Illustrative demand downside with inventory bought to baseline forecast.
+def demand_range(r):
+    # Illustrative product-specific forecast error, not fitted historical variance.
+    uncertainty=min(0.35,max(0.10,0.10+r["markdown"]*1.3))
+    return uncertainty, r["demand"]*(1-uncertainty),r["demand"]*(1+uncertainty)
 
-    1P commits to baseline forecast volume and recovers salvage_fraction of
-    procurement cost for incremental unsold units. 3P inventory risk is borne
-    by sellers. This is a stress assumption, not a measured forecast error.
-    """
-    stressed = dict(r)
-    stressed["demand"] = r["demand"] * (1 - demand_drop)
-    operating_contribution = calc(stressed, share, scenario)[0]
-    cogs_factor = SCENARIOS[scenario][0]
-    buy = r["cost"] * cogs_factor * (1 + procurement_adjust)
-    baseline_1p_units = r["demand"] * share * (1 + r["uplift"] * (1-share))
-    incremental_unsold = baseline_1p_units * demand_drop
-    excess_stock_loss = incremental_unsold * buy * (1-salvage_fraction)
-    return operating_contribution - excess_stock_loss
+def downside_contribution(r,share,scenario):
+    uncertainty,_,_=demand_range(r)
+    return economics(r,share,scenario,1-uncertainty,stock_committed=True)["profit"]
+
 
 def recommend(r,scenario):
-    checks=[(round(i/100,2),calc(r,i/100,scenario)[0]) for i in range(101)]
+    checks=[(i/100,calc(r,i/100,scenario)[0]) for i in range(101)]
     share,val=max(checks,key=lambda x:x[1])
     pure1=calc(r,1,scenario)[0]
     pure3=calc(r,0,scenario)[0]
     pure=max(pure1,pure3)
     label="1P" if share>=.995 else "3P" if share<=.005 else "Hybrid"
-    benefit=val-pure
-    downside_checks = [(i/100, downside_contribution(r,i/100,scenario)) for i in range(101)]
-    downside_share,downside_best = max(downside_checks,key=lambda x:x[1])
-    downside_label = "1P" if downside_share >= .995 else "3P" if downside_share <= .005 else "Hybrid"
-    downside_fixed = downside_contribution(r,share,scenario)
-    unit_1p = calc(r,1,scenario)[2]
-    unit_3p = calc(r,0,scenario)[3]
+    uncertainty,low,high=demand_range(r)
+    low_checks=[(i/100,downside_contribution(r,i/100,scenario)) for i in range(101)]
+    low_share,low_best=max(low_checks,key=lambda x:x[1])
+    low_label="1P" if low_share>=.995 else "3P" if low_share<=.005 else "Hybrid"
+    high_checks=[(i/100,economics(r,i/100,scenario,1+uncertainty)["profit"]) for i in range(101)]
+    high_share,high_best=max(high_checks,key=lambda x:x[1])
+    high_label="1P" if high_share>=.995 else "3P" if high_share<=.005 else "Hybrid"
+    detail=economics(r,share,scenario)
     pure_delta=pure1-pure3
-    losing_pure=min(pure1,pure3)
-    win_gap=abs(pure_delta)
-    winner="1P" if pure_delta>0.005 else "3P" if pure_delta< -0.005 else "Tie"
-    if share>.005 and share<.995:
-        why="Blended inventory control and retained seller contribution outweigh either pure model in this scenario."
-    elif label=="1P":
-        why="Assumed procurement, service and demand advantages outweigh 3P fee economics and inventory exposure."
-    else:
-        why="Available seller contribution exceeds the modeled return from owning and financing stock."
-    # Identify whether a seller-coverage change changes the decision.
-    return dict(scenario=scenario,product=r["id"],category=r["category"],model=label,
-        share1p=share,contribution=round(val,2),pure1p=round(pure1,2),
-        pure3p=round(pure3,2),advantage_gbp=round(benefit,2),
-        advantage_pct=round(100*benefit/pure,2) if pure>0 else None,
-        rationale=why,coverage=round(calc(r,share,scenario)[1],3),
-        annual_demand_units=round(r["demand"]),pure_winner=winner,
-        pure_advantage_gbp=round(win_gap,2),
-        pure_advantage_pct=round(100*win_gap/abs(losing_pure),1) if abs(losing_pure)>0.01 else None,
+    pure_winner="1P" if pure_delta>0.005 else "3P" if pure_delta< -0.005 else "Tie"
+    alternative=pure if label=="Hybrid" else pure3 if label=="1P" else pure1
+    extra=val-alternative
+    reason=(
+        "Both owned stock and independent sellers add profit" if label=="Hybrid" else
+        "Buying and selling directly earns more after inventory costs" if label=="1P" else
+        "Seller fees earn more without owning stock"
+    )
+    return dict(
+        scenario=scenario,product=r["id"],category=r["category"],
+        model=label,share1p=share,contribution=round(val,2),
+        pure1p=round(pure1,2),pure3p=round(pure3,2),
+        advantage_gbp=round(val-pure,2),
+        advantage_pct=round(100*(val-pure)/abs(pure),1) if abs(pure)>0.01 else None,
+        rationale=reason,coverage=round(detail["coverage"],3),
+        annual_demand_units=round(r["demand"]),
+        demand_low=round(low),demand_high=round(high),
+        forecast_uncertainty_pct=round(100*uncertainty),
+        demand_predictability=("High" if uncertainty<=0.16 else "Medium" if uncertainty<=0.23 else "Low"),
+        pure_winner=pure_winner,pure_advantage_gbp=round(abs(pure_delta),2),
+        pure_advantage_pct=round(100*abs(pure_delta)/abs(min(pure1,pure3)),1)
+            if abs(min(pure1,pure3))>0.01 else None,
         pure_delta_gbp=round(pure_delta,2),
-        one_p_contribution_per_sale=round(unit_1p,2),
-        three_p_contribution_per_sale=round(unit_3p,2),
+        one_p_contribution_per_sale=round(detail["one_margin"],2),
+        three_p_contribution_per_sale=round(detail["three_margin"],2),
         best_annual_contribution=round(val,2),
         best_per_potential_unit=round(val/r["demand"],2),
-        downside_annual_contribution=round(downside_fixed,2),
-        downside_annual_drop_pct=round(100*(val-downside_fixed)/abs(val),1) if abs(val)>0.01 else None,
-        downside_winner=downside_label,
-        downside_changes_decision=(downside_label != label),
-        stock_days=round(r["days"]*SCENARIOS[scenario][3],1),
+        extra_profit=round(extra,2),
+        extra_profit_pct=round(100*extra/abs(alternative),1) if abs(alternative)>0.01 else None,
+        low_profit=round(low_best,2),high_profit=round(high_best,2),
+        downside_winner=low_label,upside_winner=high_label,
+        downside_changes_decision=(low_label!=label),
+        downside_annual_contribution=round(downside_contribution(r,share,scenario),2),
+        downside_annual_drop_pct=round(100*(val-downside_contribution(r,share,scenario))/abs(val),1)
+            if abs(val)>0.01 else None,
+        turns=round(detail["turns"],1) if share>0 else None,
+        gmroi=round(detail["gmroi"],2) if detail["gmroi"] is not None else None,
+        one_units=round(detail["one_units"]),three_units=round(detail["three_units"]),
+        displaced_3p_units=round(detail["displaced"]),
+        incremental_sales=round(detail["incremental"]),
+        stock_days=round(detail["days"],1),
         risk=r["markdown"]*demand_adjust,
         procurement_ratio=round(r["cost"]*SCENARIOS[scenario][0]*(1+procurement_adjust)/r["price"],3))
 
