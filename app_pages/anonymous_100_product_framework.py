@@ -7,7 +7,7 @@ import pandas as pd
 import streamlit as st
 
 st.title("1P vs 3P | Marketplace Decision Framework")
-st.caption("100 illustrative electronics profiles · 3 anonymised operating models · 300 evaluations. Scenario simulator — not observed SKU-level marketplace data.")
+st.caption("100 example electronics products · 3 marketplace operating styles · 300 comparisons. Figures are estimates for testing decisions, not real marketplace sales data.")
 
 GROUPS = [
     ("Smartphones",700,.80,38,24,8,.035,.93,.105,10,.06,2800),
@@ -175,93 +175,86 @@ n2.metric("1P recommendations",int((selected.model=="1P").sum()))
 n3.metric("3P recommendations",int((selected.model=="3P").sum()))
 n4.metric("Hybrid recommendations",int((selected.model=="Hybrid").sum()))
 
-st.markdown("**Read the decision:** The pure-model winner compares 1P with 3P. The recommendation also considers hybrid allocation. "
-    "A positive 1P-minus-3P figure favours 1P. Extra hybrid gain is a separate measure.")
-st.caption("Seller availability 0.70 means capable 3P sellers can serve 70% of potential demand at the modelled service level, "
-    "not that there are seven sellers. Demand index 100 = median annual demand across 100 illustrative product profiles.")
+st.markdown("**What the table tells you:** Which selling model earns more, how much more it earns, and whether the answer changes when customer sales are below or above forecast.")
+st.caption("1P = marketplace buys stock and sells it. 3P = outside sellers sell through the marketplace. Hybrid = both. Annual sales are estimates.")
 st.subheader("Category decisions")
 st.caption("These are conditional results for the selected hypothetical operating model, not observed decisions by a real marketplace.")
 
+
 summary = (selected.groupby("category",sort=False)
-    .agg(profiles=("product","count"),one_p=("model",lambda x:int((x=="1P").sum())),
+    .agg(products=("product","count"),
+         expected_sales=("annual_demand_units","sum"),
+         one_p=("model",lambda x:int((x=="1P").sum())),
          three_p=("model",lambda x:int((x=="3P").sum())),
          hybrid=("model",lambda x:int((x=="Hybrid").sum())),
-         total_contribution=("contribution","sum"),
-         incremental_vs_pure=("advantage_gbp","sum"),
-         category_pure_delta=("pure_delta_gbp","sum"),
-         annual_units=("annual_demand_units","sum"),
-         downside_switches=("downside_changes_decision","sum"),
-         sum_pure1p=("pure1p","sum"),sum_pure3p=("pure3p","sum"),
-         mean_1p_share=("share1p","mean"))
+         annual_profit=("contribution","sum"),
+         extra_profit=("extra_profit","sum"),
+         switches=("downside_changes_decision","sum"))
     .reset_index())
-
-summary["Category decision"] = summary.apply(
-    lambda r: (f'{int(r["one_p"])} 1P / {int(r["three_p"])} 3P / {int(r["hybrid"])} hybrid'
-               if r["one_p"] not in (0,r["profiles"]) or r["three_p"] not in (0,r["profiles"])
-               else ("1P" if r["one_p"]==r["profiles"] else "3P" if r["three_p"]==r["profiles"] else "Hybrid")),
-    axis=1)
-summary["Better pure model"] = summary.apply(
-    lambda r:"1P" if r["sum_pure1p"]>r["sum_pure3p"] else "3P" if r["sum_pure1p"]<r["sum_pure3p"] else "Tie",axis=1)
-summary["Pure-model advantage (£)"] = (summary["sum_pure1p"]-summary["sum_pure3p"]).abs().round(2)
-summary["Contribution per potential unit (£)"] = (summary["total_contribution"]/summary["annual_units"]).round(2)
-st.dataframe(summary[["category","annual_units","Category decision","total_contribution",
-    "Contribution per potential unit (£)","Better pure model","Pure-model advantage (£)",
-    "downside_switches"]].rename(columns={
-    "category":"Electronics category",
-    "annual_units":"Forecast annual demand (units)",
-    "total_contribution":"Best annual contribution (£)",
-    "downside_switches":"Products switching under demand shock (of 10)"}),
+summary["Recommended approach"] = summary.apply(
+    lambda r:f'{r["one_p"]} products 1P · {r["three_p"]} 3P · {r["hybrid"]} hybrid',axis=1)
+st.dataframe(summary[["category","expected_sales","Recommended approach",
+    "annual_profit","extra_profit","switches"]].rename(columns={
+    "category":"Category","expected_sales":"Expected annual sales (units)",
+    "annual_profit":"Annual profit contribution (£)",
+    "extra_profit":"Extra profit vs alternative (£)",
+    "switches":"Products changing decision if sales disappoint"}),
     use_container_width=True,hide_index=True)
-st.caption("Category decision reports the number of the ten product profiles recommended for 1P, 3P or hybrid. "
-    "Contribution per potential unit divides annual contribution by assumed customer demand; it is not margin per completed sale.")
+st.caption("Category decisions show how many of its 10 example products favour each model. "
+    "Extra profit compares the recommended model with the other pure model, or with the better pure model when hybrid wins.")
 
 
-st.subheader("Product-level decisions")
-st.caption("Best annual contribution is for the recommended strategy. Per-unit 1P/3P contribution is earned on a completed sale, "
-    "before seller-availability adjustment. Demand stress is a hypothetical 20% volume shortfall with unsold 1P stock.")
+st.subheader("Decisions for each product")
+st.caption("The sales range is an illustrative forecast, not a measured confidence interval. "
+    "Profit contribution excludes shared company overhead and tax.")
 display=selected.copy()
-display["Pure-model seller coverage crossover"]=display.apply(
-    lambda r: (
-        f'{(r["pure1p"] / (r["pure3p"] / r["coverage"])):.0%}'
-        if r["coverage"]>0 and r["pure3p"]>0 and 0<=r["pure1p"]/(r["pure3p"]/r["coverage"])<=1
-        else "Not feasible / undefined"
-    ),axis=1)
-display["Decision under -20% demand"] = display["downside_winner"]
-display["Downside change?"] = display["downside_changes_decision"].map({True:"Yes",False:"No"})
-display["Pure winner advantage"] = display.apply(
-    lambda r:f'{r["pure_advantage_gbp"]:,.0f} ({r["pure_advantage_pct"]:.1f}%)'
-    if pd.notna(r["pure_advantage_pct"]) else f'{r["pure_advantage_gbp"]:,.0f} (n/a)',axis=1)
+display["Expected sales range"] = display.apply(
+    lambda r:f'{r["demand_low"]:,}–{r["demand_high"]:,} units',axis=1)
+display["If sales disappoint"] = display["downside_winner"]
+display["Extra profit (£ / %)"] = display.apply(
+    lambda r:f'£{r["extra_profit"]:,.0f} ({r["extra_profit_pct"]:.1f}%)'
+    if pd.notna(r["extra_profit_pct"]) else f'£{r["extra_profit"]:,.0f}',axis=1)
 main_cols={
-    "product":"Product","category":"Category","annual_demand_units":"Forecast units/year",
-    "model":"Recommended model","best_annual_contribution":"Best annual contribution (£)",
-    "best_per_potential_unit":"Contribution / potential unit (£)",
-    "pure_winner":"Better pure model","Pure winner advantage":"Pure winner advantage £ (%)",
-    "one_p_contribution_per_sale":"1P contribution / sale (£)",
-    "three_p_contribution_per_sale":"3P contribution / sale (£)",
-    "Decision under -20% demand":"Winner at -20% demand",
-    "Downside change?":"Switches under shock?"}
-st.dataframe(display[list(main_cols)].rename(columns=main_cols),use_container_width=True,hide_index=True)
-st.caption("Demand shock: 20% fewer units than forecast, with baseline 1P stock committed and 70% of procurement cost "
-    "recovered on newly unsold inventory. Assumptions are illustrative; this is not a measured forecast error.")
-with st.expander("Show detailed economics, seller coverage and inventory assumptions",expanded=False):
+    "product":"Product","category":"Category",
+    "annual_demand_units":"Expected sales/year",
+    "Expected sales range":"Possible sales range",
+    "model":"Recommended model",
+    "best_annual_contribution":"Annual profit contribution (£)",
+    "Extra profit (£ / %)":"Extra profit vs alternative",
+    "If sales disappoint":"If sales are lower",
+    "turns":"1P inventory turns/year",
+    "gmroi":"1P GMROI (£/£)"}
+st.dataframe(display[list(main_cols)].rename(columns=main_cols),
+    use_container_width=True,hide_index=True)
+st.caption("Inventory turns and GMROI only apply where the recommendation includes 1P stock. "
+    "GMROI £2.00/£1 means £2 gross margin per £1 of average inventory invested. "
+    "If the recommendation is pure 3P, these fields are blank.")
+with st.expander("See how each decision was calculated",expanded=False):
     details={
         "product":"Product","category":"Category",
-        "demand_index":"Demand index (median=100)","coverage":"3P seller availability",
-        "share1p":"Recommended 1P allocation",
-        "pure1p":"Pure 1P annual contribution (£)",
-        "pure3p":"Pure 3P annual contribution (£)",
-        "pure_delta_gbp":"1P minus 3P (£)",
-        "advantage_gbp":"Extra hybrid gain (£)",
-        "downside_annual_contribution":"Recommended model contribution at -20% demand (£)",
-        "downside_annual_drop_pct":"Downside contribution loss (%)",
-        "Pure-model seller coverage crossover":"Seller coverage crossover",
-        "stock_days":"1P stock days",
-        "risk":"Markdown-risk assumption",
-        "procurement_ratio":"1P buying cost / price",
-        "rationale":"Qualitative rationale"}
-    st.dataframe(display[list(details)].rename(columns=details),use_container_width=True,hide_index=True)
-    st.caption("Seller availability 0.70 means capable 3P sellers can fulfil 70% of potential demand. "
-        "The demand index measures volume, NOT predictability.")
+        "one_p_contribution_per_sale":"1P profit contribution / sale (£)",
+        "three_p_contribution_per_sale":"3P profit contribution / sale (£)",
+        "pure1p":"Annual profit if all 1P (£)",
+        "pure3p":"Annual profit if all 3P (£)",
+        "share1p":"Recommended 1P share",
+        "coverage":"Demand sellers can fulfil",
+        "one_units":"Expected 1P units sold",
+        "three_units":"Expected 3P units sold",
+        "displaced_3p_units":"3P sales moved to 1P",
+        "incremental_sales":"Additional sales vs all-3P",
+        "forecast_uncertainty_pct":"Forecast range ± (%)",
+        "low_profit":"Profit if sales are lower (£)",
+        "high_profit":"Profit if sales are higher (£)",
+        "upside_winner":"Model if sales are higher",
+        "stock_days":"1P stock held (days)",
+        "risk":"Assumed markdown rate",
+        "procurement_ratio":"1P buying cost / selling price",
+        "rationale":"Why this model wins"}
+    st.dataframe(display[list(details)].rename(columns=details),
+        use_container_width=True,hide_index=True)
+    st.caption("Demand sellers can fulfil = share of possible customer orders that outside sellers could serve. "
+        "3P sales moved to 1P estimates cannibalisation within one common demand pool; "
+        "it is not extra demand.")
 
 st.download_button("Download all 300 scenario evaluations (CSV)",
     all_results.to_csv(index=False).encode("utf-8"),
@@ -272,25 +265,17 @@ with st.expander("Cross-marketplace comparison",expanded=False):
                .unstack(fill_value=0).reindex(columns=["1P","3P","Hybrid"],fill_value=0))
     st.bar_chart(by_market)
     st.dataframe(by_market,use_container_width=True)
-with st.expander("Method, interpretation and limitations",expanded=False):
+with st.expander("How the estimates work and what is missing",expanded=False):
     st.markdown("""
-**Research question:** When do demand predictability, procurement advantage, seller capability and stock risk favour inventory ownership, third-party intermediation or a hybrid?
+**What annual profit contribution means:** Sales income retained by the marketplace minus the purchasing, fulfilment, returns, markdown, inventory financing or seller-service costs included in the model. It is NOT net profit after all overhead and taxes.
 
-**Data integrity:** All 100 product profiles and all three marketplaces are synthetic. Marketplace A, B and C represent operating archetypes; they are not disguised observations of named firms.
+**Demand estimates:** Each product has a central annual demand estimate and a lower/higher sales scenario. The range is based on illustrative category assumptions, not actual forecasting data. When sales are lower, the model assumes the marketplace has already bought 1P stock for expected demand, and recovers 70% of the buying cost of newly unsold stock. Third-party sellers bear their own inventory risk. These assumptions can materially change the result.
 
-**Unit economics:** 1P contribution deducts buying cost, fulfilment, returns, assumed markdown loss and cost of stock capital. 3P contribution uses fee income net of assumed seller servicing, adjusted for seller availability. The model searches 1P allocation from 0 to 100% in one-percentage-point steps.
+**No double counting of customers:** Both 1P and 3P draw from the same underlying customer pool. Moving customers to 1P reduces 3P volume; any additional sales are shown separately. A small hypothetical hybrid demand lift is included. This is not a causal estimate of cannibalisation.
 
-**Financial advantage:** The recommended allocation's annual contribution minus the larger contribution from pure 1P or pure 3P. A result of £0 means a pure strategy is optimal; it does not imply no benefit relative to the weaker pure strategy.
+**Inventory turnover:** 365 divided by estimated days stock is held. **GMROI:** 1P gross margin divided by average 1P inventory cost, expressed as £ of gross margin per £1 invested. GMROI is not return on invested capital and is not meaningful for pure 3P inventory that the marketplace does not own.
 
-**Demand:** Annual demand is a synthetic unit assumption. Demand index 100 equals the median annual demand across 100 profiles; it is not a demand-predictability score. The -20% stress test assumes forecast-level 1P inventory is already committed, that 70% of incremental excess-stock buying cost is recoverable, and that 3P sellers absorb their own unsold inventory. These are illustrative assumptions, not measured forecast errors.
+**Three marketplaces:** A/B/C are invented operating profiles, not anonymised measurements from actual companies. All 100 product profiles are synthetic. This tool cannot support empirical claims about real marketplace margins or strategy.
 
-**Contribution per unit:** The displayed 1P and 3P per-sale contributions are calculated before seller availability affects how many transactions occur. "Contribution / potential unit" divides the optimal annual contribution by assumed total addressable demand; it is not the same as contribution per completed transaction.
-
-**Seller availability:** A value of 0.70 means 70% of hypothetical demand is serviceable by capable 3P sellers, not seven sellers or 70% of listings.
-
-**Pure-model advantage:** The absolute annual contribution difference between pure 1P and pure 3P, with the percentage measured relative to the absolute weaker contribution. Signed 1P minus 3P identifies the direction. Extra hybrid gain is distinct and equals zero when a pure model wins.
-
-**Pure-model seller coverage crossover:** Seller availability needed for pure 3P contribution to equal pure 1P contribution under fixed economics. It is NOT a full hybrid-optimum switching threshold. Where the crossover exceeds feasible availability or is undefined it is marked as such.
-
-**Limitations:** Demand response, category parameters and cannibalisation are assumed, not estimated from transactions. No real listing, seller contracts, price scraping, advertising fees, FBA revenue or actual contribution margins are included. The recommended mix is scenario-specific, not causal or prescriptive for a real marketplace. Do not share the synthetic outputs as empirical findings.
+**Caveats:** Returns, fees, buying terms, forecast uncertainty, seller availability and service levels are estimates. No actual sales or procurement data has been verified. The profit advantage is conditional on these assumptions. Use the model for scenario exploration, not as validated company-specific investment advice.
 """)
