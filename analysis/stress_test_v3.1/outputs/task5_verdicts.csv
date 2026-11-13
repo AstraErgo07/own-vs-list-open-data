@@ -1,0 +1,441 @@
+scenario,maturity,sub_id,sub_en,category_en,operating,unit,c1p_pct,roc,gross_margin
+A haircut 0%,0.0,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,0.07147162026495484,0.47882148176993866,0.18338015993084072
+A haircut 0%,0.0,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,0.07147162026495482,0.47882148176993866,0.18338015993084072
+A haircut 0%,0.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,0.06932544158491495,0.4588112762774608,0.18338015993084072
+A haircut 0%,0.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,0.06932544158491492,0.45881127627746066,0.18338015993084072
+A haircut 0%,0.0,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,0.07147162026495474,0.478821481769938,0.18338015993084072
+A haircut 0%,0.0,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,0.07147162026495482,0.4788214817699386,0.18338015993084072
+A haircut 0%,0.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,0.06717926290487504,0.43928055445245257,0.18338015993084072
+A haircut 0%,0.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,0.06717926290487511,0.43928055445245306,0.18338015993084072
+A haircut 0%,0.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.2812700432615467,2.941033088585026,0.393
+A haircut 0%,0.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.2791613874899985,2.8779997593733495,0.393
+A haircut 0%,0.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.2812700432615466,2.9410330885850247,0.393
+A haircut 0%,0.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.2791613874899985,2.87799975937335,0.393
+A haircut 0%,0.0,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,0.20823029944446242,2.138149896398574,0.399
+A haircut 0%,0.0,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,0.20823029944446242,2.138149896398574,0.399
+A haircut 0%,0.0,footwear,Footwear,Clothing,Bring in-house,Bring in-house,0.21033788118861468,2.190116005085019,0.399
+A haircut 0%,0.0,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,0.21033788118861466,2.190116005085019,0.399
+A haircut 0%,0.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.28127004326154664,2.941033088585025,0.393
+A haircut 0%,0.0,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,0.2103378811886147,2.1901160050850197,0.399
+A haircut 0%,0.0,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,0.06503308422483525,0.4202122862811824,0.18338015993084072
+A haircut 0%,0.0,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,0.06717926290487507,0.43928055445245284,0.18338015993084072
+B with entrant-haircut-param 0% (inert at t=1),1.0,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,0.03547162026495482,0.23764081061940628,0.18338015993084072
+B with entrant-haircut-param 0% (inert at t=1),1.0,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,0.03547162026495481,0.23764081061940623,0.18338015993084072
+B with entrant-haircut-param 0% (inert at t=1),1.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,0.03332544158491494,0.22055522527550517,0.18338015993084072
+B with entrant-haircut-param 0% (inert at t=1),1.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,0.03332544158491492,0.220555225275505,0.18338015993084072
+B with entrant-haircut-param 0% (inert at t=1),1.0,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,0.03547162026495473,0.2376408106194056,0.18338015993084072
+B with entrant-haircut-param 0% (inert at t=1),1.0,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,0.03547162026495481,0.23764081061940623,0.18338015993084072
+B with entrant-haircut-param 0% (inert at t=1),1.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,0.031179262904875025,0.20387904397918555,0.18338015993084072
+B with entrant-haircut-param 0% (inert at t=1),1.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,0.03117926290487509,0.20387904397918605,0.18338015993084072
+B with entrant-haircut-param 0% (inert at t=1),1.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.24437004326154668,2.5551970439413614,0.393
+B with entrant-haircut-param 0% (inert at t=1),1.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.24226138748999848,2.497581134592437,0.393
+B with entrant-haircut-param 0% (inert at t=1),1.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.24437004326154663,2.555197043941361,0.393
+B with entrant-haircut-param 0% (inert at t=1),1.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.24226138748999856,2.4975811345924384,0.393
+B with entrant-haircut-param 0% (inert at t=1),1.0,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,0.1392302994444624,1.4296442502697293,0.399
+B with entrant-haircut-param 0% (inert at t=1),1.0,outerwear,Outerwear,Clothing,Test as 3P first,Test as 3P first,0.13923029944446247,1.42964425026973,0.399
+B with entrant-haircut-param 0% (inert at t=1),1.0,footwear,Footwear,Clothing,Test as 3P first,Test as 3P first,0.1413378811886147,1.4716624222263262,0.399
+B with entrant-haircut-param 0% (inert at t=1),1.0,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,0.14133788118861468,1.471662422226326,0.399
+B with entrant-haircut-param 0% (inert at t=1),1.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.24437004326154663,2.5551970439413614,0.393
+B with entrant-haircut-param 0% (inert at t=1),1.0,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Test as 3P first,0.1413378811886147,1.4716624222263264,0.399
+B with entrant-haircut-param 0% (inert at t=1),1.0,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,0.029033084224835234,0.18759772576268355,0.18338015993084072
+B with entrant-haircut-param 0% (inert at t=1),1.0,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,0.03117926290487506,0.20387904397918585,0.18338015993084072
+A haircut 5%,0.0,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,0.06216890317874094,0.4118737533170032,0.17421115193429867
+A haircut 5%,0.0,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,0.06216890317874099,0.41187375331700354,0.17421115193429867
+A haircut 5%,0.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,0.060021083204404205,0.39282234223186085,0.17421115193429867
+A haircut 5%,0.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,0.06002108320440428,0.3928223422318614,0.17421115193429867
+A haircut 5%,0.0,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,0.062168903178740964,0.4118737533170034,0.17421115193429867
+A haircut 5%,0.0,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,0.062168903178740936,0.4118737533170032,0.17421115193429867
+A haircut 5%,0.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,0.057873263230067515,0.37422744022459997,0.17421115193429867
+A haircut 5%,0.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,0.0578732632300675,0.37422744022459975,0.17421115193429867
+A haircut 5%,0.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.26137304383830023,2.6472860628538677,0.37335
+A haircut 5%,0.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.25926087062703074,2.58902370760623,0.37335
+A haircut 5%,0.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.2613730438383002,2.6472860628538673,0.37335
+A haircut 5%,0.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.25926087062703074,2.589023707606231,0.37335
+A haircut 5%,0.0,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,0.18802238675547253,1.8686227272502982,0.37905
+A haircut 5%,0.0,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,0.18802238675547242,1.8686227272502969,0.37905
+A haircut 5%,0.0,footwear,Footwear,Clothing,Bring in-house,Bring in-house,0.19013353964071592,1.9161354163655988,0.37905
+A haircut 5%,0.0,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,0.19013353964071592,1.916135416365599,0.37905
+A haircut 5%,0.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.26137304383830023,2.6472860628538677,0.37335
+A haircut 5%,0.0,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,0.19013353964071597,1.9161354163655995,0.37905
+A haircut 5%,0.0,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,0.05572544325573083,0.35607283327920053,0.17421115193429867
+A haircut 5%,0.0,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,0.05787326323006757,0.37422744022460036,0.17421115193429867
+B with entrant-haircut-param 5% (inert at t=1),1.0,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,0.03547162026495482,0.23764081061940628,0.18338015993084072
+B with entrant-haircut-param 5% (inert at t=1),1.0,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,0.03547162026495481,0.23764081061940623,0.18338015993084072
+B with entrant-haircut-param 5% (inert at t=1),1.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,0.03332544158491494,0.22055522527550517,0.18338015993084072
+B with entrant-haircut-param 5% (inert at t=1),1.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,0.03332544158491492,0.220555225275505,0.18338015993084072
+B with entrant-haircut-param 5% (inert at t=1),1.0,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,0.03547162026495473,0.2376408106194056,0.18338015993084072
+B with entrant-haircut-param 5% (inert at t=1),1.0,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,0.03547162026495481,0.23764081061940623,0.18338015993084072
+B with entrant-haircut-param 5% (inert at t=1),1.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,0.031179262904875025,0.20387904397918555,0.18338015993084072
+B with entrant-haircut-param 5% (inert at t=1),1.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,0.03117926290487509,0.20387904397918605,0.18338015993084072
+B with entrant-haircut-param 5% (inert at t=1),1.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.24437004326154668,2.5551970439413614,0.393
+B with entrant-haircut-param 5% (inert at t=1),1.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.24226138748999848,2.497581134592437,0.393
+B with entrant-haircut-param 5% (inert at t=1),1.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.24437004326154663,2.555197043941361,0.393
+B with entrant-haircut-param 5% (inert at t=1),1.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.24226138748999856,2.4975811345924384,0.393
+B with entrant-haircut-param 5% (inert at t=1),1.0,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,0.1392302994444624,1.4296442502697293,0.399
+B with entrant-haircut-param 5% (inert at t=1),1.0,outerwear,Outerwear,Clothing,Test as 3P first,Test as 3P first,0.13923029944446247,1.42964425026973,0.399
+B with entrant-haircut-param 5% (inert at t=1),1.0,footwear,Footwear,Clothing,Test as 3P first,Test as 3P first,0.1413378811886147,1.4716624222263262,0.399
+B with entrant-haircut-param 5% (inert at t=1),1.0,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,0.14133788118861468,1.471662422226326,0.399
+B with entrant-haircut-param 5% (inert at t=1),1.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.24437004326154663,2.5551970439413614,0.393
+B with entrant-haircut-param 5% (inert at t=1),1.0,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Test as 3P first,0.1413378811886147,1.4716624222263264,0.399
+B with entrant-haircut-param 5% (inert at t=1),1.0,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,0.029033084224835234,0.18759772576268355,0.18338015993084072
+B with entrant-haircut-param 5% (inert at t=1),1.0,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,0.03117926290487506,0.20387904397918585,0.18338015993084072
+A haircut 10%,0.0,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,0.05286618609252705,0.3463963847225407,0.16504214393775665
+A haircut 10%,0.0,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,0.05286618609252693,0.3463963847225398,0.16504214393775665
+A haircut 10%,0.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,0.05071672482389346,0.3282827102307998,0.16504214393775665
+A haircut 10%,0.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,0.05071672482389346,0.3282827102307998,0.16504214393775665
+A haircut 10%,0.0,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,0.05286618609252703,0.3463963847225405,0.16504214393775665
+A haircut 10%,0.0,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,0.05286618609252695,0.34639638472254,0.16504214393775665
+A haircut 10%,0.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,0.048567263555259775,0.3106030748137655,0.16504214393775665
+A haircut 10%,0.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,0.04856726355525978,0.3106030748137656,0.16504214393775665
+A haircut 10%,0.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.24147604441505371,2.3714011106353725,0.3537
+A haircut 10%,0.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.2393603537640627,2.317619617520135,0.3537
+A haircut 10%,0.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.24147604441505366,2.3714011106353716,0.3537
+A haircut 10%,0.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.23936035376406267,2.3176196175201347,0.3537
+A haircut 10%,0.0,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,0.1678144740664825,1.6158752960471234,0.35910000000000003
+A haircut 10%,0.0,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,0.16781447406648245,1.6158752960471223,0.35910000000000003
+A haircut 10%,0.0,footwear,Footwear,Clothing,Bring in-house,Bring in-house,0.16992919809281715,1.6592118185806535,0.35910000000000003
+A haircut 10%,0.0,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,0.16992919809281715,1.6592118185806535,0.35910000000000003
+A haircut 10%,0.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.24147604441505374,2.371401110635373,0.3537
+A haircut 10%,0.0,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,0.1699291980928172,1.6592118185806544,0.35910000000000003
+A haircut 10%,0.0,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,0.04641780228662618,0.29334206253153483,0.16504214393775665
+A haircut 10%,0.0,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,0.048567263555259886,0.3106030748137663,0.16504214393775665
+B with entrant-haircut-param 10% (inert at t=1),1.0,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,0.03547162026495482,0.23764081061940628,0.18338015993084072
+B with entrant-haircut-param 10% (inert at t=1),1.0,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,0.03547162026495481,0.23764081061940623,0.18338015993084072
+B with entrant-haircut-param 10% (inert at t=1),1.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,0.03332544158491494,0.22055522527550517,0.18338015993084072
+B with entrant-haircut-param 10% (inert at t=1),1.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,0.03332544158491492,0.220555225275505,0.18338015993084072
+B with entrant-haircut-param 10% (inert at t=1),1.0,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,0.03547162026495473,0.2376408106194056,0.18338015993084072
+B with entrant-haircut-param 10% (inert at t=1),1.0,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,0.03547162026495481,0.23764081061940623,0.18338015993084072
+B with entrant-haircut-param 10% (inert at t=1),1.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,0.031179262904875025,0.20387904397918555,0.18338015993084072
+B with entrant-haircut-param 10% (inert at t=1),1.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,0.03117926290487509,0.20387904397918605,0.18338015993084072
+B with entrant-haircut-param 10% (inert at t=1),1.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.24437004326154668,2.5551970439413614,0.393
+B with entrant-haircut-param 10% (inert at t=1),1.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.24226138748999848,2.497581134592437,0.393
+B with entrant-haircut-param 10% (inert at t=1),1.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.24437004326154663,2.555197043941361,0.393
+B with entrant-haircut-param 10% (inert at t=1),1.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.24226138748999856,2.4975811345924384,0.393
+B with entrant-haircut-param 10% (inert at t=1),1.0,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,0.1392302994444624,1.4296442502697293,0.399
+B with entrant-haircut-param 10% (inert at t=1),1.0,outerwear,Outerwear,Clothing,Test as 3P first,Test as 3P first,0.13923029944446247,1.42964425026973,0.399
+B with entrant-haircut-param 10% (inert at t=1),1.0,footwear,Footwear,Clothing,Test as 3P first,Test as 3P first,0.1413378811886147,1.4716624222263262,0.399
+B with entrant-haircut-param 10% (inert at t=1),1.0,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,0.14133788118861468,1.471662422226326,0.399
+B with entrant-haircut-param 10% (inert at t=1),1.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.24437004326154663,2.5551970439413614,0.393
+B with entrant-haircut-param 10% (inert at t=1),1.0,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Test as 3P first,0.1413378811886147,1.4716624222263264,0.399
+B with entrant-haircut-param 10% (inert at t=1),1.0,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,0.029033084224835234,0.18759772576268355,0.18338015993084072
+B with entrant-haircut-param 10% (inert at t=1),1.0,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,0.03117926290487506,0.20387904397918585,0.18338015993084072
+A haircut 15%,0.0,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,0.04356346900631316,0.2823414623071949,0.1558731359412146
+A haircut 15%,0.0,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,0.043563469006313096,0.2823414623071946,0.1558731359412146
+A haircut 15%,0.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,0.04141236644338271,0.26514515279247974,0.1558731359412146
+A haircut 15%,0.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,0.041412366443382635,0.26514515279247924,0.1558731359412146
+A haircut 15%,0.0,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,0.0435634690063131,0.2823414623071946,0.1558731359412146
+A haircut 15%,0.0,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,0.04356346900631316,0.282341462307195,0.1558731359412146
+A haircut 15%,0.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Do not range,0.03926126388045224,0.24836090049307705,0.1558731359412146
+A haircut 15%,0.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Do not range,0.03926126388045227,0.2483609004930772,0.1558731359412146
+A haircut 15%,0.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.22157904499180722,2.111797078339074,0.33405
+A haircut 15%,0.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.2194598369010947,2.0622320162701144,0.33405
+A haircut 15%,0.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.22157904499180714,2.111797078339073,0.33405
+A haircut 15%,0.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.2194598369010947,2.0622320162701144,0.33405
+A haircut 15%,0.0,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,0.1476065613774926,1.3783879427814643,0.33915
+A haircut 15%,0.0,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,0.1476065613774926,1.3783879427814645,0.33915
+A haircut 15%,0.0,footwear,Footwear,Clothing,Bring in-house,Bring in-house,0.1497248565449185,1.4178004422553743,0.33915
+A haircut 15%,0.0,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,0.14972485654491857,1.417800442255375,0.33915
+A haircut 15%,0.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.22157904499180714,2.1117970783390727,0.33405
+A haircut 15%,0.0,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,0.14972485654491857,1.4178004422553752,0.33915
+A haircut 15%,0.0,pushchairs,Pushchairs,Mother and baby,Bring in-house,Do not range,0.037110161317521775,0.2319740702075994,0.1558731359412146
+A haircut 15%,0.0,car_seats,Car seats and safety,Mother and baby,Bring in-house,Do not range,0.0392612638804522,0.2483609004930768,0.1558731359412146
+B with entrant-haircut-param 15% (inert at t=1),1.0,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,0.03547162026495482,0.23764081061940628,0.18338015993084072
+B with entrant-haircut-param 15% (inert at t=1),1.0,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,0.03547162026495481,0.23764081061940623,0.18338015993084072
+B with entrant-haircut-param 15% (inert at t=1),1.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,0.03332544158491494,0.22055522527550517,0.18338015993084072
+B with entrant-haircut-param 15% (inert at t=1),1.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,0.03332544158491492,0.220555225275505,0.18338015993084072
+B with entrant-haircut-param 15% (inert at t=1),1.0,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,0.03547162026495473,0.2376408106194056,0.18338015993084072
+B with entrant-haircut-param 15% (inert at t=1),1.0,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,0.03547162026495481,0.23764081061940623,0.18338015993084072
+B with entrant-haircut-param 15% (inert at t=1),1.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,0.031179262904875025,0.20387904397918555,0.18338015993084072
+B with entrant-haircut-param 15% (inert at t=1),1.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,0.03117926290487509,0.20387904397918605,0.18338015993084072
+B with entrant-haircut-param 15% (inert at t=1),1.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.24437004326154668,2.5551970439413614,0.393
+B with entrant-haircut-param 15% (inert at t=1),1.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.24226138748999848,2.497581134592437,0.393
+B with entrant-haircut-param 15% (inert at t=1),1.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.24437004326154663,2.555197043941361,0.393
+B with entrant-haircut-param 15% (inert at t=1),1.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.24226138748999856,2.4975811345924384,0.393
+B with entrant-haircut-param 15% (inert at t=1),1.0,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,0.1392302994444624,1.4296442502697293,0.399
+B with entrant-haircut-param 15% (inert at t=1),1.0,outerwear,Outerwear,Clothing,Test as 3P first,Test as 3P first,0.13923029944446247,1.42964425026973,0.399
+B with entrant-haircut-param 15% (inert at t=1),1.0,footwear,Footwear,Clothing,Test as 3P first,Test as 3P first,0.1413378811886147,1.4716624222263262,0.399
+B with entrant-haircut-param 15% (inert at t=1),1.0,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,0.14133788118861468,1.471662422226326,0.399
+B with entrant-haircut-param 15% (inert at t=1),1.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.24437004326154663,2.5551970439413614,0.393
+B with entrant-haircut-param 15% (inert at t=1),1.0,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Test as 3P first,0.1413378811886147,1.4716624222263264,0.399
+B with entrant-haircut-param 15% (inert at t=1),1.0,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,0.029033084224835234,0.18759772576268355,0.18338015993084072
+B with entrant-haircut-param 15% (inert at t=1),1.0,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,0.03117926290487506,0.20387904397918585,0.18338015993084072
+A haircut 25%,0.0,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Do not range,0.024958034833885236,0.1583174888627708,0.13753511994813056
+A haircut 25%,0.0,refrigeration,Refrigeration,Home appliances,Bring in-house,Do not range,0.024958034833885208,0.15831748886277064,0.13753511994813056
+A haircut 25%,0.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Do not range,0.022803649682361066,0.14289739334159896,0.13753511994813056
+A haircut 25%,0.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Do not range,0.02280364968236099,0.1428973933415985,0.13753511994813056
+A haircut 25%,0.0,laptops,Laptops,Computers and office,Bring in-house,Do not range,0.02495803483388524,0.15831748886277083,0.13753511994813056
+A haircut 25%,0.0,tablets,Tablets,Computers and office,Bring in-house,Do not range,0.024958034833885277,0.1583174888627711,0.13753511994813056
+A haircut 25%,0.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Do not range,0.020649264530836875,0.12784679347383282,0.13753511994813056
+A haircut 25%,0.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Do not range,0.020649264530836948,0.1278467934738333,0.13753511994813056
+A haircut 25%,0.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.1817850461453143,1.635988255728376,0.29475
+A haircut 25%,0.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.17965880317515903,1.5941511749007076,0.29475
+A haircut 25%,0.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.1817850461453143,1.635988255728376,0.29475
+A haircut 25%,0.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.17965880317515906,1.5941511749007078,0.29475
+A haircut 25%,0.0,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,0.10719073599951255,0.9439801091518917,0.29925
+A haircut 25%,0.0,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,0.10719073599951257,0.9439801091518919,0.29925
+A haircut 25%,0.0,footwear,Footwear,Clothing,Bring in-house,Bring in-house,0.10931617344912108,0.9762148522821397,0.29925
+A haircut 25%,0.0,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,0.109316173449121,0.976214852282139,0.29925
+A haircut 25%,0.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.18178504614531432,1.6359882557283763,0.29475
+A haircut 25%,0.0,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,0.10931617344912105,0.9762148522821394,0.29925
+A haircut 25%,0.0,pushchairs,Pushchairs,Mother and baby,Bring in-house,Do not range,0.018494879379312698,0.11315256573415024,0.13753511994813056
+A haircut 25%,0.0,car_seats,Car seats and safety,Mother and baby,Bring in-house,Do not range,0.020649264530836826,0.12784679347383254,0.13753511994813056
+B with entrant-haircut-param 25% (inert at t=1),1.0,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,0.03547162026495482,0.23764081061940628,0.18338015993084072
+B with entrant-haircut-param 25% (inert at t=1),1.0,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,0.03547162026495481,0.23764081061940623,0.18338015993084072
+B with entrant-haircut-param 25% (inert at t=1),1.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,0.03332544158491494,0.22055522527550517,0.18338015993084072
+B with entrant-haircut-param 25% (inert at t=1),1.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,0.03332544158491492,0.220555225275505,0.18338015993084072
+B with entrant-haircut-param 25% (inert at t=1),1.0,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,0.03547162026495473,0.2376408106194056,0.18338015993084072
+B with entrant-haircut-param 25% (inert at t=1),1.0,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,0.03547162026495481,0.23764081061940623,0.18338015993084072
+B with entrant-haircut-param 25% (inert at t=1),1.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,0.031179262904875025,0.20387904397918555,0.18338015993084072
+B with entrant-haircut-param 25% (inert at t=1),1.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,0.03117926290487509,0.20387904397918605,0.18338015993084072
+B with entrant-haircut-param 25% (inert at t=1),1.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.24437004326154668,2.5551970439413614,0.393
+B with entrant-haircut-param 25% (inert at t=1),1.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.24226138748999848,2.497581134592437,0.393
+B with entrant-haircut-param 25% (inert at t=1),1.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.24437004326154663,2.555197043941361,0.393
+B with entrant-haircut-param 25% (inert at t=1),1.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.24226138748999856,2.4975811345924384,0.393
+B with entrant-haircut-param 25% (inert at t=1),1.0,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,0.1392302994444624,1.4296442502697293,0.399
+B with entrant-haircut-param 25% (inert at t=1),1.0,outerwear,Outerwear,Clothing,Test as 3P first,Test as 3P first,0.13923029944446247,1.42964425026973,0.399
+B with entrant-haircut-param 25% (inert at t=1),1.0,footwear,Footwear,Clothing,Test as 3P first,Test as 3P first,0.1413378811886147,1.4716624222263262,0.399
+B with entrant-haircut-param 25% (inert at t=1),1.0,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,0.14133788118861468,1.471662422226326,0.399
+B with entrant-haircut-param 25% (inert at t=1),1.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.24437004326154663,2.5551970439413614,0.393
+B with entrant-haircut-param 25% (inert at t=1),1.0,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Test as 3P first,0.1413378811886147,1.4716624222263264,0.399
+B with entrant-haircut-param 25% (inert at t=1),1.0,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,0.029033084224835234,0.18759772576268355,0.18338015993084072
+B with entrant-haircut-param 25% (inert at t=1),1.0,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,0.03117926290487506,0.20387904397918585,0.18338015993084072
+A beauty+clothing GM minus 5 points,0.0,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,0.06216890317874094,0.4118737533170032,0.17421115193429867
+A beauty+clothing GM minus 5 points,0.0,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,0.06216890317874099,0.41187375331700354,0.17421115193429867
+A beauty+clothing GM minus 5 points,0.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,0.060021083204404205,0.39282234223186085,0.17421115193429867
+A beauty+clothing GM minus 5 points,0.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,0.06002108320440428,0.3928223422318614,0.17421115193429867
+A beauty+clothing GM minus 5 points,0.0,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,0.062168903178740964,0.4118737533170034,0.17421115193429867
+A beauty+clothing GM minus 5 points,0.0,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,0.062168903178740936,0.4118737533170032,0.17421115193429867
+A beauty+clothing GM minus 5 points,0.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,0.057873263230067515,0.37422744022459997,0.17421115193429867
+A beauty+clothing GM minus 5 points,0.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,0.0578732632300675,0.37422744022459975,0.17421115193429867
+A beauty+clothing GM minus 5 points,0.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.23064154600137748,2.228113410991095,0.343
+A beauty+clothing GM minus 5 points,0.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.22852394000153053,2.1766591648757823,0.343
+A beauty+clothing GM minus 5 points,0.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.23064154600137743,2.228113410991094,0.343
+A beauty+clothing GM minus 5 points,0.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.22852394000153042,2.1766591648757814,0.343
+A beauty+clothing GM minus 5 points,0.0,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,0.15758390172769557,1.493824429572436,0.34900000000000003
+A beauty+clothing GM minus 5 points,0.0,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,0.15758390172769562,1.4938244295724366,0.34900000000000003
+A beauty+clothing GM minus 5 points,0.0,footwear,Footwear,Clothing,Bring in-house,Bring in-house,0.1597004337001467,1.535144295606547,0.34900000000000003
+A beauty+clothing GM minus 5 points,0.0,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,0.1597004337001467,1.5351442956065473,0.34900000000000003
+A beauty+clothing GM minus 5 points,0.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.23064154600137743,2.2281134109910945,0.343
+A beauty+clothing GM minus 5 points,0.0,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,0.15970043370014667,1.5351442956065466,0.34900000000000003
+A beauty+clothing GM minus 5 points,0.0,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,0.05572544325573083,0.35607283327920053,0.17421115193429867
+A beauty+clothing GM minus 5 points,0.0,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,0.05787326323006757,0.37422744022460036,0.17421115193429867
+B beauty+clothing GM minus 5 points,1.0,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,0.03547162026495482,0.23764081061940628,0.18338015993084072
+B beauty+clothing GM minus 5 points,1.0,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,0.03547162026495481,0.23764081061940623,0.18338015993084072
+B beauty+clothing GM minus 5 points,1.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,0.03332544158491494,0.22055522527550517,0.18338015993084072
+B beauty+clothing GM minus 5 points,1.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,0.03332544158491492,0.220555225275505,0.18338015993084072
+B beauty+clothing GM minus 5 points,1.0,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,0.03547162026495473,0.2376408106194056,0.18338015993084072
+B beauty+clothing GM minus 5 points,1.0,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,0.03547162026495481,0.23764081061940623,0.18338015993084072
+B beauty+clothing GM minus 5 points,1.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,0.031179262904875025,0.20387904397918555,0.18338015993084072
+B beauty+clothing GM minus 5 points,1.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,0.03117926290487509,0.20387904397918605,0.18338015993084072
+B beauty+clothing GM minus 5 points,1.0,skincare,Skincare,Beauty,Test as 3P first,Test as 3P first,0.19374154600137744,1.8716408400646045,0.343
+B beauty+clothing GM minus 5 points,1.0,makeup,Makeup,Beauty,Test as 3P first,Test as 3P first,0.19162394000153052,1.8251917291953959,0.343
+B beauty+clothing GM minus 5 points,1.0,haircare,Haircare,Beauty,Test as 3P first,Test as 3P first,0.19374154600137744,1.8716408400646039,0.343
+B beauty+clothing GM minus 5 points,1.0,fragrance,Fragrance,Beauty,Test as 3P first,Test as 3P first,0.19162394000153044,1.8251917291953947,0.343
+B beauty+clothing GM minus 5 points,1.0,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,0.08858390172769555,0.8397354997361293,0.34900000000000003
+B beauty+clothing GM minus 5 points,1.0,outerwear,Outerwear,Clothing,Keep 3P,Keep 3P,0.0885839017276956,0.8397354997361298,0.34900000000000003
+B beauty+clothing GM minus 5 points,1.0,footwear,Footwear,Clothing,Keep 3P,Keep 3P,0.0907004337001467,0.8718714794804726,0.34900000000000003
+B beauty+clothing GM minus 5 points,1.0,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,0.09070043370014669,0.8718714794804726,0.34900000000000003
+B beauty+clothing GM minus 5 points,1.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Test as 3P first,Test as 3P first,0.1937415460013774,1.871640840064604,0.343
+B beauty+clothing GM minus 5 points,1.0,baby_clothing,Baby clothing,Mother and baby,Keep 3P,Keep 3P,0.09070043370014666,0.8718714794804722,0.34900000000000003
+B beauty+clothing GM minus 5 points,1.0,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,0.029033084224835234,0.18759772576268355,0.18338015993084072
+B beauty+clothing GM minus 5 points,1.0,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,0.03117926290487506,0.20387904397918585,0.18338015993084072
+A beauty+clothing (published-5 points) then 5% haircut,0.0,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,0.06216890317874094,0.4118737533170032,0.17421115193429867
+A beauty+clothing (published-5 points) then 5% haircut,0.0,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,0.06216890317874099,0.41187375331700354,0.17421115193429867
+A beauty+clothing (published-5 points) then 5% haircut,0.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,0.060021083204404205,0.39282234223186085,0.17421115193429867
+A beauty+clothing (published-5 points) then 5% haircut,0.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,0.06002108320440428,0.3928223422318614,0.17421115193429867
+A beauty+clothing (published-5 points) then 5% haircut,0.0,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,0.062168903178740964,0.4118737533170034,0.17421115193429867
+A beauty+clothing (published-5 points) then 5% haircut,0.0,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,0.062168903178740936,0.4118737533170032,0.17421115193429867
+A beauty+clothing (published-5 points) then 5% haircut,0.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,0.057873263230067515,0.37422744022459997,0.17421115193429867
+A beauty+clothing (published-5 points) then 5% haircut,0.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,0.0578732632300675,0.37422744022459975,0.17421115193429867
+A beauty+clothing (published-5 points) then 5% haircut,0.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.21327597144113944,2.0079389842392827,0.32585000000000003
+A beauty+clothing (published-5 points) then 5% haircut,0.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.211155295512986,1.9600607622725221,0.32585000000000003
+A beauty+clothing (published-5 points) then 5% haircut,0.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.2132759714411394,2.0079389842392823,0.32585000000000003
+A beauty+clothing (published-5 points) then 5% haircut,0.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.21115529551298592,1.960060762272521,0.32585000000000003
+A beauty+clothing (published-5 points) then 5% haircut,0.0,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,0.13990830892454398,1.2916453251647535,0.33155
+A beauty+clothing (published-5 points) then 5% haircut,0.0,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,0.13990830892454398,1.2916453251647535,0.33155
+A beauty+clothing (published-5 points) then 5% haircut,0.0,footwear,Footwear,Clothing,Bring in-house,Bring in-house,0.14202796452667138,1.3296245692374844,0.33155
+A beauty+clothing (published-5 points) then 5% haircut,0.0,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,0.14202796452667138,1.3296245692374844,0.33155
+A beauty+clothing (published-5 points) then 5% haircut,0.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.2132759714411394,2.0079389842392827,0.32585000000000003
+A beauty+clothing (published-5 points) then 5% haircut,0.0,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,0.14202796452667138,1.3296245692374844,0.33155
+A beauty+clothing (published-5 points) then 5% haircut,0.0,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,0.05572544325573083,0.35607283327920053,0.17421115193429867
+A beauty+clothing (published-5 points) then 5% haircut,0.0,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,0.05787326323006757,0.37422744022460036,0.17421115193429867
+A beauty+clothing GM minus 10 points,0.0,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,0.06216890317874094,0.4118737533170032,0.17421115193429867
+A beauty+clothing GM minus 10 points,0.0,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,0.06216890317874099,0.41187375331700354,0.17421115193429867
+A beauty+clothing GM minus 10 points,0.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,0.060021083204404205,0.39282234223186085,0.17421115193429867
+A beauty+clothing GM minus 10 points,0.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,0.06002108320440428,0.3928223422318614,0.17421115193429867
+A beauty+clothing GM minus 10 points,0.0,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,0.062168903178740964,0.4118737533170034,0.17421115193429867
+A beauty+clothing GM minus 10 points,0.0,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,0.062168903178740936,0.4118737533170032,0.17421115193429867
+A beauty+clothing GM minus 10 points,0.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,0.057873263230067515,0.37422744022459997,0.17421115193429867
+A beauty+clothing GM minus 10 points,0.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,0.0578732632300675,0.37422744022459975,0.17421115193429867
+A beauty+clothing GM minus 10 points,0.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.18001304874120838,1.6160310286721198,0.29300000000000004
+A beauty+clothing GM minus 10 points,0.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.1778864925130626,1.5745180886947032,0.29300000000000004
+A beauty+clothing GM minus 10 points,0.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.18001304874120835,1.6160310286721196,0.29300000000000004
+A beauty+clothing GM minus 10 points,0.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.17788649251306257,1.5745180886947032,0.29300000000000004
+A beauty+clothing GM minus 10 points,0.0,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,0.10693750401092883,0.9414141505959621,0.29900000000000004
+A beauty+clothing GM minus 10 points,0.0,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,0.10693750401092879,0.9414141505959616,0.29900000000000004
+A beauty+clothing GM minus 10 points,0.0,footwear,Footwear,Clothing,Bring in-house,Bring in-house,0.1090629862116787,0.9736064961820656,0.29900000000000004
+A beauty+clothing GM minus 10 points,0.0,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,0.10906298621167872,0.9736064961820657,0.29900000000000004
+A beauty+clothing GM minus 10 points,0.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.18001304874120835,1.6160310286721193,0.29300000000000004
+A beauty+clothing GM minus 10 points,0.0,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,0.10906298621167873,0.9736064961820659,0.29900000000000004
+A beauty+clothing GM minus 10 points,0.0,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,0.05572544325573083,0.35607283327920053,0.17421115193429867
+A beauty+clothing GM minus 10 points,0.0,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,0.05787326323006757,0.37422744022460036,0.17421115193429867
+B beauty+clothing GM minus 10 points,1.0,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,0.03547162026495482,0.23764081061940628,0.18338015993084072
+B beauty+clothing GM minus 10 points,1.0,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,0.03547162026495481,0.23764081061940623,0.18338015993084072
+B beauty+clothing GM minus 10 points,1.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,0.03332544158491494,0.22055522527550517,0.18338015993084072
+B beauty+clothing GM minus 10 points,1.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,0.03332544158491492,0.220555225275505,0.18338015993084072
+B beauty+clothing GM minus 10 points,1.0,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,0.03547162026495473,0.2376408106194056,0.18338015993084072
+B beauty+clothing GM minus 10 points,1.0,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,0.03547162026495481,0.23764081061940623,0.18338015993084072
+B beauty+clothing GM minus 10 points,1.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,0.031179262904875025,0.20387904397918555,0.18338015993084072
+B beauty+clothing GM minus 10 points,1.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,0.03117926290487509,0.20387904397918605,0.18338015993084072
+B beauty+clothing GM minus 10 points,1.0,skincare,Skincare,Beauty,Keep 3P,Keep 3P,0.14311304874120837,1.2847686819978563,0.29300000000000004
+B beauty+clothing GM minus 10 points,1.0,makeup,Makeup,Beauty,Keep 3P,Keep 3P,0.14098649251306258,1.2479069073057163,0.29300000000000004
+B beauty+clothing GM minus 10 points,1.0,haircare,Haircare,Beauty,Keep 3P,Keep 3P,0.14311304874120837,1.2847686819978563,0.29300000000000004
+B beauty+clothing GM minus 10 points,1.0,fragrance,Fragrance,Beauty,Keep 3P,Keep 3P,0.14098649251306258,1.2479069073057163,0.29300000000000004
+B beauty+clothing GM minus 10 points,1.0,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,0.03793750401092882,0.3339792100489783,0.29900000000000004
+B beauty+clothing GM minus 10 points,1.0,outerwear,Outerwear,Clothing,Keep 3P,Keep 3P,0.037937504010928755,0.3339792100489777,0.29900000000000004
+B beauty+clothing GM minus 10 points,1.0,footwear,Footwear,Clothing,Keep 3P,Keep 3P,0.0400629862116787,0.35764272542874953,0.29900000000000004
+B beauty+clothing GM minus 10 points,1.0,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,0.04006298621167869,0.3576427254287495,0.29900000000000004
+B beauty+clothing GM minus 10 points,1.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Keep 3P,Keep 3P,0.14311304874120834,1.284768681997856,0.29300000000000004
+B beauty+clothing GM minus 10 points,1.0,baby_clothing,Baby clothing,Mother and baby,Keep 3P,Keep 3P,0.040062986211678725,0.35764272542874975,0.29900000000000004
+B beauty+clothing GM minus 10 points,1.0,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,0.029033084224835234,0.18759772576268355,0.18338015993084072
+B beauty+clothing GM minus 10 points,1.0,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,0.03117926290487506,0.20387904397918585,0.18338015993084072
+A beauty+clothing (published-10 points) then 5% haircut,0.0,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,0.06216890317874094,0.4118737533170032,0.17421115193429867
+A beauty+clothing (published-10 points) then 5% haircut,0.0,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,0.06216890317874099,0.41187375331700354,0.17421115193429867
+A beauty+clothing (published-10 points) then 5% haircut,0.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,0.060021083204404205,0.39282234223186085,0.17421115193429867
+A beauty+clothing (published-10 points) then 5% haircut,0.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,0.06002108320440428,0.3928223422318614,0.17421115193429867
+A beauty+clothing (published-10 points) then 5% haircut,0.0,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,0.062168903178740964,0.4118737533170034,0.17421115193429867
+A beauty+clothing (published-10 points) then 5% haircut,0.0,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,0.062168903178740936,0.4118737533170032,0.17421115193429867
+A beauty+clothing (published-10 points) then 5% haircut,0.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,0.057873263230067515,0.37422744022459997,0.17421115193429867
+A beauty+clothing (published-10 points) then 5% haircut,0.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,0.0578732632300675,0.37422744022459975,0.17421115193429867
+A beauty+clothing (published-10 points) then 5% haircut,0.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.16517889904397895,1.4527573216413097,0.27835000000000004
+A beauty+clothing (published-10 points) then 5% haircut,0.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.1630497203989415,1.4138962369578034,0.27835000000000004
+A beauty+clothing (published-10 points) then 5% haircut,0.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.16517889904397887,1.4527573216413088,0.27835000000000004
+A beauty+clothing (published-10 points) then 5% haircut,0.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.16304972039894153,1.4138962369578036,0.27835000000000004
+A beauty+clothing (published-10 points) then 5% haircut,0.0,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,0.09179423109361545,0.7912275336639242,0.28405
+A beauty+clothing (published-10 points) then 5% haircut,0.0,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,0.09179423109361551,0.7912275336639247,0.28405
+A beauty+clothing (published-10 points) then 5% haircut,0.0,footwear,Footwear,Clothing,Bring in-house,Bring in-house,0.09392238941262683,0.8209383334330252,0.28405
+A beauty+clothing (published-10 points) then 5% haircut,0.0,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,0.0939223894126268,0.8209383334330248,0.28405
+A beauty+clothing (published-10 points) then 5% haircut,0.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.16517889904397887,1.4527573216413086,0.27835000000000004
+A beauty+clothing (published-10 points) then 5% haircut,0.0,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,0.09392238941262679,0.8209383334330247,0.28405
+A beauty+clothing (published-10 points) then 5% haircut,0.0,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,0.05572544325573083,0.35607283327920053,0.17421115193429867
+A beauty+clothing (published-10 points) then 5% haircut,0.0,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,0.05787326323006757,0.37422744022460036,0.17421115193429867
+B electronics GM Currys minus 3 points,1.0,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,0.0050341386211751014,0.03253094310886215,0.15338015993084073
+B electronics GM Currys minus 3 points,1.0,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,0.005034138621175105,0.03253094310886217,0.15338015993084073
+B electronics GM Currys minus 3 points,1.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,0.0028825898041559285,0.01840160779225484,0.15338015993084073
+B electronics GM Currys minus 3 points,1.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,0.03332544158491492,0.220555225275505,0.18338015993084072
+B electronics GM Currys minus 3 points,1.0,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,0.005034138621175186,0.03253094310886269,0.15338015993084073
+B electronics GM Currys minus 3 points,1.0,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,0.0050341386211752,0.032530943108862787,0.15338015993084073
+B electronics GM Currys minus 3 points,1.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,0.0007310409871367726,0.004610838989573079,0.15338015993084073
+B electronics GM Currys minus 3 points,1.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,0.03117926290487509,0.20387904397918605,0.18338015993084072
+B electronics GM Currys minus 3 points,1.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.24437004326154668,2.5551970439413614,0.393
+B electronics GM Currys minus 3 points,1.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.24226138748999848,2.497581134592437,0.393
+B electronics GM Currys minus 3 points,1.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.24437004326154663,2.555197043941361,0.393
+B electronics GM Currys minus 3 points,1.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.24226138748999856,2.4975811345924384,0.393
+B electronics GM Currys minus 3 points,1.0,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,0.1392302994444624,1.4296442502697293,0.399
+B electronics GM Currys minus 3 points,1.0,outerwear,Outerwear,Clothing,Test as 3P first,Test as 3P first,0.13923029944446247,1.42964425026973,0.399
+B electronics GM Currys minus 3 points,1.0,footwear,Footwear,Clothing,Test as 3P first,Test as 3P first,0.1413378811886147,1.4716624222263262,0.399
+B electronics GM Currys minus 3 points,1.0,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,0.14133788118861468,1.471662422226326,0.399
+B electronics GM Currys minus 3 points,1.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.24437004326154663,2.5551970439413614,0.393
+B electronics GM Currys minus 3 points,1.0,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Test as 3P first,0.1413378811886147,1.4716624222263264,0.399
+B electronics GM Currys minus 3 points,1.0,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,-0.001420507829882414,0.0,0.15338015993084073
+B electronics GM Currys minus 3 points,1.0,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,0.0007310409871368357,0.004610838989573476,0.15338015993084073
+A electronics (Currys minus 3 points) then 5% haircut,0.0,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Do not range,0.03325329561715013,0.21295600047659977,0.14571115193429868
+A electronics (Currys minus 3 points) then 5% haircut,0.0,refrigeration,Refrigeration,Home appliances,Bring in-house,Do not range,0.03325329561715016,0.21295600047659996,0.14571115193429868
+A electronics (Currys minus 3 points) then 5% haircut,0.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Do not range,0.03110037401268305,0.19675339745934,0.14571115193429868
+A electronics (Currys minus 3 points) then 5% haircut,0.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,0.06002108320440428,0.3928223422318614,0.17421115193429867
+A electronics (Currys minus 3 points) then 5% haircut,0.0,laptops,Laptops,Computers and office,Bring in-house,Do not range,0.03325329561715018,0.2129560004766001,0.14571115193429868
+A electronics (Currys minus 3 points) then 5% haircut,0.0,tablets,Tablets,Computers and office,Bring in-house,Do not range,0.033253295617150076,0.21295600047659938,0.14571115193429868
+A electronics (Currys minus 3 points) then 5% haircut,0.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Do not range,0.028947452408216025,0.1809390405058302,0.14571115193429868
+A electronics (Currys minus 3 points) then 5% haircut,0.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,0.0578732632300675,0.37422744022459975,0.17421115193429867
+A electronics (Currys minus 3 points) then 5% haircut,0.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.26137304383830023,2.6472860628538677,0.37335
+A electronics (Currys minus 3 points) then 5% haircut,0.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.25926087062703074,2.58902370760623,0.37335
+A electronics (Currys minus 3 points) then 5% haircut,0.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.2613730438383002,2.6472860628538673,0.37335
+A electronics (Currys minus 3 points) then 5% haircut,0.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.25926087062703074,2.589023707606231,0.37335
+A electronics (Currys minus 3 points) then 5% haircut,0.0,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,0.18802238675547253,1.8686227272502982,0.37905
+A electronics (Currys minus 3 points) then 5% haircut,0.0,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,0.18802238675547242,1.8686227272502969,0.37905
+A electronics (Currys minus 3 points) then 5% haircut,0.0,footwear,Footwear,Clothing,Bring in-house,Bring in-house,0.19013353964071592,1.9161354163655988,0.37905
+A electronics (Currys minus 3 points) then 5% haircut,0.0,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,0.19013353964071592,1.916135416365599,0.37905
+A electronics (Currys minus 3 points) then 5% haircut,0.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.26137304383830023,2.6472860628538677,0.37335
+A electronics (Currys minus 3 points) then 5% haircut,0.0,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,0.19013353964071597,1.9161354163655995,0.37905
+A electronics (Currys minus 3 points) then 5% haircut,0.0,pushchairs,Pushchairs,Mother and baby,Bring in-house,Do not range,0.026794530803748957,0.16549914012490252,0.14571115193429868
+A electronics (Currys minus 3 points) then 5% haircut,0.0,car_seats,Car seats and safety,Mother and baby,Bring in-house,Do not range,0.028947452408215956,0.18093904050582973,0.14571115193429868
+B electronics GM Currys minus 5 points,1.0,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,-0.015257515808011369,0.0,0.13338015993084074
+B electronics GM Currys minus 5 points,1.0,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,-0.015257515808011369,0.0,0.13338015993084074
+B electronics GM Currys minus 5 points,1.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,-0.01741264471635008,0.0,0.13338015993084074
+B electronics GM Currys minus 5 points,1.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,0.03332544158491492,0.220555225275505,0.18338015993084072
+B electronics GM Currys minus 5 points,1.0,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,-0.015257515808011287,0.0,0.13338015993084074
+B electronics GM Currys minus 5 points,1.0,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,-0.015257515808011365,0.0,0.13338015993084074
+B electronics GM Currys minus 5 points,1.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,-0.01956777362468876,0.0,0.13338015993084074
+B electronics GM Currys minus 5 points,1.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,0.03117926290487509,0.20387904397918605,0.18338015993084072
+B electronics GM Currys minus 5 points,1.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.24437004326154668,2.5551970439413614,0.393
+B electronics GM Currys minus 5 points,1.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.24226138748999848,2.497581134592437,0.393
+B electronics GM Currys minus 5 points,1.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.24437004326154663,2.555197043941361,0.393
+B electronics GM Currys minus 5 points,1.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.24226138748999856,2.4975811345924384,0.393
+B electronics GM Currys minus 5 points,1.0,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,0.1392302994444624,1.4296442502697293,0.399
+B electronics GM Currys minus 5 points,1.0,outerwear,Outerwear,Clothing,Test as 3P first,Test as 3P first,0.13923029944446247,1.42964425026973,0.399
+B electronics GM Currys minus 5 points,1.0,footwear,Footwear,Clothing,Test as 3P first,Test as 3P first,0.1413378811886147,1.4716624222263262,0.399
+B electronics GM Currys minus 5 points,1.0,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,0.14133788118861468,1.471662422226326,0.399
+B electronics GM Currys minus 5 points,1.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.24437004326154663,2.5551970439413614,0.393
+B electronics GM Currys minus 5 points,1.0,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Test as 3P first,0.1413378811886147,1.4716624222263264,0.399
+B electronics GM Currys minus 5 points,1.0,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,-0.021722902533027513,0.0,0.13338015993084074
+B electronics GM Currys minus 5 points,1.0,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,-0.01956777362468883,0.0,0.13338015993084074
+A electronics (Currys minus 5 points) then 5% haircut,0.0,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Do not range,0.013976223909423068,0.08755719927298006,0.1267111519342987
+A electronics (Currys minus 5 points) then 5% haircut,0.0,refrigeration,Refrigeration,Home appliances,Bring in-house,Do not range,0.013976223909423127,0.08755719927298043,0.1267111519342987
+A electronics (Currys minus 5 points) then 5% haircut,0.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Do not range,0.01181990121820243,0.0731504998966502,0.1267111519342987
+A electronics (Currys minus 5 points) then 5% haircut,0.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,0.06002108320440428,0.3928223422318614,0.17421115193429867
+A electronics (Currys minus 5 points) then 5% haircut,0.0,laptops,Laptops,Computers and office,Bring in-house,Do not range,0.013976223909423094,0.08755719927298021,0.1267111519342987
+A electronics (Currys minus 5 points) then 5% haircut,0.0,tablets,Tablets,Computers and office,Bring in-house,Do not range,0.01397622390942316,0.08755719927298064,0.1267111519342987
+A electronics (Currys minus 5 points) then 5% haircut,0.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Do not range,0.00966357852698178,0.05908901321969491,0.1267111519342987
+A electronics (Currys minus 5 points) then 5% haircut,0.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,0.0578732632300675,0.37422744022459975,0.17421115193429867
+A electronics (Currys minus 5 points) then 5% haircut,0.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.26137304383830023,2.6472860628538677,0.37335
+A electronics (Currys minus 5 points) then 5% haircut,0.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.25926087062703074,2.58902370760623,0.37335
+A electronics (Currys minus 5 points) then 5% haircut,0.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.2613730438383002,2.6472860628538673,0.37335
+A electronics (Currys minus 5 points) then 5% haircut,0.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.25926087062703074,2.589023707606231,0.37335
+A electronics (Currys minus 5 points) then 5% haircut,0.0,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,0.18802238675547253,1.8686227272502982,0.37905
+A electronics (Currys minus 5 points) then 5% haircut,0.0,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,0.18802238675547242,1.8686227272502969,0.37905
+A electronics (Currys minus 5 points) then 5% haircut,0.0,footwear,Footwear,Clothing,Bring in-house,Bring in-house,0.19013353964071592,1.9161354163655988,0.37905
+A electronics (Currys minus 5 points) then 5% haircut,0.0,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,0.19013353964071592,1.916135416365599,0.37905
+A electronics (Currys minus 5 points) then 5% haircut,0.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.26137304383830023,2.6472860628538677,0.37335
+A electronics (Currys minus 5 points) then 5% haircut,0.0,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,0.19013353964071597,1.9161354163655995,0.37905
+A electronics (Currys minus 5 points) then 5% haircut,0.0,pushchairs,Pushchairs,Mother and baby,Bring in-house,Do not range,0.007507255835761226,0.0453604781842104,0.1267111519342987
+A electronics (Currys minus 5 points) then 5% haircut,0.0,car_seats,Car seats and safety,Mother and baby,Bring in-house,Do not range,0.009663578526981728,0.0590890132196946,0.1267111519342987
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,-0.015257515808011369,0.0,0.13338015993084074
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,-0.015257515808011369,0.0,0.13338015993084074
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,-0.01741264471635008,0.0,0.13338015993084074
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,0.03332544158491492,0.220555225275505,0.18338015993084072
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,-0.015257515808011287,0.0,0.13338015993084074
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,-0.015257515808011365,0.0,0.13338015993084074
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,-0.01956777362468876,0.0,0.13338015993084074
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,0.03117926290487509,0.20387904397918605,0.18338015993084072
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,skincare,Skincare,Beauty,Keep 3P,Keep 3P,0.14311304874120837,1.2847686819978563,0.29300000000000004
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,makeup,Makeup,Beauty,Keep 3P,Keep 3P,0.14098649251306258,1.2479069073057163,0.29300000000000004
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,haircare,Haircare,Beauty,Keep 3P,Keep 3P,0.14311304874120837,1.2847686819978563,0.29300000000000004
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,fragrance,Fragrance,Beauty,Keep 3P,Keep 3P,0.14098649251306258,1.2479069073057163,0.29300000000000004
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,0.03793750401092882,0.3339792100489783,0.29900000000000004
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,outerwear,Outerwear,Clothing,Keep 3P,Keep 3P,0.037937504010928755,0.3339792100489777,0.29900000000000004
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,footwear,Footwear,Clothing,Keep 3P,Keep 3P,0.0400629862116787,0.35764272542874953,0.29900000000000004
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,0.04006298621167869,0.3576427254287495,0.29900000000000004
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Keep 3P,Keep 3P,0.14311304874120834,1.284768681997856,0.29300000000000004
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,baby_clothing,Baby clothing,Mother and baby,Keep 3P,Keep 3P,0.040062986211678725,0.35764272542874975,0.29900000000000004
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,-0.021722902533027513,0.0,0.13338015993084074
+"B combined: beauty+clothing -10pt, electronics -5pt",1.0,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,-0.01956777362468883,0.0,0.13338015993084074
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Do not range,-0.0130888172208394,0.0,0.10003511994813055
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,refrigeration,Refrigeration,Home appliances,Bring in-house,Do not range,-0.013088817220839427,0.0,0.10003511994813055
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Do not range,-0.015249915043587707,0.0,0.10003511994813055
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Do not range,0.02280364968236099,0.1428973933415985,0.13753511994813056
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,laptops,Laptops,Computers and office,Bring in-house,Do not range,-0.013088817220839391,0.0,0.10003511994813055
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,tablets,Tablets,Computers and office,Bring in-house,Do not range,-0.01308881722083935,0.0,0.10003511994813055
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Do not range,-0.017411012866336038,0.0,0.10003511994813055
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Do not range,0.020649264530836948,0.1278467934738333,0.13753511994813056
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,skincare,Skincare,Beauty,Bring in-house,Bring in-house,0.10584230025506049,0.8609751447965331,0.21975000000000003
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,makeup,Makeup,Beauty,Bring in-house,Bring in-house,0.10370263194245698,0.8317256548213676,0.21975000000000003
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,haircare,Haircare,Beauty,Bring in-house,Bring in-house,0.10584230025506053,0.8609751447965336,0.21975000000000003
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,0.10370263194245694,0.8317256548213672,0.21975000000000003
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,everyday,Everyday clothing,Clothing,Bring in-house,Do not range,0.0312211394243624,0.24836801206878265,0.22425000000000003
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,outerwear,Outerwear,Clothing,Bring in-house,Do not range,0.031221139424362367,0.24836801206878237,0.22425000000000003
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,footwear,Footwear,Clothing,Bring in-house,Bring in-house,0.03336000221641907,0.2691090993391659,0.22425000000000003
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,0.03336000221641909,0.269109099339166,0.22425000000000003
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,0.1058423002550606,0.8609751447965341,0.21975000000000003
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,0.0333600022164191,0.26910909933916605,0.22425000000000003
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,pushchairs,Pushchairs,Mother and baby,Bring in-house,Do not range,-0.019572110689084356,0.0,0.10003511994813055
+A combined: 25% haircut + beauty+clothing -10pt + electronics -5pt,0.0,car_seats,Car seats and safety,Mother and baby,Bring in-house,Do not range,-0.017411012866336086,0.0,0.10003511994813055

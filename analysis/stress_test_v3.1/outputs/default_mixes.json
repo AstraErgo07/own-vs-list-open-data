@@ -1,0 +1,46 @@
+{
+  "A_operating": {
+    "n_1p": 20,
+    "n_test": 0,
+    "n_keep": 0,
+    "n_unranged": 0,
+    "share_subs_1p": 1.0,
+    "share_sales_1p": 1.0,
+    "share_subs_3p": 0.0,
+    "share_sales_3p": 0.0,
+    "share_subs_unranged": 0.0
+  },
+  "A_unit": {
+    "n_1p": 20,
+    "n_test": 0,
+    "n_keep": 0,
+    "n_unranged": 0,
+    "share_subs_1p": 1.0,
+    "share_sales_1p": 1.0,
+    "share_subs_3p": 0.0,
+    "share_sales_3p": 0.0,
+    "share_subs_unranged": 0.0
+  },
+  "B_operating": {
+    "n_1p": 5,
+    "n_test": 3,
+    "n_keep": 12,
+    "n_unranged": 0,
+    "share_subs_1p": 0.25,
+    "share_sales_1p": 0.05639805376993288,
+    "share_subs_3p": 0.75,
+    "share_sales_3p": 0.9436019462300671,
+    "share_subs_unranged": 0.0
+  },
+  "B_unit": {
+    "n_1p": 5,
+    "n_test": 3,
+    "n_keep": 12,
+    "n_unranged": 0,
+    "share_subs_1p": 0.25,
+    "share_sales_1p": 0.05639805376993288,
+    "share_subs_3p": 0.75,
+    "share_sales_3p": 0.9436019462300671,
+    "share_subs_unranged": 0.0
+  }
+}

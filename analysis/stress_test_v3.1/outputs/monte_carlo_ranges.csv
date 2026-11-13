@@ -1,0 +1,14 @@
+side,parameter,lo,hi,draw,n_draws,seed,note
+A,seller_coverage,0.0,0.1,uniform,10000,20261113,"Entrant coverage is the Task 0 evidence-informed range 0–10%, not the brief's 0–30%."
+A,spillover_pct,0.0,0.2,uniform,10000,20261113,
+A,gm_haircut_entrant,0.0,0.25,uniform,10000,20261113,
+A,fulfilment_variable_share,0.5,0.9,uniform,10000,20261113,
+A,intro_commission,0.05,0.15,uniform,10000,20261113,
+A,ad_take_entrant,0.0,0.05,uniform,10000,20261113,
+A,hurdle_rate,0.1,0.35,uniform,10000,20261113,
+A,fulfilment_delta,-0.05,0.05,uniform,10000,20261113,
+B,seller_coverage,0.5,0.95,uniform,10000,20261113,
+B,spillover_pct,0.0,0.2,uniform,10000,20261113,
+B,ad_take_established,0.0,0.05,uniform,10000,20261113,
+B,hurdle_rate,0.1,0.35,uniform,10000,20261113,
+B,fulfilment_delta,-0.05,0.05,uniform,10000,20261113,

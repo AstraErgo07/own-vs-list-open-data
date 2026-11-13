@@ -1,0 +1,681 @@
+side,param,param_key,label,lo,hi,layer,sub_id,sub_en,category_en,from,to,at,flipped
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,operating,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,,False
+A,seller_coverage,seller_coverage,Seller coverage (evidence range 0–10%),0.0,0.1,unit,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Test as 3P first,0.7574710683245214,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Test as 3P first,0.7574710683245214,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,refrigeration,Refrigeration,Home appliances,Bring in-house,Test as 3P first,0.7574710683245214,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,refrigeration,Refrigeration,Home appliances,Bring in-house,Test as 3P first,0.7574710683245214,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Test as 3P first,0.7460275567369535,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Test as 3P first,0.7460275567369535,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Test as 3P first,0.7460275567369535,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Test as 3P first,0.7460275567369535,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,laptops,Laptops,Computers and office,Bring in-house,Test as 3P first,0.7574710683245214,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,laptops,Laptops,Computers and office,Bring in-house,Test as 3P first,0.7574710683245214,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,tablets,Tablets,Computers and office,Bring in-house,Test as 3P first,0.7574710683245214,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,tablets,Tablets,Computers and office,Bring in-house,Test as 3P first,0.7574710683245214,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Test as 3P first,0.7345840451540425,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Test as 3P first,0.7345840451540425,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Test as 3P first,0.7345840451540425,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Test as 3P first,0.7345840451540425,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,pushchairs,Pushchairs,Mother and baby,Bring in-house,Test as 3P first,0.7231405335711316,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,pushchairs,Pushchairs,Mother and baby,Bring in-house,Test as 3P first,0.7231405335711316,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,operating,car_seats,Car seats and safety,Mother and baby,Bring in-house,Test as 3P first,0.7345840451540425,True
+A,seller_coverage_beyond,seller_coverage,"Seller coverage (0–100%, beyond evidence, to locate the break)",0.0,1.0,unit,car_seats,Car seats and safety,Mother and baby,Bring in-house,Test as 3P first,0.7345840451540425,True
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,,False
+A,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Do not range,0.17566462801536548,True
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,refrigeration,Refrigeration,Home appliances,Bring in-house,Do not range,0.17566462801536548,True
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Do not range,0.16215750810806637,True
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Do not range,0.16215750810806637,True
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,laptops,Laptops,Computers and office,Bring in-house,Do not range,0.17566462801536548,True
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,tablets,Tablets,Computers and office,Bring in-house,Do not range,0.17566462801536548,True
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Do not range,0.1486692141927779,True
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Do not range,0.1486692141927779,True
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,pushchairs,Pushchairs,Mother and baby,Bring in-house,Do not range,0.13519970693858335,True
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,operating,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,,False
+A,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut,0.0,0.25,unit,car_seats,Car seats and safety,Mother and baby,Bring in-house,Do not range,0.1486692141927779,True
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Do not range,0.8818538722842932,True
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Do not range,0.8818538722842932,True
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Do not range,0.8600953185092656,True
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Do not range,0.8600953185092656,True
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,pushchairs,Pushchairs,Mother and baby,Bring in-house,Do not range,0.8383367647361012,True
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,operating,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,,False
+A,fulfilment_variable_share,fulfilment_variable_share,Fulfilment variable-cost share,0.5,0.9,unit,car_seats,Car seats and safety,Mother and baby,Bring in-house,Do not range,0.8600953185092656,True
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,operating,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,,False
+A,intro_commission,intro_commission,Introductory commission,0.05,0.15,unit,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,operating,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,,False
+A,ad_take,ad_take,Advertising take,0.0,0.05,unit,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,,False
+A,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Do not range,0.034904987324494874,True
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,refrigeration,Refrigeration,Home appliances,Bring in-house,Do not range,0.034904987324494874,True
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Do not range,0.031174949534703053,True
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Do not range,0.031174949534703053,True
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,laptops,Laptops,Computers and office,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,laptops,Laptops,Computers and office,Bring in-house,Do not range,0.034904987324494874,True
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,tablets,Tablets,Computers and office,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,tablets,Tablets,Computers and office,Bring in-house,Do not range,0.034904987324494874,True
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Do not range,0.027444911744445556,True
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Do not range,0.027444911744445556,True
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,footwear,Footwear,Clothing,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,pushchairs,Pushchairs,Mother and baby,Bring in-house,Do not range,0.02371487395465373,True
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,,False
+A,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,car_seats,Car seats and safety,Mother and baby,Bring in-house,Do not range,0.027444911744445556,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Test as 3P first,0.6453812889754771,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Test as 3P first,0.6453812889754771,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,refrigeration,Refrigeration,Home appliances,Keep 3P,Test as 3P first,0.6453812889754771,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,refrigeration,Refrigeration,Home appliances,Keep 3P,Test as 3P first,0.6453812889754771,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Test as 3P first,0.5700474928836338,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Test as 3P first,0.5700474928836338,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,laptops,Laptops,Computers and office,Keep 3P,Test as 3P first,0.6453812889754771,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,laptops,Laptops,Computers and office,Keep 3P,Test as 3P first,0.6453812889754771,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,tablets,Tablets,Computers and office,Keep 3P,Test as 3P first,0.6453812889754771,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,tablets,Tablets,Computers and office,Keep 3P,Test as 3P first,0.6453812889754771,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,everyday,Everyday clothing,Clothing,Keep 3P,Test as 3P first,0.8262863688170909,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,everyday,Everyday clothing,Clothing,Keep 3P,Test as 3P first,0.8262863688170909,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,outerwear,Outerwear,Clothing,Test as 3P first,Bring in-house,0.8262448471039535,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,outerwear,Outerwear,Clothing,Test as 3P first,Bring in-house,0.8262448471039535,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,footwear,Footwear,Clothing,Test as 3P first,Bring in-house,0.775168042629957,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,footwear,Footwear,Clothing,Test as 3P first,Bring in-house,0.775168042629957,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,sportswear,Sportswear,Clothing,Keep 3P,Test as 3P first,0.8821053769439461,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,sportswear,Sportswear,Clothing,Keep 3P,Test as 3P first,0.8821053769439461,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Bring in-house,0.8483990333974363,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Bring in-house,0.8483990333974363,True
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,operating,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,,False
+B,seller_coverage,seller_coverage,Seller coverage (established 50–95%),0.5,0.95,unit,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,everyday,Everyday clothing,Clothing,Keep 3P,Test as 3P first,0.18293526608217509,True
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,everyday,Everyday clothing,Clothing,Keep 3P,Test as 3P first,0.18293526608217509,True
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,outerwear,Outerwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,outerwear,Outerwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,footwear,Footwear,Clothing,Test as 3P first,Keep 3P,0.010617850199341772,True
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,footwear,Footwear,Clothing,Test as 3P first,Keep 3P,0.010617850199341772,True
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,sportswear,Sportswear,Clothing,Keep 3P,Test as 3P first,0.10363220427092165,True
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,sportswear,Sportswear,Clothing,Keep 3P,Test as 3P first,0.10363220427092165,True
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Test as 3P first,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Test as 3P first,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,operating,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,,False
+B,spillover_pct,spillover_pct,Basket / traffic spillover,0.0,0.2,unit,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,outerwear,Outerwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,outerwear,Outerwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,footwear,Footwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,footwear,Footwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Test as 3P first,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Test as 3P first,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,operating,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,,False
+B,gm_haircut_entrant,gm_haircut_entrant,1P margin haircut (at B this is 0 by construction unless forced),0.0,0.25,unit,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,outerwear,Outerwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,outerwear,Outerwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,footwear,Footwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,footwear,Footwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Test as 3P first,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Test as 3P first,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,operating,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,,False
+B,fulfilment_variable_share,fulfilment_variable_share,"Variable share (at B, unit fulfilment is fully loaded, so this is inert)",0.5,0.9,unit,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,outerwear,Outerwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,outerwear,Outerwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,footwear,Footwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,footwear,Footwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Test as 3P first,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Test as 3P first,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,operating,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,,False
+B,intro_commission,intro_commission,"Introductory commission (at B, Amazon referral is used, so this is inert)",0.05,0.15,unit,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,everyday,Everyday clothing,Clothing,Keep 3P,Test as 3P first,0.005854690661653877,True
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,everyday,Everyday clothing,Clothing,Keep 3P,Test as 3P first,0.005854690661653877,True
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,outerwear,Outerwear,Clothing,Test as 3P first,Bring in-house,0.010430299434810877,True
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,outerwear,Outerwear,Clothing,Test as 3P first,Bring in-house,0.010430299434810877,True
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,footwear,Footwear,Clothing,Test as 3P first,Keep 3P,0.046274825260974456,True
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,footwear,Footwear,Clothing,Test as 3P first,Keep 3P,0.046274825260974456,True
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,sportswear,Sportswear,Clothing,Keep 3P,Test as 3P first,0.02445664342492819,True
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,sportswear,Sportswear,Clothing,Keep 3P,Test as 3P first,0.02445664342492819,True
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Bring in-house,0.016537881167605524,True
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Bring in-house,0.016537881167605524,True
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,operating,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,,False
+B,ad_take,ad_take,Advertising take,0.0,0.05,unit,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,refrigeration,Refrigeration,Home appliances,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,laptops,Laptops,Computers and office,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,tablets,Tablets,Computers and office,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,skincare,Skincare,Beauty,Bring in-house,Bring in-house,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,makeup,Makeup,Beauty,Bring in-house,Bring in-house,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,haircare,Haircare,Beauty,Bring in-house,Bring in-house,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,everyday,Everyday clothing,Clothing,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,outerwear,Outerwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,outerwear,Outerwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,footwear,Footwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,footwear,Footwear,Clothing,Test as 3P first,Test as 3P first,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,sportswear,Sportswear,Clothing,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Test as 3P first,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Test as 3P first,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,operating,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,,False
+B,hurdle_rate,hurdle_rate,GMROI hurdle,0.1,0.35,unit,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,,False
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Test as 3P first,-0.045556379761546854,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,laundry,Laundry (washing machines and dryers),Home appliances,Keep 3P,Test as 3P first,-0.045556379761546854,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,refrigeration,Refrigeration,Home appliances,Keep 3P,Test as 3P first,-0.045556379761546854,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,refrigeration,Refrigeration,Home appliances,Keep 3P,Test as 3P first,-0.045556379761546854,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Test as 3P first,-0.04770255843177438,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Keep 3P,Test as 3P first,-0.04770255843177438,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,,False
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Keep 3P,Keep 3P,,False
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,laptops,Laptops,Computers and office,Keep 3P,Test as 3P first,-0.045556379761546854,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,laptops,Laptops,Computers and office,Keep 3P,Test as 3P first,-0.045556379761546854,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,tablets,Tablets,Computers and office,Keep 3P,Test as 3P first,-0.045556379761546854,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,tablets,Tablets,Computers and office,Keep 3P,Test as 3P first,-0.045556379761546854,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,,False
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Keep 3P,Keep 3P,,False
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,,False
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Keep 3P,Keep 3P,,False
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,skincare,Skincare,Beauty,Bring in-house,Test as 3P first,0.029570043261628598,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,skincare,Skincare,Beauty,Bring in-house,Test as 3P first,0.029570043261628598,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,makeup,Makeup,Beauty,Bring in-house,Test as 3P first,0.027461387490387998,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,makeup,Makeup,Beauty,Bring in-house,Test as 3P first,0.027461387490387998,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,haircare,Haircare,Beauty,Bring in-house,Test as 3P first,0.029570043261628598,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,haircare,Haircare,Beauty,Bring in-house,Test as 3P first,0.029570043261628598,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,fragrance,Fragrance,Beauty,Bring in-house,Test as 3P first,0.027461387490387998,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,fragrance,Fragrance,Beauty,Bring in-house,Test as 3P first,0.027461387490387998,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,everyday,Everyday clothing,Clothing,Keep 3P,Test as 3P first,-0.01955770058557392,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,everyday,Everyday clothing,Clothing,Keep 3P,Test as 3P first,-0.01955770058557392,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,outerwear,Outerwear,Clothing,Test as 3P first,Bring in-house,-0.01956970058381559,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,outerwear,Outerwear,Clothing,Test as 3P first,Bring in-house,-0.01956970058381559,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,footwear,Footwear,Clothing,Test as 3P first,Bring in-house,-0.03564393701963127,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,footwear,Footwear,Clothing,Test as 3P first,Bring in-house,-0.03564393701963127,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,sportswear,Sportswear,Clothing,Keep 3P,Test as 3P first,-0.0044901188462972644,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,sportswear,Sportswear,Clothing,Keep 3P,Test as 3P first,-0.0044901188462972644,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Test as 3P first,0.029570043261628598,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Test as 3P first,0.029570043261628598,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Bring in-house,-0.013462118851020933,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,baby_clothing,Baby clothing,Mother and baby,Test as 3P first,Bring in-house,-0.013462118851020933,True
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,,False
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,pushchairs,Pushchairs,Mother and baby,Keep 3P,Keep 3P,,False
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,operating,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,,False
+B,fulfilment_delta,fulfilment_delta,"Established fulfilment rate, percentage-point shift",-0.05,0.05,unit,car_seats,Car seats and safety,Mother and baby,Keep 3P,Keep 3P,,False

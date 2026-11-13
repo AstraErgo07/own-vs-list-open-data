@@ -1,0 +1,21 @@
+sub_id,sub_en,category_en,default_op_A,default_unit_A,default_op_B,default_unit_B,survives_all_A_operating,survives_all_A_unit,survives_all_B_operating,survives_all_B_unit
+laundry,Laundry (washing machines and dryers),Home appliances,Bring in-house,Bring in-house,Keep 3P,Keep 3P,True,False,True,True
+refrigeration,Refrigeration,Home appliances,Bring in-house,Bring in-house,Keep 3P,Keep 3P,True,False,True,True
+cooking,"Cooking (ovens, hobs, cookers)",Home appliances,Bring in-house,Bring in-house,Keep 3P,Keep 3P,True,False,True,True
+compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",Home appliances,Bring in-house,Bring in-house,Keep 3P,Keep 3P,True,False,True,True
+laptops,Laptops,Computers and office,Bring in-house,Bring in-house,Keep 3P,Keep 3P,True,False,True,True
+tablets,Tablets,Computers and office,Bring in-house,Bring in-house,Keep 3P,Keep 3P,True,False,True,True
+peripherals,"Peripherals (keyboards, mice, webcams)",Computers and office,Bring in-house,Bring in-house,Keep 3P,Keep 3P,True,False,True,True
+office_equipment,"Office equipment (printers, ink, desks)",Computers and office,Bring in-house,Bring in-house,Keep 3P,Keep 3P,True,False,True,True
+skincare,Skincare,Beauty,Bring in-house,Bring in-house,Bring in-house,Bring in-house,True,True,False,False
+makeup,Makeup,Beauty,Bring in-house,Bring in-house,Bring in-house,Bring in-house,True,True,False,False
+haircare,Haircare,Beauty,Bring in-house,Bring in-house,Bring in-house,Bring in-house,True,True,False,False
+fragrance,Fragrance,Beauty,Bring in-house,Bring in-house,Bring in-house,Bring in-house,True,True,False,False
+everyday,Everyday clothing,Clothing,Bring in-house,Bring in-house,Keep 3P,Keep 3P,True,False,True,True
+outerwear,Outerwear,Clothing,Bring in-house,Bring in-house,Test as 3P first,Test as 3P first,True,False,False,False
+footwear,Footwear,Clothing,Bring in-house,Bring in-house,Test as 3P first,Test as 3P first,True,True,False,False
+sportswear,Sportswear,Clothing,Bring in-house,Bring in-house,Keep 3P,Keep 3P,True,True,True,True
+baby_care,"Baby care (toiletries, nappies, feeding)",Mother and baby,Bring in-house,Bring in-house,Bring in-house,Bring in-house,True,True,False,False
+baby_clothing,Baby clothing,Mother and baby,Bring in-house,Bring in-house,Test as 3P first,Test as 3P first,True,True,False,False
+pushchairs,Pushchairs,Mother and baby,Bring in-house,Bring in-house,Keep 3P,Keep 3P,True,False,True,True
+car_seats,Car seats and safety,Mother and baby,Bring in-house,Bring in-house,Keep 3P,Keep 3P,True,False,True,True
