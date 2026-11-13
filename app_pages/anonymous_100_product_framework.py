@@ -178,6 +178,7 @@ def economics(r, model, scenario, sales_factor=1.0):
         turns=turns,gmroi=gmroi,days=days,discount=discount,
         fulfil_discount=fulfil_discount,fixed_cost=fixed,volume=q,
         avg_inventory=avg_inventory,gross_margin=gross_margin,
+        unit_cogs=buy,fulfil_per_unit=fulfil,
         annual_cogs=one_units*buy,
         gmv=(one_units+three_units)*r["price"])
 
@@ -232,6 +233,15 @@ def recommend(r,scenario,sales_factor=1.0):
         annual_demand_units=round(r["demand"]),
         tested_sales_units=round(r["demand"]*sales_factor),
         selling_price=round(r["price"],2),
+        base_supplier_cogs_per_unit=round(r["cost"],2),
+        one_p_cogs_per_unit=round(one["unit_cogs"],2),
+        one_p_annual_cogs_if_chosen=round(one["annual_cogs"],2),
+        chosen_platform_annual_cogs=round(detail["annual_cogs"],2),
+        one_p_fulfilment_per_unit=round(one["fulfil_per_unit"],2),
+        action_if_current_1p="Keep 1P" if label=="1P" else "Switch to 3P",
+        action_if_current_3p="Switch to 1P" if label=="1P" else "Keep 3P",
+        gain_if_current_1p=round(max(0,three["profit"]-one["profit"]),2),
+        gain_if_current_3p=round(max(0,one["profit"]-three["profit"]),2),
         one_p_contribution_per_sale=round(one["one_margin"],2),
         three_p_contribution_per_sale=round(three["three_margin"],2),
         best_annual_contribution=round(val,2),
@@ -352,22 +362,41 @@ main_cols={
     "annual_demand_units":"Expected demand/year",
     "tested_sales_units":"Demand tested/year",
     "model":"Recommended model",
+    "action_if_current_1p":"If currently 1P",
+    "action_if_current_3p":"If currently 3P",
+    "one_p_cogs_per_unit":"1P COGS/unit (£)",
+    "one_p_contribution_per_sale":"1P contribution/sale (£)",
+    "three_p_contribution_per_sale":"3P contribution/sale (£)",
     "pure1p":"Annual contribution if 1P (£)",
     "pure3p":"Annual contribution if 3P (£)",
     "best_annual_contribution":"Chosen annual contribution (£)",
+    "chosen_platform_annual_cogs":"Chosen platform annual COGS (£)",
     "Extra profit (£ / %)":"Advantage over other model",
     "one_p_threshold":"When 1P beats 3P",
     "turns":"1P inventory turns/year",
     "gmroi":"1P GMROI (£/£)"}
 st.dataframe(display[list(main_cols)].rename(columns=main_cols),
     use_container_width=True,hide_index=True)
-st.caption("The crossover compares the two exclusive SKU models over 10%–300% of estimated demand. "
-    "Inventory turns and GMROI are shown only when the SKU is assigned to 1P.")
+st.caption("COGS means cost of goods bought and owned by the marketplace. "
+    "The 1P COGS/unit column shows the hypothetical 1P purchasing cost even if 3P is recommended. "
+    "Chosen platform annual COGS is zero for 3P because sellers, not the marketplace, own the stock. "
+    "The action columns explicitly show Keep or Switch depending on the SKU's actual current model; "
+    "the app does not assume what the current model is. "
+    "Inventory turns and GMROI apply only to chosen 1P SKUs.")
 
 with st.expander("See SKU-level costs and assumptions",expanded=False):
     details={
         "product":"Product","category":"Category",
         "selling_price":"Selling price (£)",
+        "base_supplier_cogs_per_unit":"Base supplier COGS/unit (£)",
+        "one_p_cogs_per_unit":"1P COGS/unit after scale (£)",
+        "one_p_annual_cogs_if_chosen":"Annual COGS if SKU is 1P (£)",
+        "chosen_platform_annual_cogs":"Annual platform COGS for chosen model (£)",
+        "one_p_fulfilment_per_unit":"1P fulfilment cost/unit (£)",
+        "action_if_current_1p":"Action if currently 1P",
+        "action_if_current_3p":"Action if currently 3P",
+        "gain_if_current_1p":"Gain from switching if currently 1P (£)",
+        "gain_if_current_3p":"Gain from switching if currently 3P (£)",
         "one_p_contribution_per_sale":"1P contribution per fulfilled sale (£)",
         "three_p_contribution_per_sale":"3P contribution per fulfilled sale (£)",
         "coverage":"Share of demand 3P sellers can fulfil",
@@ -422,7 +451,9 @@ with st.expander("Assumptions and limitations",expanded=False):
 
 **Switching threshold:** The earliest tested annual sales volume where all-1P contribution overtakes all-3P contribution, scanning 10%–300% of the original sales estimate. "No crossover" means none within that tested range, not that 1P can never win.
 
-**Annual profit contribution:** Sales revenue retained by the marketplace less purchasing, fulfilment, expected returns, markdown allowance, inventory financing, 3P servicing and the above annual product costs. It is not net profit after all overhead and tax.
+**COGS and contribution:** For 1P, COGS per unit = synthetic base supplier buying cost × operating-model procurement factor × (1 + manual procurement adjustment) × (1 - applicable 1P volume discount). Annual 1P COGS = 1P units fulfilled × adjusted unit COGS. 1P contribution per sale = selling price - adjusted unit COGS - fulfilment - expected returns - markdown allowance - inventory financing. Annual 1P contribution = 1P units × 1P contribution per sale - annualised product setup and administration. For 3P, contribution per fulfilled sale = price × marketplace referral rate - seller service cost; annual 3P contribution = fulfilled 3P units × per-sale contribution - annualised product administration. Marketplace COGS is zero under 3P because sellers own the goods; that does not mean sellers have zero COGS. Contribution is not company net profit after overhead and tax.
+
+**Keep or switch:** The two action columns are conditional on the SKU's current model. If the SKU is currently 1P, use the "If currently 1P" column; if currently 3P, use the other. Without a real current-SKU channel mapping, it is incorrect to assert that a recommendation requires switching.
 
 **Inventory turns and GMROI:** SKU turns = 365 / assumed days held; category turns = annual 1P cost of goods sold / total average 1P inventory investment. GMROI = 1P gross margin divided by average 1P inventory cost. GMROI is not return on total invested capital.
 
