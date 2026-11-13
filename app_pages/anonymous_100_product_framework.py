@@ -84,7 +84,7 @@ with st.expander("Adjust model assumptions · optional stress test", expanded=Fa
         "an existing 1P substitute and the lost contribution on each displaced sale. "
         "This is incremental cannibalisation relative to the evaluated SKU being 1P. "
         "Do not enter a positive rate for categories without evidence of substitution.")
-        st.caption("1P and 3P draw from the same customer pool; sales switching is not charged twice.")
+    st.caption("1P and 3P draw from the same customer pool; sales switching is not charged twice.")
     st.caption("Assumptions are illustrative and apply to all profiles. Selling prices and costs are net of tax.")
     st.markdown("**Product setup and annual administration costs — editable**")
     rate=st.number_input("Staff cost per hour (£, including employer costs)",
