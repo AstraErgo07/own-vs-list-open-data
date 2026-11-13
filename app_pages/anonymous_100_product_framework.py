@@ -76,6 +76,10 @@ def recommend(r,scenario):
     pure=max(pure1,pure3)
     label="1P" if share>=.995 else "3P" if share<=.005 else "Hybrid"
     benefit=val-pure
+    pure_delta=pure1-pure3
+    losing_pure=min(pure1,pure3)
+    win_gap=abs(pure_delta)
+    winner="1P" if pure_delta>0.005 else "3P" if pure_delta< -0.005 else "Tie"
     if share>.005 and share<.995:
         why="Blended inventory control and retained seller contribution outweigh either pure model in this scenario."
     elif label=="1P":
@@ -88,6 +92,10 @@ def recommend(r,scenario):
         pure3p=round(pure3,2),advantage_gbp=round(benefit,2),
         advantage_pct=round(100*benefit/pure,2) if pure>0 else None,
         rationale=why,coverage=round(calc(r,share,scenario)[1],3),
+        annual_demand_units=round(r["demand"]),pure_winner=winner,
+        pure_advantage_gbp=round(win_gap,2),
+        pure_advantage_pct=round(100*win_gap/abs(losing_pure),1) if abs(losing_pure)>0.01 else None,
+        pure_delta_gbp=round(pure_delta,2),
         stock_days=round(r["days"]*SCENARIOS[scenario][3],1),
         risk=r["markdown"]*demand_adjust,
         procurement_ratio=round(r["cost"]*SCENARIOS[scenario][0]*(1+procurement_adjust)/r["price"],3))
@@ -97,7 +105,10 @@ def recommend(r,scenario):
 all_profiles = make_profiles()
 scenario = st.selectbox("Compare operating model", list(SCENARIOS), index=0)
 selected = pd.DataFrame([recommend(r,scenario) for r in all_profiles])
+reference_demand = pd.Series([r["demand"] for r in all_profiles]).median()
+selected["demand_index"] = (selected["annual_demand_units"] / reference_demand * 100).round(0).astype(int)
 all_results = pd.DataFrame([recommend(r,s) for s in SCENARIOS for r in all_profiles])
+all_results["demand_index"] = (all_results["annual_demand_units"] / reference_demand * 100).round(0).astype(int)
 
 n1,n2,n3,n4 = st.columns(4)
 n1.metric("Products evaluated",len(selected))
@@ -105,6 +116,10 @@ n2.metric("1P recommendations",int((selected.model=="1P").sum()))
 n3.metric("3P recommendations",int((selected.model=="3P").sum()))
 n4.metric("Hybrid recommendations",int((selected.model=="Hybrid").sum()))
 
+st.markdown("**Read the decision:** The pure-model winner compares 1P with 3P. The recommendation also considers hybrid allocation. "
+    "A positive 1P-minus-3P figure favours 1P. Extra hybrid gain is a separate measure.")
+st.caption("Seller availability 0.70 means capable 3P sellers can serve 70% of potential demand at the modelled service level, "
+    "not that there are seven sellers. Demand index 100 = median annual demand across 100 illustrative product profiles.")
 st.subheader("Category decisions")
 st.caption("These are conditional results for the selected hypothetical operating model, not observed decisions by a real marketplace.")
 
@@ -114,15 +129,19 @@ summary = (selected.groupby("category",sort=False)
          hybrid=("model",lambda x:int((x=="Hybrid").sum())),
          total_contribution=("contribution","sum"),
          incremental_vs_pure=("advantage_gbp","sum"),
+         category_pure_delta=("pure_delta_gbp","sum"),
+         annual_units=("annual_demand_units","sum"),
          mean_1p_share=("share1p","mean"))
     .reset_index())
 summary["Indicative mix"] = summary["mean_1p_share"].map(lambda x:f"{x:.0%} 1P")
-st.dataframe(summary[["category","profiles","one_p","three_p","hybrid","Indicative mix",
-    "total_contribution","incremental_vs_pure"]].rename(columns={
-    "category":"Electronics category","profiles":"Profiles","one_p":"1P wins",
+summary["Better pure model"] = summary["category_pure_delta"].map(lambda x:"1P" if x>0 else "3P" if x<0 else "Tie")
+summary["Pure-model advantage (£)"] = summary["category_pure_delta"].abs().round(2)
+st.dataframe(summary[["category","profiles","annual_units","Better pure model","Pure-model advantage (£)",
+    "one_p","three_p","hybrid","Indicative mix","incremental_vs_pure","total_contribution"]].rename(columns={
+    "category":"Electronics category","profiles":"Profiles","annual_units":"Est. annual demand (units)","one_p":"1P wins",
     "three_p":"3P wins","hybrid":"Hybrid wins",
     "total_contribution":"Optimised annual contribution (£)",
-    "incremental_vs_pure":"Value above better pure model (£)"}),
+    "incremental_vs_pure":"Extra hybrid gain (£)"}),
     use_container_width=True,hide_index=True)
 
 st.subheader("Product-level recommendations")
