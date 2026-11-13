@@ -7,7 +7,7 @@ import pandas as pd
 import streamlit as st
 
 st.title("1P vs 3P | Marketplace Decision Framework")
-st.caption("100 synthetic electronics product profiles × 3 hypothetical marketplace operating models = 300 scenario evaluations. This is a decision simulator, not an empirical SKU study.")
+st.caption("100 illustrative electronics profiles · 3 anonymised operating models · 300 evaluations. Scenario simulator — not observed SKU-level marketplace data.")
 
 GROUPS = [
     ("Smartphones",700,.80,38,24,8,.035,.93,.105,10,.06,2800),
@@ -27,14 +27,16 @@ SCENARIOS = {
     "Marketplace C — omnichannel hybrid": (.98,.025,0,.84,.90),
 }
 
-with st.sidebar:
-    st.header("Economic assumptions")
-    capital = st.slider("Annual inventory financing cost",0.,.30,.12,.01)
-    coverage_adjust = st.slider("Seller coverage change (percentage points)",-40,40,0,5)/100
-    procurement_adjust = st.slider("1P procurement cost change (%)",-25,25,0,5)/100
-    demand_adjust = st.slider("Demand uncertainty / inventory loss multiplier",.5,2.,1.,.1)
-    substitution = st.slider("1P share cannibalising 3P demand",.0,1.,.75,.05)
-    st.caption("All figures are illustrative. Profit calculations omit tax and any common fixed overhead, and assume the same net retail price.")
+with st.expander("Adjust model assumptions · optional stress test", expanded=False):
+    col_a, col_b = st.columns(2)
+    with col_a:
+        capital = st.slider("Annual inventory financing cost",0.,.30,.12,.01)
+        procurement_adjust = st.slider("1P procurement cost change (%)",-25,25,0,5)/100
+        demand_adjust = st.slider("Inventory markdown-risk multiplier",.5,2.,1.,.1)
+    with col_b:
+        coverage_adjust = st.slider("Seller availability adjustment (percentage points)",-40,40,0,5)/100
+        substitution = st.slider("1P cannibalisation of third-party demand",.0,1.,.75,.05)
+    st.caption("Adjustments are illustrative and apply to all profiles. Costs and selling prices are treated on a consistent net-of-tax basis.")
 
 def make_profiles():
     rows=[]
@@ -90,43 +92,85 @@ def recommend(r,scenario):
         risk=r["markdown"]*demand_adjust,
         procurement_ratio=round(r["cost"]*SCENARIOS[scenario][0]*(1+procurement_adjust)/r["price"],3))
 
-rows=[recommend(r,s) for s in SCENARIOS for r in make_profiles()]
-df=pd.DataFrame(rows)
-a,b,c,d=st.columns(4)
-a.metric("Product profiles",100)
-b.metric("Operating scenarios",3)
-c.metric("Evaluated cases",len(df))
-d.metric("Hybrid recommendations",int((df.model=="Hybrid").sum()))
-st.info("Marketplace A/B/C are **hypothetical operating assumptions**, not aliases for identified companies. Product profiles are generated scenarios, not scraped listings. A recommendation is conditional on the sliders, not a claim about real-world policy.")
 
-tab1,tab2,tab3=st.tabs(["Product-level decisions","Compare categories","Method and limitations"])
-with tab1:
-    scenario=st.selectbox("Operating model",list(SCENARIOS))
-    categories=st.multiselect("Categories",sorted(df.category.unique()),default=sorted(df.category.unique()))
-    shown=df[(df.scenario==scenario)&df.category.isin(categories)]
-    st.dataframe(shown.rename(columns={
-        "product":"Product profile","category":"Category","model":"Recommended model",
-        "share1p":"Recommended 1P share","contribution":"Annual contribution (£)",
-        "pure1p":"Pure 1P (£)","pure3p":"Pure 3P (£)",
-        "advantage_gbp":"Hybrid/optimal advantage (£)","advantage_pct":"Advantage vs better pure (%)",
-        "rationale":"Qualitative rationale","coverage":"Seller availability",
-        "stock_days":"Stock days","risk":"Markdown risk","procurement_ratio":"Procurement/retail ratio"
-    }).drop(columns=["scenario"]),use_container_width=True,hide_index=True)
-    st.download_button("Download 300 evaluations (CSV)",df.to_csv(index=False),file_name="anonymous_marketplace_300_scenarios.csv",mime="text/csv")
-with tab2:
-    grouped=df.groupby(["scenario","category","model"],as_index=False).agg(profiles=("product","count"),annual_contribution=("contribution","sum"))
-    st.dataframe(grouped,use_container_width=True,hide_index=True)
-    st.bar_chart(df.groupby(["scenario","model"]).size().unstack(fill_value=0))
-    st.caption("The three operating models must not be interpreted as empirical outcomes for three named marketplaces.")
-with tab3:
+# A single scenario is visible first. The full 300-row export remains available.
+all_profiles = make_profiles()
+scenario = st.selectbox("Compare operating model", list(SCENARIOS), index=0)
+selected = pd.DataFrame([recommend(r,scenario) for r in all_profiles])
+all_results = pd.DataFrame([recommend(r,s) for s in SCENARIOS for r in all_profiles])
+
+n1,n2,n3,n4 = st.columns(4)
+n1.metric("Products evaluated",len(selected))
+n2.metric("1P recommendations",int((selected.model=="1P").sum()))
+n3.metric("3P recommendations",int((selected.model=="3P").sum()))
+n4.metric("Hybrid recommendations",int((selected.model=="Hybrid").sum()))
+
+st.subheader("Category decisions")
+st.caption("These are conditional results for the selected hypothetical operating model, not observed decisions by a real marketplace.")
+
+summary = (selected.groupby("category",sort=False)
+    .agg(profiles=("product","count"),one_p=("model",lambda x:int((x=="1P").sum())),
+         three_p=("model",lambda x:int((x=="3P").sum())),
+         hybrid=("model",lambda x:int((x=="Hybrid").sum())),
+         total_contribution=("contribution","sum"),
+         incremental_vs_pure=("advantage_gbp","sum"),
+         mean_1p_share=("share1p","mean"))
+    .reset_index())
+summary["Indicative mix"] = summary["mean_1p_share"].map(lambda x:f"{x:.0%} 1P")
+st.dataframe(summary[["category","profiles","one_p","three_p","hybrid","Indicative mix",
+    "total_contribution","incremental_vs_pure"]].rename(columns={
+    "category":"Electronics category","profiles":"Profiles","one_p":"1P wins",
+    "three_p":"3P wins","hybrid":"Hybrid wins",
+    "total_contribution":"Optimised annual contribution (£)",
+    "incremental_vs_pure":"Value above better pure model (£)"}),
+    use_container_width=True,hide_index=True)
+
+st.subheader("Product-level recommendations")
+st.caption("100 profiles below. The advantage column compares the recommended allocation with the BETTER of pure 1P and pure 3P, not automatically with 3P.")
+display=selected.copy()
+display["1P vs 3P (£)"]=(display["pure1p"]-display["pure3p"]).round(2)
+display["1P vs 3P (%)"]=display.apply(
+    lambda r: round(100*(r["pure1p"]-r["pure3p"])/abs(r["pure3p"]),1)
+    if abs(r["pure3p"])>0.01 else None,axis=1)
+display["Pure-model seller coverage crossover"]=display.apply(
+    lambda r: (
+        f'{(r["pure1p"] / (r["pure3p"] / r["coverage"])):.0%}'
+        if r["coverage"]>0 and r["pure3p"]>0 and 0<=r["pure1p"]/(r["pure3p"]/r["coverage"])<=1
+        else "Outside 0–100% / none"
+    ),axis=1)
+columns={"product":"Product ID","category":"Category","model":"Recommendation",
+    "share1p":"1P allocation","contribution":"Optimised annual contribution (£)",
+    "pure1p":"Pure 1P contribution (£)","pure3p":"Pure 3P contribution (£)",
+    "advantage_gbp":"Advantage vs best pure (£)",
+    "advantage_pct":"Advantage vs best pure (%)",
+    "rationale":"Qualitative reason","coverage":"Seller availability",
+    "stock_days":"Days inventory held","risk":"Markdown risk proxy",
+    "procurement_ratio":"Procurement cost / retail"}
+ordered=["product","category","model","share1p","1P vs 3P (£)","advantage_gbp",
+    "advantage_pct","Pure-model seller coverage crossover","rationale",
+    "pure1p","pure3p","contribution","coverage","stock_days","risk","procurement_ratio"]
+st.dataframe(display[ordered].rename(columns=columns),use_container_width=True,hide_index=True,
+    column_config={"1P allocation":st.column_config.ProgressColumn("1P allocation",min_value=0,max_value=1,format="%.0f%%")})
+st.download_button("Download all 300 scenario evaluations (CSV)",
+    all_results.to_csv(index=False).encode("utf-8"),
+    file_name="1p_3p_300_illustrative_evaluations.csv",mime="text/csv")
+
+with st.expander("Cross-marketplace comparison",expanded=False):
+    by_market=(all_results.groupby(["scenario","model"]).size()
+               .unstack(fill_value=0).reindex(columns=["1P","3P","Hybrid"],fill_value=0))
+    st.bar_chart(by_market)
+    st.dataframe(by_market,use_container_width=True)
+with st.expander("Method, interpretation and limitations",expanded=False):
     st.markdown("""
-**Question:** When does inventory ownership outperform seller intermediation, and when does a hybrid create incremental economic value?
+**Research question:** When do demand predictability, procurement advantage, seller capability and stock risk favour inventory ownership, third-party intermediation or a hybrid?
 
-**Observations versus assumptions:** Every input on this page is synthetic. No real SKU sales, procurement agreements, seller fees, or inventory turns were obtained.
+**Data integrity:** All 100 product profiles and all three marketplaces are synthetic. Marketplace A, B and C represent operating archetypes; they are not disguised observations of named firms.
 
-**Economics:** 1P earns retail price less procurement, fulfilment, returns, markdowns and stock financing. 3P earns the assumed fee less service costs, adjusted for seller coverage. A grid searches 1P allocation from 0% to 100% and compares its contribution with both pure endpoints.
+**Unit economics:** 1P contribution deducts buying cost, fulfilment, returns, assumed markdown loss and cost of stock capital. 3P contribution uses fee income net of assumed seller servicing, adjusted for seller availability. The model searches 1P allocation from 0 to 100% in one-percentage-point steps.
 
-**Cautions:** The current hybrid demand response is illustrative; allocation is not a controlled causal estimate. Fees such as advertising, FBA, supplier rebates, payment costs and fixed infrastructure are omitted. A 100-profile simulation is not statistically equivalent to 100 verified live listings. Switching thresholds and confidence bands require empirically supported priors; do not claim them without calibration. A zero hybrid uplift is a valid possible output, not proof that hybrid models are inferior.
+**Financial advantage:** The recommended allocation's annual contribution minus the larger contribution from pure 1P or pure 3P. A result of £0 means a pure strategy is optimal; it does not imply no benefit relative to the weaker pure strategy.
 
-**Next research step:** Replace scenarios with licensed product observations, document provenance and access rights, and assess sensitivities using disclosed or justified margin ranges before external publication.
+**Pure-model seller coverage crossover:** Seller availability needed for pure 3P contribution to equal pure 1P contribution under fixed economics. It is NOT a full hybrid-optimum switching threshold. Where the crossover exceeds feasible availability or is undefined it is marked as such.
+
+**Limitations:** Demand response, category parameters and cannibalisation are assumed, not estimated from transactions. No real listing, seller contracts, price scraping, advertising fees, FBA revenue or actual contribution margins are included. The recommended mix is scenario-specific, not causal or prescriptive for a real marketplace. Do not share the synthetic outputs as empirical findings.
 """)
