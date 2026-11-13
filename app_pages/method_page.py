@@ -1,4 +1,4 @@
-"""Data and method page for the Entrant A vs Established B v3.2 model."""
+"""Method, version history, stress-test summary and sources for v3.2."""
 from __future__ import annotations
 
 import sys
@@ -14,6 +14,7 @@ import streamlit as st
 from common.panel import parent_jd_panel, uk_context_panel
 from common.text import BENCHMARK_STANDIN, VERSION
 from own_vs_list.calc import RULE_CITATIONS
+from own_vs_list.insights import nuance_findings
 from own_vs_list.maturity import (
     ENTRANT_AD_TAKE_REASON,
     ENTRANT_GM_HAIRCUT_REASON,
@@ -27,6 +28,9 @@ from own_vs_list.maturity import (
     OPEN_QUESTIONS,
     SAME_DAY_SUBSIDY_REASON,
     SPILLOVER_REASON,
+    WHY_ENTRANT_STARTS_1P,
+    WHY_ENTRANT_STARTS_1P_POINTS,
+    WHY_SHIFT_TO_3P,
 )
 from own_vs_list.published import (
     ZALANDO_FULFILMENT_PCT_2025,
@@ -75,17 +79,101 @@ def _fig_frame(figs) -> pd.DataFrame:
 
 
 def render() -> None:
-    st.title("Data and method")
+    st.title("Method and changes")
     st.caption(f"{VERSION} · {BENCHMARK_STANDIN}")
     st.markdown(
-        "This page is the source list and the method. Every number used as "
-        "a published figure has a document, a location and a URL. Entrant "
-        "parameters are Assumptions with stated reasoning. Advertising takes "
-        "and some fulfilment ratios are model estimates. Amazon UK referral "
-        "fees are a **benchmark stand-in**, because Joybuy has not published "
-        "a seller fee card. Circulating 5–10% USD figures for Joybuy are "
-        "unverified and are **not used**."
+        "This page holds the version history, a stress-test summary, the "
+        "limits, the source list and the method. The main page is the "
+        "question, the headline mix and the verdict table. Every number "
+        "used as a published figure has a document, a location and a URL. "
+        "Entrant parameters are Assumptions with stated reasoning. "
+        "Advertising takes and some fulfilment ratios are model estimates. "
+        "Amazon UK referral fees are a **benchmark stand-in**, because "
+        "Joybuy has not published a seller fee card. Circulating 5–10% USD "
+        "figures for Joybuy are unverified and are **not used**."
     )
+
+    st.header("Version history")
+    st.markdown(
+        "v3.1 is a principled fix, not a refit. v3.0's entrant scenario "
+        "recommended 0% 1P, while Joybuy UK actually launched ~100% 1P. "
+        "The model was wrong, not Joybuy. JD China's 78.2% 1P share is a "
+        "parent-company **revenue** figure, not Joybuy's mix, and is not "
+        "used as a target. v3.2 changes labels and wording only: the "
+        "modelled marketplaces are **A · Entrant** and **B · Established**; "
+        "A is Joybuy-inspired and illustrative. Defaults and numbers are "
+        "unchanged from v3.1."
+    )
+
+    st.header("Stress-test summary")
+    st.markdown(
+        "A stress test of the published v3.1 mid-band model is in "
+        "[docs/stress_test_v3.1.pdf](https://github.com/AstraErgo07/own-vs-list-open-data/blob/main/docs/stress_test_v3.1.pdf). "
+        "Predictions were written down before any run and scored 17.5 out of 21. "
+        "The Monte Carlo used 10,000 draws (seed 20261113). Results depend "
+        "on the ranges that were drawn, which are reported next to each finding."
+    )
+    st.markdown(
+        "- **What holds.** Under the stated Assumptions, the entrant's "
+        "operating mix stays 100% 1P in every one of those 10,000 draws. "
+        "Public evidence for seller coverage at launch supports a 0 to 10% "
+        "band, not 0 to 30%. The first break of a 100% operating 1P result "
+        "is at 72.31% coverage with the 8% spillover default (Pushchairs), "
+        "or 56.40% coverage if spillover is zero. The 25% return-on-stock "
+        "hurdle never decides a flip on its own: none of the 15 operating "
+        "shifts from A to B are hurdle-driven. Joybuy still has no "
+        "published seller fees."
+    )
+    st.markdown(
+        "- **What breaks.** The established 25% / 5.6% 1P mix rests on "
+        "borrowed THG Beauty and Zalando margins. A 5-point cut on those "
+        "gross margins turns all five B 1P lines to Test as 3P first "
+        "(0% of modelled sales). That is the biggest weakness, and it "
+        "comes from an Assumption. At the entrant, unit-economics 1P first "
+        "fails at a 13.52% margin haircut, starting with Pushchairs. At B, "
+        "a 5-point change in fulfilment cost flips 15 of 20 verdicts."
+    )
+    st.markdown(
+        "- **What is fragile inside the Monte Carlo ranges.** Entrant "
+        "unit-economics 1P on Pushchairs holds in 58.62% of draws. At B, "
+        "Everyday clothing holds in 42.29% and Sportswear in 52.28%. "
+        "'Fragile' is a function of those ranges."
+    )
+    st.markdown(
+        "- **Safe to say publicly.** Under the stated Assumptions the "
+        "entrant comes out fully in-house across all runs; no flip is "
+        "driven by the hurdle alone; A is Joybuy-inspired and illustrative. "
+        "**Not safe to say:** that Joybuy should stock everything; that B "
+        "is 'miscalibrated' against Amazon's 61% worldwide share of paid "
+        "units (that figure is a different scope: global units, every "
+        "category, versus five UK categories by modelled sales, so it "
+        "is a check on direction only); or that beauty is a clear 1P win."
+    )
+
+    st.header("Why an entrant starts 1P")
+    st.markdown(WHY_ENTRANT_STARTS_1P)
+    for point in WHY_ENTRANT_STARTS_1P_POINTS:
+        st.markdown(f"- {point}")
+    st.markdown(WHY_SHIFT_TO_3P)
+    st.markdown(
+        "This result leans on a Joybuy-like profile: no sellers at launch, "
+        "JD-scale buying, and fulfilment that is already paid for. It is "
+        "not a rule that every new entrant should go all 1P. An entrant "
+        "without those advantages would come out much more 3P."
+    )
+
+    st.header("Limits")
+    st.markdown(
+        "Contribution is not profit. Amazon UK fees are a labelled "
+        "stand-in, not Joybuy's fees. Prices, weekly units and CVs are "
+        "Assumptions, not observed. Modelled sales are assumed mid-band "
+        "price times assumed weekly units, exclusive of VAT, and are not "
+        "observed GMV. The model compares a representative unit. It does "
+        "not model competitive response, buy-box rules, or a seller's "
+        "decision to leave."
+    )
+    for bullet in nuance_findings():
+        st.markdown(f"- {bullet}")
 
     st.header("What this model is, and is not")
     st.markdown(

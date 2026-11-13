@@ -17,7 +17,7 @@ from common.nav import footer  # noqa: E402
 
 nav = st.navigation({
     "Own vs List": [st.Page("app_pages/own_vs_list_page.py", title="Own stock vs marketplace listing", default=True)],
-    "About": [st.Page("app_pages/method_page.py", title="Data and method", url_path="data-and-method")],
+    "About": [st.Page("app_pages/method_page.py", title="Method and changes", url_path="method-and-changes")],
 })
 nav.run()
 footer()

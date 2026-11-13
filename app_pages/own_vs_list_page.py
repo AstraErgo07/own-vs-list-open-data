@@ -34,7 +34,7 @@ from own_vs_list.calc import (
     mix_curve,
     mix_summary,
 )
-from own_vs_list.insights import insights, mix_narrative, nuance_findings
+from own_vs_list.insights import insights, mix_narrative
 from own_vs_list.maturity import (
     ENTRANT_AD_TAKE,
     ENTRANT_AD_TAKE_REASON,
@@ -52,18 +52,12 @@ from own_vs_list.maturity import (
     ESTABLISHED_SELLER_COVERAGE,
     FULFILMENT_VARIABLE_SHARE,
     FULFILMENT_VARIABLE_SHARE_REASON,
-    OPEN_QUESTIONS,
     SAME_DAY_SUBSIDY,
     SAME_DAY_SUBSIDY_REASON,
-    SCENARIO_A_BLURB,
     SCENARIO_A_NAME,
-    SCENARIO_B_BLURB,
     SCENARIO_B_NAME,
     SPILLOVER_PCT,
     SPILLOVER_REASON,
-    WHY_ENTRANT_STARTS_1P,
-    WHY_ENTRANT_STARTS_1P_POINTS,
-    WHY_SHIFT_TO_3P,
 )
 from own_vs_list.workings import gbp, steps as working_steps
 
@@ -87,67 +81,67 @@ def _base_assumptions() -> Assumptions:
     intro = sb.slider(
         "Introductory commission (entrant)",
         min_value=0.05, max_value=0.08, value=ENTRANT_INTRO_COMMISSION,
-        step=0.01, format="%.0%%",
+        step=0.01, format="percent",
         help=ENTRANT_INTRO_REASON,
     )
     haircut = sb.slider(
         "Entrant 1P margin haircut (relative)",
         min_value=0.00, max_value=0.25, value=ENTRANT_GM_HAIRCUT,
-        step=0.05, format="%.0%%",
+        step=0.05, format="percent",
         help=ENTRANT_GM_HAIRCUT_REASON + " 25% is a stress test, not the default.",
     )
     cov_a = sb.slider(
         "Entrant seller coverage",
         min_value=0.00, max_value=0.30, value=float(ENTRANT_SELLER_COVERAGE),
-        step=0.05, format="%.0%%",
+        step=0.05, format="percent",
         help=ENTRANT_SELLER_COVERAGE_REASON,
     )
     cov_b = sb.slider(
         "Established seller coverage",
         min_value=0.50, max_value=1.00, value=float(ESTABLISHED_SELLER_COVERAGE),
-        step=0.05, format="%.0%%",
+        step=0.05, format="percent",
         help="Assumption: share of the range third-party sellers can actually supply once the marketplace is deep.",
     )
     spill = sb.slider(
         "Basket / traffic spillover",
         min_value=0.00, max_value=0.20, value=float(SPILLOVER_PCT),
-        step=0.01, format="%.0%%",
+        step=0.01, format="percent",
         help=SPILLOVER_REASON,
     )
     var_share = sb.slider(
         "Fulfilment variable-cost share",
         min_value=0.50, max_value=1.00, value=float(FULFILMENT_VARIABLE_SHARE),
-        step=0.05, format="%.0%%",
+        step=0.05, format="percent",
         help=FULFILMENT_VARIABLE_SHARE_REASON,
     )
     same_day = sb.slider(
         "Same-day subsidy (customer-acquisition cost)",
         min_value=0.00, max_value=0.05, value=float(SAME_DAY_SUBSIDY),
-        step=0.005, format="%.1%%",
+        step=0.005, format="percent",
         help=SAME_DAY_SUBSIDY_REASON,
     )
     util = sb.slider(
         "Entrant warehouse utilisation (memo only)",
         min_value=0.20, max_value=1.00, value=float(ENTRANT_WAREHOUSE_UTILISATION),
-        step=0.05, format="%.0%%",
+        step=0.05, format="percent",
         help=ENTRANT_WAREHOUSE_UTILISATION_REASON,
     )
     ad_e = sb.slider(
         "Entrant advertising take",
         min_value=0.0, max_value=0.01, value=ENTRANT_AD_TAKE,
-        step=0.001, format="%.1%%",
+        step=0.001, format="percent",
         help=ENTRANT_AD_TAKE_REASON,
     )
     ad_b = sb.slider(
         "Established advertising take",
         min_value=0.015, max_value=0.05, value=ESTABLISHED_AD_TAKE,
-        step=0.005, format="%.1%%",
+        step=0.005, format="percent",
         help=ESTABLISHED_AD_TAKE_REASON,
     )
     hurdle = sb.slider(
         "Return-on-stock hurdle",
         min_value=0.10, max_value=1.00, value=0.25,
-        step=0.05, format="%.0%%",
+        step=0.05, format="percent",
         help="Assumption. A return-on-inventory bar, not a published WACC.",
     )
     sb.divider()
@@ -243,101 +237,170 @@ def _decision_table(cmp_: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def _front_table(cmp_: pd.DataFrame) -> pd.DataFrame:
+    return pd.DataFrame({
+        "Category": cmp_["category_en"],
+        "Sub-category": cmp_["sub_en"],
+        "Assumed mid price, ex-VAT": cmp_["price_gbp"].map(lambda x: gbp(x, 0)),
+        "A · Operating": cmp_["rec_a"],
+        "B · Operating": cmp_["rec_b"],
+        "Operating flips?": cmp_["flipped"].map(lambda x: "Yes" if x else ""),
+    })
+
+
 def render() -> None:
     st.title("Own stock vs marketplace listing")
-    st.caption(f"{VERSION} · Joybuy UK and Europe · {BENCHMARK_STANDIN}")
+    st.caption(
+        f"{VERSION} · {BENCHMARK_STANDIN} "
+        "This is not a forecast and not a profit claim."
+    )
     st.markdown(
-        "A decision-support model for whether a UK marketplace should **stock "
-        "a line itself (1P)** or **leave it with a third-party seller (3P)**. "
-        "The central lens is a **scale-up entrant (A)** versus an "
-        "**established marketplace (B)**. A is Joybuy-inspired and "
-        "illustrative, not Joybuy's actual economics. The 1P versus 3P "
-        "mix that follows. Each sub-category has two verdicts: a "
-        "**unit-economics verdict** and an **entrant strategic verdict** "
-        "(range completeness, warehouse fill, no 3P ads yet). The operating "
-        "mix — what an entrant would run — uses the strategic layer while "
-        "seller coverage is thin, and shows the thin unit contribution it "
-        "accepts. This is not a forecast, not a profit claim, and "
-        "**not Joybuy's actual numbers**. Joybuy has not published a seller "
-        "fee card. Contribution is not profit. "
-        "**JD China's 78.2% 1P revenue share is a parent-company figure, "
-        "not Joybuy's mix**, and is not used as a target."
+        "Should a marketplace **stock a product itself (1P)** or **let sellers "
+        "list it (3P)**? This decision-support model compares two scenarios: "
+        "**A · Entrant**, a well-funded scale-up with no sellers yet, and "
+        "**B · Established**, a mature marketplace with a deep seller base. "
+        "A is Joybuy-inspired and illustrative, not Joybuy's actual economics. "
+        "**Made by Ami Sata**."
     )
 
     a = _base_assumptions()
 
-    # ----- Central lens: A vs B -----
-    st.header("Entrant versus established: the central lens")
-    col_a, col_b = st.columns(2)
     res_a = evaluate_entrant(a)
     res_b = evaluate_established(a)
     mid_a, mid_b = mid_band_table(res_a), mid_band_table(res_b)
     mix_a, mix_b = mix_summary(res_a, "operating"), mix_summary(res_b, "operating")
     unit_a, unit_b = mix_summary(res_a, "unit"), mix_summary(res_b, "unit")
+    cmp_ = comparison_mid_table(a)
 
-    with col_a:
-        st.subheader(SCENARIO_A_NAME)
-        st.markdown(SCENARIO_A_BLURB)
-        st.caption("Operating mix (strategic / land-grab) — the mix an entrant would run.")
-        _mix_metrics(mix_a, st)
+    st.subheader("Headline result, mid-band")
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("A · 1P share of sub-categories", f"{mix_a['share_subs_1p']:.0%}")
+    m2.metric("A · 1P share of modelled sales", f"{mix_a['share_sales_1p']:.0%}")
+    m3.metric("B · 1P share of sub-categories", f"{mix_b['share_subs_1p']:.0%}")
+    m4.metric("B · 1P share of modelled sales", f"{mix_b['share_sales_1p']:.0%}")
+    st.caption(
+        f"A · Entrant, operating (what the model would run): "
+        f"Bring in-house {mix_a['n_1p']}, Test as 3P first {mix_a['n_test']}, "
+        f"Keep 3P {mix_a['n_keep']}, Do not range {mix_a.get('n_unranged', 0)}. "
+        f"Unit-economics mix: Bring in-house {unit_a['n_1p']}, "
+        f"Test {unit_a['n_test']}, Keep 3P {unit_a['n_keep']}, "
+        f"Do not range {unit_a['n_unranged']}. "
+        f"B · Established, operating: "
+        f"Bring in-house {mix_b['n_1p']}, Test as 3P first {mix_b['n_test']}, "
+        f"Keep 3P {mix_b['n_keep']}, Do not range {mix_b.get('n_unranged', 0)}. "
+        f"At B, unit and strategic verdicts coincide. "
+        "Modelled sales are an Assumption (ex-VAT price times assumed weekly units), "
+        "not observed GMV. 1P margins use published Currys, THG and Zalando figures. "
+        "Assumptions you can change sit in the sidebar."
+    )
+
+    st.subheader("Decisions per sub-category")
+    st.markdown(
+        "One mid-price band per sub-category. The operating verdict is what "
+        "the model would run: the strategic layer while seller coverage is "
+        "thin, and unit economics once coverage is deep. "
+        "'Do not range' is a hole, not a 3P listing. Contribution is a share "
+        "of the assumed ex-VAT price."
+    )
+    st.dataframe(_front_table(cmp_), use_container_width=True, hide_index=True)
+    n_flip = int(cmp_["flipped"].sum())
+    n_flip_u = int(cmp_["flipped_unit"].sum())
+    st.caption(
+        f"{n_flip} of {len(cmp_)} mid-band sub-categories change operating "
+        f"recommendation between the entrant and the established scenario "
+        f"({n_flip_u} flip on the unit-economics verdict). "
+        "These are model estimates, not Joybuy decisions."
+    )
+    with st.expander("Full verdicts, with contribution and both layers", expanded=False):
+        st.dataframe(_decision_table(cmp_), use_container_width=True, hide_index=True)
         st.caption(
-            f"Unit-economics mix, shown separately: "
-            f"Bring in-house {unit_a['n_1p']}, Test {unit_a['n_test']}, "
-            f"Keep 3P {unit_a['n_keep']}, Do not range {unit_a['n_unranged']}. "
-            f"1P share {unit_a['share_subs_1p']:.0%} of sub-categories and "
-            f"{unit_a['share_sales_1p']:.0%} of modelled sales. "
-            "Where this is narrower than the operating mix, the platform "
-            "is accepting a thin unit contribution for range completeness."
+            "Unit payoff compares 1P (contribution plus spillover) with the "
+            "availability-adjusted 3P alternative. Where coverage is zero, "
+            "that alternative is 'not ranged', not a 3P take."
         )
-        st.altair_chart(_rec_chart(mid_a, "Mid-band operating recommendations, entrant"), use_container_width=True)
-        st.caption(
-            f"Operating 1P path: {mix_a['share_subs_1p']:.0%} of sub-categories and "
-            f"{mix_a['share_sales_1p']:.0%} of modelled mid-band sales. "
-            "All entrant parameters are Assumptions. Joybuy launched 1P-only "
-            "in March 2026; that is a sanity check, not a fitted target."
+
+    with st.expander("How it decides", expanded=False):
+        st.markdown(
+            "Four tests, plus a strategic layer that is shown separately."
         )
-    with col_b:
-        st.subheader(SCENARIO_B_NAME)
-        st.markdown(SCENARIO_B_BLURB)
-        st.caption("Operating mix. At high seller coverage the strategic layer follows unit economics, so the two verdicts coincide.")
-        _mix_metrics(mix_b, st)
-        st.caption(
-            f"Unit-economics mix: Bring in-house {unit_b['n_1p']}, "
-            f"Test {unit_b['n_test']}, Keep 3P {unit_b['n_keep']}, "
-            f"Do not range {unit_b['n_unranged']}. "
-            f"1P share {unit_b['share_subs_1p']:.0%} of sub-categories and "
-            f"{unit_b['share_sales_1p']:.0%} of modelled sales."
+        st.markdown(
+            "**1. Contribution per unit, availability-adjusted.** What is kept "
+            "if we stock it (plus a labelled basket spillover), versus the 3P "
+            "take only where sellers can actually supply. Where they cannot, "
+            "the alternative is 'not ranged', not a 3P take."
         )
-        st.altair_chart(_rec_chart(mid_b, "Mid-band operating recommendations, established"), use_container_width=True)
-        st.caption(
-            f"1P path: {mix_b['share_subs_1p']:.0%} of sub-categories and "
-            f"{mix_b['share_sales_1p']:.0%} of modelled mid-band sales. "
-            "Modelled sales are an Assumption, not observed GMV."
+        st.markdown(
+            "**2. Inventory liquidity.** Stock days and turn. Currys' published "
+            "60 stock days for electronics; an assumed 50 days for fashion and beauty."
         )
+        st.markdown(
+            "**3. Return on stock (GMROI).** Margin times turn, tested against a "
+            "25% hurdle (Assumption)."
+        )
+        st.markdown(
+            "**4. Demand predictability.** Assumed weekly velocity and CV drive "
+            "the mid-tail rule and a safety-stock add-on. Volatility is a "
+            "warning, not an automatic override. Long-tail lines with no "
+            "sellers are left as a hole."
+        )
+        st.markdown(
+            "**5. Strategic layer (land-grab).** While seller coverage is thin "
+            "(below a 50% Assumption), mid- and high-velocity lines are ranged "
+            "as 1P for range completeness, warehouse fill, and the absence of "
+            "3P ad income. This is reported next to the unit-economics verdict, "
+            "not instead of it. Variable-only fulfilment treats already-built "
+            "warehouse fixed cost as sunk. The Method and changes page has "
+            "the sources, limits, version history and a stress-test summary."
+        )
+        with st.expander("Decision rules, with citations", expanded=False):
+            for key, rule in RULE_CITATIONS.items():
+                st.markdown(f"**{rule['title']}**")
+                st.markdown(rule["basis"])
+                st.caption(rule["cite"])
+                st.markdown(rule["in_this_model"])
+                st.divider()
 
     st.info(mix_narrative(a))
 
-    # ----- Why an entrant starts 1P -----
-    st.header("Why an entrant tends to start 1P, then shift toward 3P")
-    st.markdown(WHY_ENTRANT_STARTS_1P)
-    for title, body in WHY_ENTRANT_STARTS_1P_POINTS:
-        st.markdown(f"**{title}.** {body}")
-    st.markdown(WHY_SHIFT_TO_3P)
-    st.markdown(
-        "The unit-economics verdict and the strategic verdict are reported "
-        "separately, on purpose. Under the default entrant assumptions the "
-        "core mid-band range is 1P-led on **both** layers — because the "
-        "real alternative to 1P is 'not ranged', not a 3P take, and "
-        "variable-only fulfilment with a 5% haircut leaves a thin but "
-        "positive contribution. That is consistent with Joybuy's 1P-only "
-        "launch. Parameters were not searched to hit 100% 1P, but the 0% "
-        "coverage default was set to that launch-day state, and that "
-        "choice does most of the work on the unit 100% 1P result. If you raise seller "
-        "coverage, raise the haircut to the 25% stress test, or turn the "
-        "strategic layer off, the two layers can part company; that "
-        "tension is then shown in the table, not hidden. "
-        "JD China's 78.2% 1P revenue share is not Joybuy's mix."
-    )
+    # ----- Recommendation counts and mix by category -----
+    ch1, ch2 = st.columns(2)
+    with ch1:
+        st.altair_chart(
+            _rec_chart(mid_a, "Mid-band operating recommendations, entrant"),
+            use_container_width=True,
+        )
+    with ch2:
+        st.altair_chart(
+            _rec_chart(mid_b, "Mid-band operating recommendations, established"),
+            use_container_width=True,
+        )
+
+    cat_rows = []
+    for side, mix in (
+        ("A · Entrant, operating", mix_a),
+        ("A · Entrant, unit economics", unit_a),
+        ("B · Established, operating", mix_b),
+        ("B · Established, unit economics", unit_b),
+    ):
+        for row in mix["by_category"]:
+            cat_rows.append({
+                "Scenario": side,
+                "Category": row["category"],
+                "1P sub-categories": f"{row['n_1p']} of {row['n']}",
+                "1P share of sub-categories": row["share_subs_1p"],
+                "1P share of modelled sales": row["share_sales_1p"],
+            })
+    cat_df = pd.DataFrame(cat_rows)
+    st.subheader("Implied mix by category")
+    display_cat = cat_df.copy()
+    display_cat["1P share of sub-categories"] = display_cat["1P share of sub-categories"].map(lambda x: f"{x:.0%}")
+    display_cat["1P share of modelled sales"] = display_cat["1P share of modelled sales"].map(lambda x: f"{x:.0%}")
+    st.dataframe(display_cat, use_container_width=True, hide_index=True)
+
+    # ----- Findings -----
+    st.header("What this run is saying")
+    for bullet in insights(a):
+        st.markdown(f"- {bullet}")
 
     # ----- Maturity slider -----
     st.header("Platform-maturity slider")
@@ -350,9 +413,9 @@ def render() -> None:
         "grow, with the unit-economics mix drawn alongside."
     )
     t = st.slider(
-        "Platform maturity",
+        "Platform maturity (percent)",
         min_value=0, max_value=100, value=0, step=5,
-        format="%d%%",
+        format="%d",
         help="0 is scenario A (entrant). 100 is scenario B (established).",
     ) / 100.0
     a_now = assumptions_at(t, a)
@@ -361,7 +424,7 @@ def render() -> None:
     mix_now = mix_summary(res_now, "operating")
     unit_now = mix_summary(res_now, "unit")
     st.caption(
-        f"At {t:.0%} maturity: {a_now.state().name}. {a_now.state().blurb} "
+        f"At {t:.0%} maturity: {a_now.state().name}. "
         f"Seller coverage at this point is {a_now.state().seller_coverage:.0%}."
     )
     st.caption("Operating mix at this maturity:")
@@ -421,97 +484,13 @@ def render() -> None:
     rule = alt.Chart(marker).mark_rule(color="#1f4e79", strokeDash=[4, 4]).encode(x="maturity:Q")
     st.altair_chart((line + rule).properties(height=280), use_container_width=True)
     st.caption(
-        "Solid and short-dash lines are the operating (strategic) mix — "
+        "Solid and short-dash lines are the operating (strategic) mix, "
         "what an entrant would run. Longer dashes are the unit-economics "
         "mix. The two converge as seller coverage crosses the 50% "
         "Assumption threshold. The sales-weighted share can sit well below "
         "the sub-category share when 1P recommendations are in lower-priced "
         "categories. All series are model outputs on assumed prices and weekly units."
     )
-
-    # ----- Side-by-side decisions -----
-    st.header("Decisions per sub-category, side by side")
-    st.markdown(
-        "One mid-price band per sub-category. Prices are Assumptions in GBP, "
-        "ex-VAT. Contribution is a share of that ex-VAT price. Each side "
-        "shows a **unit-economics verdict** and a **strategic verdict**. "
-        "The operating recommendation is the strategic one while coverage "
-        "is thin. 'Do not range' is a hole, not a 3P listing."
-    )
-    cmp_ = comparison_mid_table(a)
-    st.dataframe(_decision_table(cmp_), use_container_width=True, hide_index=True)
-    n_flip = int(cmp_["flipped"].sum())
-    n_flip_u = int(cmp_["flipped_unit"].sum())
-    st.caption(
-        f"{n_flip} of {len(cmp_)} mid-band sub-categories change operating "
-        f"recommendation between the entrant and the established scenario "
-        f"({n_flip_u} flip on the unit-economics verdict). "
-        "These are model estimates, not Joybuy decisions."
-    )
-
-    # By-category mix
-    cat_rows = []
-    for side, mix, unit in (
-        ("A · Entrant, operating", mix_a, unit_a),
-        ("A · Entrant, unit economics", unit_a, None),
-        ("B · Established, operating", mix_b, unit_b),
-        ("B · Established, unit economics", unit_b, None),
-    ):
-        for row in mix["by_category"]:
-            cat_rows.append({
-                "Scenario": side,
-                "Category": row["category"],
-                "1P sub-categories": f"{row['n_1p']} of {row['n']}",
-                "1P share of sub-categories": row["share_subs_1p"],
-                "1P share of modelled sales": row["share_sales_1p"],
-            })
-    cat_df = pd.DataFrame(cat_rows)
-    st.subheader("Implied mix by category")
-    display_cat = cat_df.copy()
-    display_cat["1P share of sub-categories"] = display_cat["1P share of sub-categories"].map(lambda x: f"{x:.0%}")
-    display_cat["1P share of modelled sales"] = display_cat["1P share of modelled sales"].map(lambda x: f"{x:.0%}")
-    st.dataframe(display_cat, use_container_width=True, hide_index=True)
-
-    # ----- Findings -----
-    st.header("What this run is saying")
-    for bullet in insights(a):
-        st.markdown(f"- {bullet}")
-
-    with st.expander("Nuance: contribution is not profit, and other limits", expanded=False):
-        for n in nuance_findings(a):
-            st.markdown(f"- {n}")
-
-    # ----- KPIs and rules -----
-    st.header("The four tests, in plain English")
-    k1, k2, k3, k4 = st.columns(4)
-    k1.markdown(
-        "**Contribution per unit, availability-adjusted.** What is kept if "
-        "we stock it (plus a labelled basket spillover), versus the 3P take "
-        "only where sellers can actually supply. Where they cannot, the "
-        "alternative is 'not ranged', not a 3P take."
-    )
-    k2.markdown(
-        "**Inventory liquidity.** Stock days and turn. Currys' published "
-        "60 stock days for electronics; an assumed 50 days for fashion and beauty."
-    )
-    k3.markdown(
-        "**Return on stock (GMROI).** Margin times turn, tested against a "
-        "25% hurdle (Assumption), which sits above a typical UK retail WACC."
-    )
-    k4.markdown(
-        "**Demand predictability.** Assumed weekly velocity and CV drive "
-        "the mid-tail rule and a safety-stock add-on. Volatility is a "
-        "warning, not an automatic override. Long-tail lines with no "
-        "sellers are left as a hole."
-    )
-
-    with st.expander("Decision rules, with citations", expanded=False):
-        for key, rule in RULE_CITATIONS.items():
-            st.markdown(f"**{rule['title']}**")
-            st.markdown(rule["basis"])
-            st.caption(rule["cite"])
-            st.markdown(rule["in_this_model"])
-            st.divider()
 
     # ----- Worked example -----
     st.header("A worked example")
@@ -531,7 +510,7 @@ def render() -> None:
     st.markdown(
         "Each point is a mid-band sub-category. The vertical axis is 1P "
         "contribution as a share of the ex-VAT price (the breakeven 3P take). "
-        "The horizontal position is the effective 3P take — but at the "
+        "The horizontal position is the effective 3P take. At the "
         "entrant end, seller coverage is near zero, so that take is not "
         "a real alternative; the availability-adjusted comparison lives "
         "in the decision table. Points above the diagonal have 1P ahead "
@@ -572,19 +551,12 @@ def render() -> None:
     )
     line_d = alt.Chart(diag).mark_line(color="#999", strokeDash=[4, 4]).encode(x="x:Q", y="y:Q")
     st.altair_chart((line_d + pts).properties(height=360), use_container_width=True)
-    st.caption("The dashed line is where 1P contribution equals the 3P take. Contribution can be negative (below zero). At the entrant, this raw comparison is not the unit test: coverage-weighted payoffs are.")
-
-    # ----- Open questions -----
-    st.header("Open questions for reviewers")
-    st.markdown(
-        "This model is meant to be improved. The entrant parameters are "
-        "Assumptions. Please challenge them."
+    st.caption(
+        "The dashed line is where 1P contribution equals the 3P take. "
+        "Contribution can be negative (below zero). At the entrant, this "
+        "raw comparison is not the unit test: coverage-weighted payoffs are."
     )
-    for title, body in OPEN_QUESTIONS:
-        with st.expander(title, expanded=False):
-            st.markdown(body)
 
-    # ----- Sensitivities (brief) -----
     with st.expander("Fees-only mid-band counts (no ads, no warehouse margin)", expanded=False):
         fees_a = mid_band_table(evaluate_all(fees_only(assumptions_at(0.0, a))))
         fees_b = mid_band_table(evaluate_all(fees_only(assumptions_at(1.0, a))))
@@ -593,22 +565,14 @@ def render() -> None:
             f"Established, fees only (operating): {_fmt_counts(counts(fees_b))}."
         )
 
-    uk_context_panel(expanded=False)
-    parent_jd_panel(expanded=False)
-
-    st.markdown(
-        "**Limits.** Prices, weekly units and CVs are Assumptions. "
-        "Joybuy has not published fees, 1P margins, fulfilment costs or a "
-        "hurdle. Amazon UK fees are a labelled stand-in. Advertising takes "
-        "are model estimates (Amazon does not publish 3P GMV). Currys' "
-        "18.3% is group gross margin, including services. Zalando figures "
-        "are EU. THG Beauty is multi-geography. Electronics fulfilment is "
-        "a model estimate. Baby uses adjacent proxies. Seller coverage, "
-        "the 8% spillover, the 70/30 variable/fixed fulfilment split, the "
-        "5% margin haircut and the 25% inventory hurdle are Assumptions. "
-        "JD China's 78.2% 1P revenue share is a parent-company figure, "
-        "not Joybuy's mix. This is decision support, made by Ami Sata."
+    st.caption(
+        "Limits, version history, the stress-test summary and open questions "
+        "for reviewers are on the Method and changes page. Contribution is "
+        "not profit. Amazon UK fees are a labelled stand-in. Decision support, "
+        "Made by Ami Sata."
     )
+
+
 
 
 def _fmt_counts(c: dict) -> str:

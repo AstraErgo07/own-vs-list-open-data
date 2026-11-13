@@ -41,20 +41,23 @@ def test_main_page_loads_without_exception():
     assert "Entrant" in blob or "entrant" in blob
     assert "Established" in blob or "established" in blob
     metric_labels = [m.label for m in at.metric]
-    assert "Bring in-house" in metric_labels
-    assert "Test as 3P first" in metric_labels
-    assert "Keep 3P" in metric_labels
-    assert any("sub-categor" in m.lower() for m in metric_labels)
-    assert any("modelled sales" in m.lower() for m in metric_labels)
-    # Mid-band headline: 20 sub-categories on each side. Do not hard-code
-    # a recommendation split, because entrant assumptions are reviewable.
+    # First-screen headline: A vs B 1P share of sub-categories and of modelled sales.
+    assert any("sub-categor" in m.lower() and "1p" in m.lower() and m.startswith("A") for m in metric_labels)
+    assert any("modelled sales" in m.lower() and "1p" in m.lower() and m.startswith("A") for m in metric_labels)
+    assert any("sub-categor" in m.lower() and "1p" in m.lower() and m.startswith("B") for m in metric_labels)
+    assert any("modelled sales" in m.lower() and "1p" in m.lower() and m.startswith("B") for m in metric_labels)
+    # Counts still appear (caption and the later maturity metrics). Do not
+    # hard-code a recommendation split, because entrant assumptions are reviewable.
+    assert "Bring in-house" in blob or "Bring in-house" in metric_labels
+    assert "Test as 3P first" in blob or "Test as 3P first" in metric_labels
+    assert "Keep 3P" in blob or "Keep 3P" in metric_labels
     expander_labels = [e.label for e in at.expander]
-    assert any("open question" in x.lower() or "reviewer" in x.lower() or "haircut" in x.lower()
-               for x in expander_labels)
+    assert any("how it decides" in x.lower() for x in expander_labels)
+    assert "illustrative" in blob.lower()
+    assert "Joybuy-inspired" in blob or "Joybuy-inspired" in blob.replace("‑", "-")
     assert "advertis" in blob.lower()
     assert "warehouse" in blob.lower() or "Milton Keynes" in blob
     assert "Currys" in blob or "18.3" in blob
-    assert "61%" in blob or "61" in blob
     assert "Olist" not in blob  # dropped, not on the main page
     assert "breakeven" in blob.lower() or "Break-even" in blob or "Breakeven" in blob
     assert "Made by Ami Sata" in blob
@@ -64,10 +67,13 @@ def test_main_page_loads_without_exception():
     assert "seller coverage" in blob.lower() or "Seller coverage" in blob
     assert "sunk" in blob.lower() or "variable" in blob.lower()
     assert "Do not range" in blob or "not ranged" in blob.lower() or "Do not range" in metric_labels
-    # 78.2% must not be presented as Joybuy's mix.
+    # Version history and the JD China 78.2% note belong on Method and changes,
+    # not as the opening of the main page.
+    assert "principled fix" not in blob.lower()
+    # If 78.2% still appears later (findings), it must not be Joybuy's mix.
     if "78.2" in blob or "78%" in blob:
         assert "parent" in blob.lower() or "JD China" in blob or "not Joybuy" in blob
-    assert "land-grab" in blob.lower() or "strategic verdict" in blob.lower() or "strategic / land-grab" in blob.lower()
+    assert "land-grab" in blob.lower() or "strategic" in blob.lower()
 
 
 def test_method_page_loads_and_credits_sources():
@@ -77,12 +83,12 @@ def test_method_page_loads_and_credits_sources():
     at.run()
     assert not at.exception
     try:
-        at.switch_page("Data and method")
+        at.switch_page("Method and changes")
     except Exception:
         at.switch_page("app_pages/method_page.py")
     at.run()
     assert not at.exception, f"Method page raised: {at.exception}"
-    assert "Data and method" in _titles(at)
+    assert "Method and changes" in _titles(at)
     text = _blob(at)
     assert "Made by Ami Sata" in text or "Made by Ami Sata" in _captions(at)
     assert "Joybuy" in text
@@ -104,6 +110,12 @@ def test_method_page_loads_and_credits_sources():
     assert "seller coverage" in text.lower() or "Seller coverage" in text or "coverage" in text.lower()
     assert "variable" in text.lower() or "sunk" in text.lower()
     assert "v3.2" in text or "v3.2" in _captions(at) or "v3.1" in text
+    # Version history and the stress-test summary live here, not on the first screen.
+    assert "principled fix" in text.lower()
+    assert "78.2" in text
+    assert "parent" in text.lower() or "JD China" in text or "not Joybuy" in text
+    assert "stress" in text.lower()
+    assert "not used as a target" in text.lower() or "not a target" in text.lower()
 
 
 def test_joybuy_is_the_subject_and_old_bans_do_not_apply():

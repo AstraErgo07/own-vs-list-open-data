@@ -16,11 +16,65 @@ Contribution is not profit. Portfolio project. Made by Ami Sata.
 **Benchmark:** Amazon UK published fees, a stand-in until Joybuy
 publishes its own.
 
-v3.1 is a principled fix, not a refit. v3.0’s entrant scenario
-recommended 0% 1P, while Joybuy UK actually launched ~100% 1P. The
-model was wrong, not Joybuy. JD China’s 78.2% 1P share is a
-parent-company **revenue** figure, not Joybuy’s mix, and is not used
-as a target.
+The Streamlit app opens on this result: a short intro, the
+A versus B 1P shares, and the verdict table. Version history, the
+stress-test summary, limits and sources are on the **Method and
+changes** page.
+
+## Headline results under the default assumptions
+
+These are model estimates on assumed mid-band prices, not Joybuy
+decisions and not a forecast. Parameters were not searched to hit
+a 100% 1P mix. The 0% seller-coverage default was set to the
+launch-day 1P-only state, which is published, and that choice does
+most of the work on the unit 100% 1P result.
+
+- **Entrant (A), mid band, operating (strategic) verdict:** Bring
+  in-house 20, Test 0, Keep 3P 0, Do not range 0. Implied 1P mix:
+  **100% of sub-categories and 100% of modelled sales**. The
+  **unit-economics verdict agrees**: also 20 Bring in-house. 1P
+  contribution is thin but positive on durables (around 6% of the
+  ex-VAT price on electronics; mid-teens on clothing; around 26% on
+  beauty). Zero of 20 mid-band lines have a negative contribution.
+  Across all 60 price bands, 55 are Bring in-house and 5 low-velocity
+  long-tail bands are Do not range (a hole, because there are no
+  sellers to leave them with).
+- **Established (B), mid band:** unit and strategic coincide (coverage
+  90%). Bring in-house 5, Test as 3P first 3, Keep 3P 12. Implied 1P
+  mix: **25% of sub-categories and 6% of modelled sales**. Beauty
+  (four lines) and baby care stay 1P; electronics, appliances and
+  most clothing move to the 3P path, because a mature 3P take
+  (Amazon referral grossed up for VAT, plus ads) beats a thin fully
+  loaded 1P contribution. A stress test of v3.1 found that a 5-point
+  cut on the THG Beauty and Zalando published gross margins turns
+  all five B 1P lines to Test as 3P first (0% of modelled sales).
+  That 25% / 6% headline is assumption-driven. A full stress-test
+  note is in `docs/stress_test_v3.1.pdf`.
+- **Fifteen of 20** mid-band sub-categories change operating
+  recommendation between A and B (durables and clothing leave 1P as
+  coverage and ads grow; beauty and baby care stay 1P).
+
+What drives the 1P-led entrant result (coverage was set to the launch; parameters were not searched):
+
+1. **Seller coverage of 0%.** The unit test compares 1P with ‘not
+   ranged’ (payoff zero), not with a 3P take that is not available.
+   If coverage is wrongly set to 100%, the mid-band unit mix falls
+   to around 50% 1P even with the other v3.1 costs.
+2. **A 5% relative margin haircut**, not 25%, justified by JD’s
+   published scale and supplier relationships. A 25% stress test
+   would leave unit-economics 1P on only half the mid-band
+   sub-categories (the high-GM beauty and fashion lines, 14% of
+   modelled sales); the strategic layer would still range the core
+   as 1P.
+3. **Variable-only fulfilment** in the unit figure (already-built
+   warehouse fixed cost is sunk). Together with (2), this keeps
+   electronics contribution around 6% and above the return-on-stock
+   hurdle.
+
+The 8% basket spillover and the strategic layer are **not required**
+for a 1P-led mid-band unit result under the defaults; they matter
+when contribution is thinner. Joybuy’s 1P-only launch is consistent
+with this result and was not used as a calibration target.
 
 ## What it does
 
@@ -82,61 +136,6 @@ The app shows both scenarios side by side, both verdicts, the implied
 maturity slider that moves the mix from 1P-led toward more 3P as
 seller depth and ad income grow.
 
-## Headline results under the default assumptions
-
-These are model estimates on assumed mid-band prices, not Joybuy
-decisions and not a forecast. Parameters were not searched to hit
-a 100% 1P mix. The 0% seller-coverage default was set to the
-launch-day 1P-only state, which is published, and that choice does
-most of the work on the unit 100% 1P result.
-
-- **Entrant (A), mid band, operating (strategic) verdict:** Bring
-  in-house 20, Test 0, Keep 3P 0, Do not range 0. Implied 1P mix:
-  **100% of sub-categories and 100% of modelled sales**. The
-  **unit-economics verdict agrees**: also 20 Bring in-house. 1P
-  contribution is thin but positive on durables (around 6% of the
-  ex-VAT price on electronics; mid-teens on clothing; around 26% on
-  beauty). Zero of 20 mid-band lines have a negative contribution.
-  Across all 60 price bands, 55 are Bring in-house and 5 low-velocity
-  long-tail bands are Do not range (a hole, because there are no
-  sellers to leave them with).
-- **Established (B), mid band:** unit and strategic coincide (coverage
-  90%). Bring in-house 5, Test as 3P first 3, Keep 3P 12. Implied 1P
-  mix: **25% of sub-categories and 6% of modelled sales**. Beauty
-  (four lines) and baby care stay 1P; electronics, appliances and
-  most clothing move to the 3P path, because a mature 3P take
-  (Amazon referral grossed up for VAT, plus ads) beats a thin fully
-  loaded 1P contribution. A stress test of v3.1 found that a 5-point
-  cut on the THG Beauty and Zalando published gross margins turns
-  all five B 1P lines to Test as 3P first (0% of modelled sales).
-  That 25% / 6% headline is assumption-driven. A full stress-test
-  note is in `docs/stress_test_v3.1.pdf`.
-- **Fifteen of 20** mid-band sub-categories change operating
-  recommendation between A and B (durables and clothing leave 1P as
-  coverage and ads grow; beauty and baby care stay 1P).
-
-What drives the 1P-led entrant result (coverage was set to the launch; parameters were not searched):
-
-1. **Seller coverage of 0%.** The unit test compares 1P with ‘not
-   ranged’ (payoff zero), not with a 3P take that is not available.
-   If coverage is wrongly set to 100%, the mid-band unit mix falls
-   to around 50% 1P even with the other v3.1 costs.
-2. **A 5% relative margin haircut**, not 25%, justified by JD’s
-   published scale and supplier relationships. A 25% stress test
-   would leave unit-economics 1P on only half the mid-band
-   sub-categories (the high-GM beauty and fashion lines, 14% of
-   modelled sales); the strategic layer would still range the core
-   as 1P.
-3. **Variable-only fulfilment** in the unit figure (already-built
-   warehouse fixed cost is sunk). Together with (2), this keeps
-   electronics contribution around 6% and above the return-on-stock
-   hurdle.
-
-The 8% basket spillover and the strategic layer are **not required**
-for a 1P-led mid-band unit result under the defaults; they matter
-when contribution is thinner. Joybuy’s 1P-only launch is consistent
-with this result and was not used as a calibration target.
-
 ## What is published, and what is not
 
 - **Joybuy has not published** seller commission, 1P margins,
@@ -171,6 +170,30 @@ with this result and was not used as a calibration target.
   share of revenue (1P gross, 3P net), not of units, and **not
   Joybuy’s mix**.
 
+## Version history and the stress test
+
+v3.1 is a principled fix, not a refit. v3.0’s entrant scenario
+recommended 0% 1P, while Joybuy UK actually launched ~100% 1P. The
+model was wrong, not Joybuy. JD China’s 78.2% 1P share is a
+parent-company **revenue** figure, not Joybuy’s mix, and is not used
+as a target. v3.2 changes labels and wording only. Defaults and
+numbers are unchanged from v3.1.
+
+A stress test of the v3.1 mid-band model is in
+[`docs/stress_test_v3.1.pdf`](docs/stress_test_v3.1.pdf). Predictions
+were written down before the run and scored 17.5 out of 21. Under the
+stated Assumptions the entrant stays 100% 1P in all 10,000 Monte Carlo
+draws. The first break of that operating result is at 72.31% seller
+coverage (Pushchairs, 8% spillover). The 25% return-on-stock hurdle
+never decides a flip on its own. The established 25% / 6% 1P mix
+disappears if the borrowed THG and Zalando margins are cut by 5
+points, and a 5-point change in fulfilment cost flips 15 of 20
+verdicts at B. Amazon’s 61% worldwide share of paid units is a
+different scope from this five-category UK sales mix, so it is a
+check on direction only. It is not safe to say that Joybuy should
+stock everything, that B is miscalibrated against Amazon, or that
+beauty is a clear 1P win.
+
 ## Running the app
 
 ```bash
@@ -183,7 +206,8 @@ streamlit run streamlit_app.py
 Requires Python 3.12 or newer (pandas 3). On Streamlit Cloud, choose
 the Python version under Advanced settings.
 
-The **Data and method** page lists every source, the entrant
+The **Method and changes** page lists the version history, the
+stress-test summary, the limits, every source, the entrant
 assumptions with reasoning, the decision rules, and the open questions
 for reviewers.
 
