@@ -62,6 +62,7 @@ with st.expander("Adjust model assumptions · optional stress test", expanded=Fa
         demand_adjust = st.slider("Inventory markdown-risk multiplier",.5,2.,1.,.1)
     with col_b:
         coverage_adjust = st.slider("Seller availability adjustment (percentage points)",-40,40,0,5)/100
+        one_p_capture = st.slider("1P share of expected demand fulfilled (%)",50,100,95,5)/100
         st.caption("1P and 3P draw from the same customer pool; sales switching is not charged twice.")
     st.caption("Assumptions are illustrative and apply to all profiles. Selling prices and costs are net of tax.")
     st.markdown("**Product setup and annual administration costs — editable**")
@@ -157,7 +158,7 @@ def economics(r, model, scenario, sales_factor=1.0):
     q=r["demand"]*sales_factor
     cov=max(0.0,min(1.0,r["coverage"]+cov_delta+coverage_adjust))
     # Illustrative demand captured if this SKU is exclusively 1P vs exclusively 3P.
-    one_units=q*0.95 if model=="1P" else 0.0
+    one_units=q*one_p_capture if model=="1P" else 0.0
     three_units=q*cov if model=="3P" else 0.0
     discount,fulfil_discount=scale_terms(one_units)
     buy=r["cost"]*cogs_factor*(1+procurement_adjust)*(1-discount)
@@ -177,6 +178,7 @@ def economics(r, model, scenario, sales_factor=1.0):
         turns=turns,gmroi=gmroi,days=days,discount=discount,
         fulfil_discount=fulfil_discount,fixed_cost=fixed,volume=q,
         avg_inventory=avg_inventory,gross_margin=gross_margin,
+        annual_cogs=one_units*buy,
         gmv=(one_units+three_units)*r["price"])
 
 def calc(r,model,scenario,sales_factor=1.0):
@@ -244,6 +246,8 @@ def recommend(r,scenario,sales_factor=1.0):
         three_p_gmv=detail["three_units"]*r["price"],
         avg_inventory=detail["avg_inventory"],
         one_p_gross_margin=detail["gross_margin"],
+        one_p_annual_cogs=detail["annual_cogs"],
+        one_p_demand_fulfilment_pct=round(one_p_capture*100,1),
         stock_days=round(detail["days"],1) if label=="1P" else None,
         buying_discount_pct=round(one["discount"]*100,1),
         fulfil_saving_pct=round(one["fulfil_discount"]*100,1),
@@ -276,7 +280,8 @@ def category_summary(results):
              all_one_p_profit=("pure1p","sum"),
              all_three_p_profit=("pure3p","sum"),
              avg_inventory=("avg_inventory","sum"),
-             gross_margin=("one_p_gross_margin","sum"))
+             gross_margin=("one_p_gross_margin","sum"),
+             annual_cogs=("one_p_annual_cogs","sum"))
         .reset_index())
     summary["category_strategy"]=summary.apply(
         lambda r:"Hybrid assortment" if r["one_p_skus"]>0 and r["three_p_skus"]>0
@@ -287,6 +292,8 @@ def category_summary(results):
     summary["one_p_gmv_pct"]=(100*summary["one_p_gmv"]/total_gmv.where(total_gmv!=0)).round(1)
     summary["category_mix_advantage"]=(
         summary["annual_profit"]-summary[["all_one_p_profit","all_three_p_profit"]].max(axis=1)).round(2)
+    summary["category_turns"]=(summary["annual_cogs"]/
+        summary["avg_inventory"].where(summary["avg_inventory"]!=0)).round(1)
     summary["category_gmroi"]=(summary["gross_margin"]/
         summary["avg_inventory"].where(summary["avg_inventory"]!=0)).round(2)
     return summary
@@ -325,6 +332,7 @@ category_cols={
     "all_three_p_profit":"If every SKU is 3P (£)",
     "category_mix_advantage":"Gain vs best all-1P/all-3P (£)",
     "avg_inventory":"Average 1P inventory investment (£)",
+    "category_turns":"Category 1P inventory turns/year",
     "category_gmroi":"Category 1P GMROI (£/£)"}
 st.dataframe(summary[list(category_cols)].rename(columns=category_cols),
     use_container_width=True,hide_index=True)
@@ -363,6 +371,7 @@ with st.expander("See SKU-level costs and assumptions",expanded=False):
         "one_p_contribution_per_sale":"1P contribution per fulfilled sale (£)",
         "three_p_contribution_per_sale":"3P contribution per fulfilled sale (£)",
         "coverage":"Share of demand 3P sellers can fulfil",
+        "one_p_demand_fulfilment_pct":"1P demand fulfilled (%)",
         "one_units":"Chosen 1P units/year",
         "three_units":"Chosen 3P units/year",
         "avg_inventory":"Average 1P stock investment (£)",
@@ -415,9 +424,9 @@ with st.expander("Assumptions and limitations",expanded=False):
 
 **Annual profit contribution:** Sales revenue retained by the marketplace less purchasing, fulfilment, expected returns, markdown allowance, inventory financing, 3P servicing and the above annual product costs. It is not net profit after all overhead and tax.
 
-**Inventory turns and GMROI:** Turns = 365 / assumed days held. GMROI = 1P gross margin divided by average 1P inventory cost. GMROI is not return on total invested capital.
+**Inventory turns and GMROI:** SKU turns = 365 / assumed days held; category turns = annual 1P cost of goods sold / total average 1P inventory investment. GMROI = 1P gross margin divided by average 1P inventory cost. GMROI is not return on total invested capital.
 
-**Demand and SKU allocation:** Expected demand is synthetic, not observed. Each SKU is evaluated exclusively as 1P (assumed 95% demand captured) or 3P (estimated seller coverage). There is no same-SKU hybrid optimisation, assumed hybrid demand uplift or independent second demand pool. A category is hybrid when its selected SKUs span both channels. Differences in demand captured are illustrative, not causal estimates of cannibalisation.
+**Demand and SKU allocation:** Expected demand is synthetic, not observed. Each SKU is evaluated exclusively as 1P (default 95% demand fulfilled, adjustable) or 3P (estimated seller coverage). There is no same-SKU hybrid optimisation, assumed hybrid demand uplift or independent second demand pool. A category is hybrid when its selected SKUs span both channels. Differences in demand captured are illustrative, not causal estimates of cannibalisation.
 
 **Category economics:** The recommended category mix is the sum of individually optimal SKU decisions, with no category-level assortment constraints or shared overhead. The comparison to all-1P or all-3P uses the same SKU demand estimates. The GMV mix measures merchandise value, not Walmart or any real company's revenue mix. 1P purchasing discounts are calculated per SKU, not pooled across a category. A real operator may obtain better procurement terms through category-wide supplier commitments, which this model does not capture.
 
