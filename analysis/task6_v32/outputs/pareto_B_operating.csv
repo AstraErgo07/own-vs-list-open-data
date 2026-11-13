@@ -1,0 +1,61 @@
+sub_id,sub_en,band,pool,sku_w,gmv_w,rec,is_1p
+baby_care,"Baby care (toiletries, nappies, feeding)",low,torso,0.3,0.15,Bring in-house,True
+baby_care,"Baby care (toiletries, nappies, feeding)",mid,head,0.2,0.8,Bring in-house,True
+baby_care,"Baby care (toiletries, nappies, feeding)",high,tail,0.5,0.05,Bring in-house,True
+baby_clothing,Baby clothing,low,torso,0.3,0.15,Bring in-house,True
+baby_clothing,Baby clothing,mid,head,0.2,0.8,Test as 3P first,False
+baby_clothing,Baby clothing,high,tail,0.5,0.05,Keep 3P,False
+car_seats,Car seats and safety,low,torso,0.3,0.15,Keep 3P,False
+car_seats,Car seats and safety,mid,head,0.2,0.8,Keep 3P,False
+car_seats,Car seats and safety,high,tail,0.5,0.05,Keep 3P,False
+compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",low,torso,0.3,0.15,Keep 3P,False
+compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",mid,head,0.2,0.8,Keep 3P,False
+compact_appliances,"Compact appliances (kettles, microwaves, vacuums)",high,tail,0.5,0.05,Keep 3P,False
+cooking,"Cooking (ovens, hobs, cookers)",low,torso,0.3,0.15,Keep 3P,False
+cooking,"Cooking (ovens, hobs, cookers)",mid,head,0.2,0.8,Keep 3P,False
+cooking,"Cooking (ovens, hobs, cookers)",high,tail,0.5,0.05,Keep 3P,False
+everyday,Everyday clothing,low,torso,0.3,0.15,Test as 3P first,False
+everyday,Everyday clothing,mid,head,0.2,0.8,Keep 3P,False
+everyday,Everyday clothing,high,tail,0.5,0.05,Test as 3P first,False
+footwear,Footwear,low,torso,0.3,0.15,Keep 3P,False
+footwear,Footwear,mid,head,0.2,0.8,Test as 3P first,False
+footwear,Footwear,high,tail,0.5,0.05,Test as 3P first,False
+fragrance,Fragrance,low,torso,0.3,0.15,Bring in-house,True
+fragrance,Fragrance,mid,head,0.2,0.8,Bring in-house,True
+fragrance,Fragrance,high,tail,0.5,0.05,Bring in-house,True
+haircare,Haircare,low,torso,0.3,0.15,Bring in-house,True
+haircare,Haircare,mid,head,0.2,0.8,Bring in-house,True
+haircare,Haircare,high,tail,0.5,0.05,Bring in-house,True
+laptops,Laptops,low,torso,0.3,0.15,Keep 3P,False
+laptops,Laptops,mid,head,0.2,0.8,Keep 3P,False
+laptops,Laptops,high,tail,0.5,0.05,Keep 3P,False
+laundry,Laundry (washing machines and dryers),low,torso,0.3,0.15,Keep 3P,False
+laundry,Laundry (washing machines and dryers),mid,head,0.2,0.8,Keep 3P,False
+laundry,Laundry (washing machines and dryers),high,tail,0.5,0.05,Keep 3P,False
+makeup,Makeup,low,torso,0.3,0.15,Bring in-house,True
+makeup,Makeup,mid,head,0.2,0.8,Bring in-house,True
+makeup,Makeup,high,tail,0.5,0.05,Bring in-house,True
+office_equipment,"Office equipment (printers, ink, desks)",low,torso,0.3,0.15,Keep 3P,False
+office_equipment,"Office equipment (printers, ink, desks)",mid,head,0.2,0.8,Keep 3P,False
+office_equipment,"Office equipment (printers, ink, desks)",high,tail,0.5,0.05,Keep 3P,False
+outerwear,Outerwear,low,torso,0.3,0.15,Keep 3P,False
+outerwear,Outerwear,mid,head,0.2,0.8,Test as 3P first,False
+outerwear,Outerwear,high,tail,0.5,0.05,Test as 3P first,False
+peripherals,"Peripherals (keyboards, mice, webcams)",low,torso,0.3,0.15,Keep 3P,False
+peripherals,"Peripherals (keyboards, mice, webcams)",mid,head,0.2,0.8,Keep 3P,False
+peripherals,"Peripherals (keyboards, mice, webcams)",high,tail,0.5,0.05,Keep 3P,False
+pushchairs,Pushchairs,low,torso,0.3,0.15,Keep 3P,False
+pushchairs,Pushchairs,mid,head,0.2,0.8,Keep 3P,False
+pushchairs,Pushchairs,high,tail,0.5,0.05,Keep 3P,False
+refrigeration,Refrigeration,low,torso,0.3,0.15,Keep 3P,False
+refrigeration,Refrigeration,mid,head,0.2,0.8,Keep 3P,False
+refrigeration,Refrigeration,high,tail,0.5,0.05,Keep 3P,False
+skincare,Skincare,low,torso,0.3,0.15,Bring in-house,True
+skincare,Skincare,mid,head,0.2,0.8,Bring in-house,True
+skincare,Skincare,high,tail,0.5,0.05,Bring in-house,True
+sportswear,Sportswear,low,torso,0.3,0.15,Keep 3P,False
+sportswear,Sportswear,mid,head,0.2,0.8,Keep 3P,False
+sportswear,Sportswear,high,tail,0.5,0.05,Test as 3P first,False
+tablets,Tablets,low,torso,0.3,0.15,Keep 3P,False
+tablets,Tablets,mid,head,0.2,0.8,Keep 3P,False
+tablets,Tablets,high,tail,0.5,0.05,Keep 3P,False

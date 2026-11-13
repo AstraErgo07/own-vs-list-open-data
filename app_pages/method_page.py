@@ -1,4 +1,4 @@
-"""Data and method page for the Joybuy UK v3.1 model."""
+"""Data and method page for the Entrant A vs Established B v3.2 model."""
 from __future__ import annotations
 
 import sys
@@ -92,8 +92,9 @@ def render() -> None:
         "- It is decision support for a UK marketplace choosing, for a "
         "representative sub-category, whether to stock the goods (1P) or "
         "leave them with a seller (3P).\n"
-        "- The central lens is a scale-up **entrant** (Joybuy-like) versus "
-        "an **established** marketplace (Amazon UK-like), and the implied "
+        "- The central lens is a scale-up **entrant (A)** versus "
+        "an **established** marketplace (B). A is Joybuy-inspired and "
+        "illustrative, not Joybuy's actual economics. The implied "
         "1P / 3P mix.\n"
         "- Each sub-category has a **unit-economics verdict** and an "
         "**entrant strategic verdict**, shown separately. 3P is only a "

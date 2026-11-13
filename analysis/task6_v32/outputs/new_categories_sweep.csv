@@ -1,0 +1,43 @@
+category,sub,side,gm,gm_label,fulfilment,fee,price_mid,unit_rec,op_rec,c1p_pct,label
+Grocery and FMCG,Ambient grocery (exploratory),A,0.25,Assumption 25%,0.15,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Bring in-house,Bring in-house,0.10705190776397819,UNVERIFIED / Assumption
+Grocery and FMCG,Ambient grocery (exploratory),B,0.25,Assumption 25%,0.15,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Keep 3P,Keep 3P,0.0747067945219457,UNVERIFIED / Assumption
+Grocery and FMCG,Ambient grocery (exploratory),A,0.25,Assumption 25%,0.23,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Bring in-house,Bring in-house,0.051051907763978166,UNVERIFIED / Assumption
+Grocery and FMCG,Ambient grocery (exploratory),B,0.25,Assumption 25%,0.23,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Keep 3P,Keep 3P,-0.005293205478054315,UNVERIFIED / Assumption
+Grocery and FMCG,Ambient grocery (exploratory),A,0.25,Assumption 25%,0.3,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Do not range,Bring in-house,0.0020519077639781745,UNVERIFIED / Assumption
+Grocery and FMCG,Ambient grocery (exploratory),B,0.25,Assumption 25%,0.3,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Keep 3P,Keep 3P,-0.07529320547805429,UNVERIFIED / Assumption
+Grocery and FMCG,Ambient grocery (exploratory),A,0.336,Ocado 33.6% UNVERIFIED page,0.15,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Bring in-house,Bring in-house,0.1897642476140541,UNVERIFIED / Assumption
+Grocery and FMCG,Ambient grocery (exploratory),B,0.336,Ocado 33.6% UNVERIFIED page,0.15,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Test as 3P first,Test as 3P first,0.16177241541676268,UNVERIFIED / Assumption
+Grocery and FMCG,Ambient grocery (exploratory),A,0.336,Ocado 33.6% UNVERIFIED page,0.23,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Bring in-house,Bring in-house,0.13376424761405412,UNVERIFIED / Assumption
+Grocery and FMCG,Ambient grocery (exploratory),B,0.336,Ocado 33.6% UNVERIFIED page,0.23,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Keep 3P,Keep 3P,0.08177241541676265,UNVERIFIED / Assumption
+Grocery and FMCG,Ambient grocery (exploratory),A,0.336,Ocado 33.6% UNVERIFIED page,0.3,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Bring in-house,Bring in-house,0.0847642476140541,UNVERIFIED / Assumption
+Grocery and FMCG,Ambient grocery (exploratory),B,0.336,Ocado 33.6% UNVERIFIED page,0.3,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Keep 3P,Keep 3P,0.011772415416762676,UNVERIFIED / Assumption
+Grocery and FMCG,Ambient grocery (exploratory),A,0.4,Assumption 40%,0.15,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Bring in-house,Bring in-house,0.25131761680480846,UNVERIFIED / Assumption
+Grocery and FMCG,Ambient grocery (exploratory),B,0.4,Assumption 40%,0.15,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Bring in-house,Bring in-house,0.22656543561755654,UNVERIFIED / Assumption
+Grocery and FMCG,Ambient grocery (exploratory),A,0.4,Assumption 40%,0.23,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Bring in-house,Bring in-house,0.19531761680480844,UNVERIFIED / Assumption
+Grocery and FMCG,Ambient grocery (exploratory),B,0.4,Assumption 40%,0.23,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Keep 3P,Keep 3P,0.14656543561755658,UNVERIFIED / Assumption
+Grocery and FMCG,Ambient grocery (exploratory),A,0.4,Assumption 40%,0.3,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Bring in-house,Bring in-house,0.14631761680480845,UNVERIFIED / Assumption
+Grocery and FMCG,Ambient grocery (exploratory),B,0.4,Assumption 40%,0.3,"15% flat stand-in (Amazon Office fee_key), UNVERIFIED for grocery",4.0,Keep 3P,Keep 3P,0.07656543561755659,UNVERIFIED / Assumption
+Toys,"Toys, general (exploratory)",A,0.25,Assumption 25%,0.12,"15% flat stand-in, UNVERIFIED for toys",15.0,Bring in-house,Bring in-house,0.11950594383774803,UNVERIFIED / Assumption
+Toys,"Toys, general (exploratory)",B,0.25,Assumption 25%,0.12,"15% flat stand-in, UNVERIFIED for toys",15.0,Keep 3P,Keep 3P,0.09616978082401445,UNVERIFIED / Assumption
+Toys,"Toys, general (exploratory)",A,0.25,Assumption 25%,0.18,"15% flat stand-in, UNVERIFIED for toys",15.0,Bring in-house,Bring in-house,0.07750594383774802,UNVERIFIED / Assumption
+Toys,"Toys, general (exploratory)",B,0.25,Assumption 25%,0.18,"15% flat stand-in, UNVERIFIED for toys",15.0,Keep 3P,Keep 3P,0.03616978082401445,UNVERIFIED / Assumption
+Toys,"Toys, general (exploratory)",A,0.32,Assumption 32%,0.12,"15% flat stand-in, UNVERIFIED for toys",15.0,Bring in-house,Bring in-house,0.18687755660468544,UNVERIFIED / Assumption
+Toys,"Toys, general (exploratory)",B,0.32,Assumption 32%,0.12,"15% flat stand-in, UNVERIFIED for toys",15.0,Test as 3P first,Test as 3P first,0.16708726794710646,UNVERIFIED / Assumption
+Toys,"Toys, general (exploratory)",A,0.32,Assumption 32%,0.18,"15% flat stand-in, UNVERIFIED for toys",15.0,Bring in-house,Bring in-house,0.14487755660468543,UNVERIFIED / Assumption
+Toys,"Toys, general (exploratory)",B,0.32,Assumption 32%,0.18,"15% flat stand-in, UNVERIFIED for toys",15.0,Keep 3P,Keep 3P,0.10708726794710649,UNVERIFIED / Assumption
+Toys,"Toys, general (exploratory)",A,0.4,Assumption 40%,0.12,"15% flat stand-in, UNVERIFIED for toys",15.0,Bring in-house,Bring in-house,0.2638736854811852,UNVERIFIED / Assumption
+Toys,"Toys, general (exploratory)",B,0.4,Assumption 40%,0.12,"15% flat stand-in, UNVERIFIED for toys",15.0,Bring in-house,Bring in-house,0.24813582465921158,UNVERIFIED / Assumption
+Toys,"Toys, general (exploratory)",A,0.4,Assumption 40%,0.18,"15% flat stand-in, UNVERIFIED for toys",15.0,Bring in-house,Bring in-house,0.22187368548118522,UNVERIFIED / Assumption
+Toys,"Toys, general (exploratory)",B,0.4,Assumption 40%,0.18,"15% flat stand-in, UNVERIFIED for toys",15.0,Test as 3P first,Test as 3P first,0.18813582465921155,UNVERIFIED / Assumption
+Home and garden,Home and garden (exploratory),A,0.3,Assumption 30%,0.12,"15% flat stand-in, UNVERIFIED for home and garden",25.0,Bring in-house,Bring in-house,0.16975651265023392,UNVERIFIED / Assumption
+Home and garden,Home and garden (exploratory),B,0.3,Assumption 30%,0.12,"15% flat stand-in, UNVERIFIED for home and garden",25.0,Keep 3P,Keep 3P,0.1489504319652641,UNVERIFIED / Assumption
+Home and garden,Home and garden (exploratory),A,0.3,Assumption 30%,0.18,"15% flat stand-in, UNVERIFIED for home and garden",25.0,Bring in-house,Bring in-house,0.1277565126502339,UNVERIFIED / Assumption
+Home and garden,Home and garden (exploratory),B,0.3,Assumption 30%,0.18,"15% flat stand-in, UNVERIFIED for home and garden",25.0,Keep 3P,Keep 3P,0.0889504319652641,UNVERIFIED / Assumption
+Home and garden,Home and garden (exploratory),A,0.381,Kingfisher 38.1% UNVERIFIED page,0.12,"15% flat stand-in, UNVERIFIED for home and garden",25.0,Bring in-house,Bring in-house,0.24770131873633827,UNVERIFIED / Assumption
+Home and garden,Home and garden (exploratory),B,0.381,Kingfisher 38.1% UNVERIFIED page,0.12,"15% flat stand-in, UNVERIFIED for home and garden",25.0,Bring in-house,Bring in-house,0.2309975962664264,UNVERIFIED / Assumption
+Home and garden,Home and garden (exploratory),A,0.381,Kingfisher 38.1% UNVERIFIED page,0.18,"15% flat stand-in, UNVERIFIED for home and garden",25.0,Bring in-house,Bring in-house,0.20570131873633823,UNVERIFIED / Assumption
+Home and garden,Home and garden (exploratory),B,0.381,Kingfisher 38.1% UNVERIFIED page,0.18,"15% flat stand-in, UNVERIFIED for home and garden",25.0,Test as 3P first,Test as 3P first,0.1709975962664264,UNVERIFIED / Assumption
+Home and garden,Home and garden (exploratory),A,0.4,Assumption 40%,0.12,"15% flat stand-in, UNVERIFIED for home and garden",25.0,Bring in-house,Bring in-house,0.2659846683120911,UNVERIFIED / Assumption
+Home and garden,Home and garden (exploratory),B,0.4,Assumption 40%,0.12,"15% flat stand-in, UNVERIFIED for home and garden",25.0,Bring in-house,Bring in-house,0.25024322739879784,UNVERIFIED / Assumption
+Home and garden,Home and garden (exploratory),A,0.4,Assumption 40%,0.18,"15% flat stand-in, UNVERIFIED for home and garden",25.0,Bring in-house,Bring in-house,0.22398466831209107,UNVERIFIED / Assumption
+Home and garden,Home and garden (exploratory),B,0.4,Assumption 40%,0.18,"15% flat stand-in, UNVERIFIED for home and garden",25.0,Test as 3P first,Test as 3P first,0.19024322739879782,UNVERIFIED / Assumption

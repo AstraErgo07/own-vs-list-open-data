@@ -1,5 +1,5 @@
 """Shared wording with no Streamlit import."""
-VERSION = "v3.1"
+VERSION = "v3.2"
 FOOTER = (
     "Independent portfolio project on Joybuy's UK and European business. "
     "It uses published UK and EU retailer filings, Amazon UK published "

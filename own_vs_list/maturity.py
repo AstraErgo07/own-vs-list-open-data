@@ -1,8 +1,9 @@
-"""Entrant vs established marketplace: the central lens (v3.1).
+"""Entrant vs established marketplace: the central lens (v3.2).
 
 Two named scenarios sit side by side.
 
-(A) Entrant, like Joybuy UK. Seller coverage is thin (Joybuy launched
+(A) Entrant A, Joybuy-inspired and illustrative, not Joybuy's actual
+    economics. Seller coverage is thin (Joybuy launched
     1P-only, so the real alternative to 1P is often 'not ranged', not
     a 3P take). 1P gross margin is close to the published retailer
     benchmark (a small haircut). Already-built warehouse fixed costs
@@ -12,7 +13,7 @@ Two named scenarios sit side by side.
     economics, values range completeness, warehouse fill and the
     absence of 3P ad monetisation.
 
-(B) Established, like Amazon UK. Deep seller coverage, published
+(B) Established B. Deep seller coverage, published
     referral fees as a labelled stand-in, fully loaded at-scale
     fulfilment, and a material advertising take.
 
@@ -20,10 +21,14 @@ A platform-maturity slider (0 = A, 1 = B) interpolates seller
 coverage, advertising, commission and the allocated fixed-fulfilment
 share, and shows the mix shifting from 1P-led toward more 3P.
 
-The model is not fitted to Joybuy's 1P-only launch. If the implied
-entrant mix is 1P-led, that is because of the availability, sunk-cost
-and strategic-layer reasoning below. If it is not, the assumption
-that prevents it is reported, not hidden.
+Parameters were not searched to hit a 100% 1P mix. The 0% seller-
+coverage default was set to the launch-day 1P-only state, which is
+published, and that choice does most of the work on the unit 100%
+1P result. 0% remains the evidenced launch value; it is an
+Assumption for later dates. If the implied entrant mix is 1P-led,
+that is because of that coverage default plus the availability,
+sunk-cost and strategic-layer reasoning below. If it is not, the
+assumption that prevents it is reported, not hidden.
 """
 from __future__ import annotations
 
@@ -160,9 +165,14 @@ ENTRANT_SELLER_COVERAGE_REASON = (
     "launch-like point, third-party sellers cannot actually supply the "
     "range, so the real alternative to 1P is 'not ranged' (a lost item "
     "and, with a spillover assumption, a lost basket), not a 3P take. "
-    "0% is consistent with that published 1P-only launch; it is still "
-    "an Assumption for any later invited-seller sliver (try 5–15% in "
-    "the sensitivity). The established 90% is also an Assumption: a "
+    "0% is the evidenced launch-day value and was set to match that "
+    "published 1P-only state; that choice does most of the work on the "
+    "unit 100% 1P result. It is an Assumption for later dates. A "
+    "stress-test Task 0 (13 November 2026) found no published coverage "
+    "share and used 0-10% as an evidence-informed sensitivity (10% is "
+    "a generous Assumption upper bound for an invitation-only curated "
+    "test, not a published figure). The established 90% is also an "
+    "Assumption: a "
     "deep seller base, in the spirit of Amazon UK, not a published "
     "Amazon 'share of range that 3P can supply'. Amazon's 61% of "
     "worldwide paid units (Q4 2025) is a unit-mix figure, not this "
@@ -366,11 +376,13 @@ def state_at(
     )
 
 
-SCENARIO_A_NAME = "A · Entrant (Joybuy-like)"
-SCENARIO_B_NAME = "B · Established (Amazon UK-like)"
+SCENARIO_A_NAME = "A · Entrant"
+SCENARIO_B_NAME = "B · Established"
 
 SCENARIO_A_BLURB = (
-    "A scale-up marketplace, in the spirit of Joybuy's UK launch. "
+    "A scale-up marketplace. Entrant A is Joybuy-inspired and "
+    "illustrative, not Joybuy's actual economics. Real names appear only "
+    "where a published figure is cited. "
     "Seller coverage is assumed at 0%: Joybuy launched 1P-only, so the "
     "real alternative to 1P is 'not ranged', not a 3P take. 1P gross "
     f"margin is close to the Currys, Zalando and THG benchmarks "
@@ -385,7 +397,9 @@ SCENARIO_A_BLURB = (
 )
 
 SCENARIO_B_BLURB = (
-    "A mature marketplace, in the spirit of Amazon UK. Seller coverage "
+    "A mature marketplace. Established B uses Amazon UK published fees "
+    "as a labelled stand-in, not as Amazon's or Joybuy's actual books. "
+    "Seller coverage "
     f"is assumed at {ESTABLISHED_SELLER_COVERAGE:.0%}: a deep seller base "
     "can actually supply the range, so 3P is a real alternative. 1P "
     "margins and fulfilment use the published Currys, Zalando and THG "
@@ -540,11 +554,14 @@ OPEN_QUESTIONS = (
         "Sanity check against Joybuy's 1P-only launch",
         "Joybuy launched ~100% 1P. That is not JD China's 78.2% 1P revenue "
         "share, which is a parent-company figure (1P recorded gross, 3P "
-        "net) and is not a Joybuy mix. The model is not fitted to 100%. "
-        "If the entrant operating mix is 1P-led, which assumptions drive "
-        "it (coverage, sunk fixed cost, haircut, spillover, the strategic "
-        "layer)? If it is not, which assumption prevents it? Please "
-        "challenge those, rather than asking the model to hide them.",
+        "net) and is not a Joybuy mix. Parameters were not searched to "
+        "hit 100% 1P, but the 0% coverage default was set to the "
+        "launch-day state, and that choice does most of the work on the "
+        "unit 100% 1P result. If the entrant operating mix is 1P-led, "
+        "which assumptions drive it (coverage, sunk fixed cost, haircut, "
+        "spillover, the strategic layer)? If it is not, which assumption "
+        "prevents it? Please challenge those, rather than asking the "
+        "model to hide them.",
     ),
 )
 

@@ -1,0 +1,254 @@
+{
+  "disclaimer": "v3.2 Task 6 exploratory. Not mixed into the v3.1 mid-band stress-test tables. Pareto weights are assigned Assumptions, not observed SKU curves. New-category proxies are cited or UNVERIFIED.",
+  "pareto_assignment": {
+    "mid": {
+      "pool": "head",
+      "sku_w": 0.2,
+      "gmv_w": 0.8
+    },
+    "low": {
+      "pool": "torso",
+      "sku_w": 0.3,
+      "gmv_w": 0.15
+    },
+    "high": {
+      "pool": "tail",
+      "sku_w": 0.5,
+      "gmv_w": 0.05
+    }
+  },
+  "fba_note": "Assumption / labelled stand-in: Amazon UK FBA standard-parcel about \u00a32.91-3.58, as cited in the v3.1 overview. Not re-verified against sell.amazon.co.uk in this run. Used as a FIXED pick/pack cost in pounds, not as a percent of selling price.",
+  "existing_60_bands": {
+    "A_operating": {
+      "n": 60,
+      "n_1p": 55,
+      "n_test": 0,
+      "n_keep": 0,
+      "n_unranged": 5,
+      "share_bands_1p": 0.9166666666666666,
+      "share_sales_1p": 0.9297164196141742
+    },
+    "A_unit": {
+      "n": 60,
+      "n_1p": 55,
+      "n_test": 0,
+      "n_keep": 0,
+      "n_unranged": 5,
+      "share_bands_1p": 0.9166666666666666,
+      "share_sales_1p": 0.9297164196141742
+    },
+    "B_operating": {
+      "n": 60,
+      "n_1p": 16,
+      "n_test": 8,
+      "n_keep": 36,
+      "n_unranged": 0,
+      "share_bands_1p": 0.26666666666666666,
+      "share_sales_1p": 0.06733199615152553
+    },
+    "A_mid_operating_for_contrast_only": {
+      "n": 20,
+      "n_1p": 20,
+      "n_test": 0,
+      "n_keep": 0,
+      "n_unranged": 0,
+      "share_bands_1p": 1.0,
+      "share_sales_1p": 1.0
+    },
+    "B_mid_operating_for_contrast_only": {
+      "n": 20,
+      "n_1p": 5,
+      "n_test": 3,
+      "n_keep": 12,
+      "n_unranged": 0,
+      "share_bands_1p": 0.25,
+      "share_sales_1p": 0.05639805376993288
+    }
+  },
+  "A_operating_holes": [
+    {
+      "sub_en": "Cooking (ovens, hobs, cookers)",
+      "band": "high",
+      "velocity": "low",
+      "unit_recommendation": "Do not range",
+      "recommendation": "Do not range"
+    },
+    {
+      "sub_en": "Office equipment (printers, ink, desks)",
+      "band": "high",
+      "velocity": "low",
+      "unit_recommendation": "Do not range",
+      "recommendation": "Do not range"
+    },
+    {
+      "sub_en": "Outerwear",
+      "band": "high",
+      "velocity": "low",
+      "unit_recommendation": "Do not range",
+      "recommendation": "Do not range"
+    },
+    {
+      "sub_en": "Pushchairs",
+      "band": "high",
+      "velocity": "low",
+      "unit_recommendation": "Do not range",
+      "recommendation": "Do not range"
+    },
+    {
+      "sub_en": "Car seats and safety",
+      "band": "high",
+      "velocity": "low",
+      "unit_recommendation": "Do not range",
+      "recommendation": "Do not range"
+    }
+  ],
+  "B_operating_holes": [],
+  "A_mid_verdicts_not_robust_across_bands": [
+    {
+      "sub_en": "Cooking (ovens, hobs, cookers)",
+      "mid_rec": "Bring in-house",
+      "other": "high (low velocity): Do not range"
+    },
+    {
+      "sub_en": "Office equipment (printers, ink, desks)",
+      "mid_rec": "Bring in-house",
+      "other": "high (low velocity): Do not range"
+    },
+    {
+      "sub_en": "Outerwear",
+      "mid_rec": "Bring in-house",
+      "other": "high (low velocity): Do not range"
+    },
+    {
+      "sub_en": "Pushchairs",
+      "mid_rec": "Bring in-house",
+      "other": "high (low velocity): Do not range"
+    },
+    {
+      "sub_en": "Car seats and safety",
+      "mid_rec": "Bring in-house",
+      "other": "high (low velocity): Do not range"
+    }
+  ],
+  "B_mid_verdicts_not_robust_across_bands": [
+    {
+      "sub_en": "Everyday clothing",
+      "mid_rec": "Keep 3P",
+      "other": "low (high velocity): Test as 3P first; high (mid velocity): Test as 3P first"
+    },
+    {
+      "sub_en": "Outerwear",
+      "mid_rec": "Test as 3P first",
+      "other": "low (mid velocity): Keep 3P"
+    },
+    {
+      "sub_en": "Footwear",
+      "mid_rec": "Test as 3P first",
+      "other": "low (high velocity): Keep 3P"
+    },
+    {
+      "sub_en": "Sportswear",
+      "mid_rec": "Keep 3P",
+      "other": "high (mid velocity): Test as 3P first"
+    },
+    {
+      "sub_en": "Baby clothing",
+      "mid_rec": "Test as 3P first",
+      "other": "low (high velocity): Bring in-house; high (mid velocity): Keep 3P"
+    }
+  ],
+  "pareto": {
+    "A_operating": {
+      "share_skus_1p": 0.875,
+      "share_gmv_1p": 0.9875,
+      "n_subs": 20
+    },
+    "A_unit": {
+      "share_skus_1p": 0.875,
+      "share_gmv_1p": 0.9875,
+      "n_subs": 20
+    },
+    "B_operating": {
+      "share_skus_1p": 0.265,
+      "share_gmv_1p": 0.2574999999999998,
+      "n_subs": 20
+    }
+  },
+  "min_referral_bind_points_ex_vat": [
+    {
+      "headline_rate": 0.05,
+      "binds_below_ex_vat_gbp": 4.166666666666667,
+      "binds_below_inc_vat_gbp": 5.0
+    },
+    {
+      "headline_rate": 0.07,
+      "binds_below_ex_vat_gbp": 2.9761904761904763,
+      "binds_below_inc_vat_gbp": 3.571428571428571
+    },
+    {
+      "headline_rate": 0.08,
+      "binds_below_ex_vat_gbp": 2.604166666666667,
+      "binds_below_inc_vat_gbp": 3.125
+    },
+    {
+      "headline_rate": 0.15,
+      "binds_below_ex_vat_gbp": 1.388888888888889,
+      "binds_below_inc_vat_gbp": 1.6666666666666667
+    }
+  ],
+  "fixed_pickpack": {
+    "note": "Assumption / labelled stand-in: Amazon UK FBA standard-parcel about \u00a32.91-3.58, as cited in the v3.1 overview. Not re-verified against sell.amazon.co.uk in this run. Used as a FIXED pick/pack cost in pounds, not as a percent of selling price.",
+    "currys_contribution_negative_below_gbp_fixed_2_91": 15.9,
+    "currys_contribution_negative_below_gbp_fixed_3_58": 19.56,
+    "thg_contribution_negative_below_gbp_fixed_2_91": 7.4,
+    "thg_contribution_negative_below_gbp_fixed_3_58": 9.11,
+    "fixed_2_91_equals_12pct_fulfilment_at_gbp": 24.25,
+    "fixed_3_58_equals_12pct_fulfilment_at_gbp": 29.83,
+    "grid_first_negative_currys_2_91": 3.0,
+    "grid_first_negative_currys_3_58": 3.0
+  },
+  "new_categories_directional": {
+    "Grocery and FMCG": {
+      "A_unit_1p_of_sweep": 8,
+      "A_op_1p_of_sweep": 9,
+      "A_n": 9,
+      "B_unit_1p_of_sweep": 1,
+      "B_op_1p_of_sweep": 1,
+      "B_n": 9,
+      "B_unit_recs": {
+        "Keep 3P": 7,
+        "Test as 3P first": 1,
+        "Bring in-house": 1
+      },
+      "note": "Gross-margin proxies: Ocado Retail FY2025 33.6% is a figure that circulated from the FY2025 results; the page number was not verified in this run (UNVERIFIED page). Tesco / Sainsbury reported figures around 6-7% may be a different margin definition and are not used as a 1P product gross margin. Fulfilment for online grocery is typically high and is swept at 15%, 23% and 30% (Assumption / UNVERIFIED). Amazon UK grocery referral 5% at or under \u00a310, else 15%, is UNVERIFIED in this run (not checked against sell.amazon.co.uk this turn)."
+    },
+    "Home and garden": {
+      "A_unit_1p_of_sweep": 6,
+      "A_op_1p_of_sweep": 6,
+      "A_n": 6,
+      "B_unit_1p_of_sweep": 2,
+      "B_op_1p_of_sweep": 2,
+      "B_n": 6,
+      "B_unit_recs": {
+        "Keep 3P": 2,
+        "Bring in-house": 2,
+        "Test as 3P first": 2
+      },
+      "note": "Kingfisher group gross margin 38.1% (FY2025/26) circulated from the annual report; the page number was not verified in this run (UNVERIFIED page). Fulfilment swept at 12% and 18% (Assumption). Amazon UK Home and Lawn-and-Garden referral figures (Home 8% at or under \u00a320 else 15%; Lawn and Garden 15%) are UNVERIFIED in this run."
+    },
+    "Toys": {
+      "A_unit_1p_of_sweep": 6,
+      "A_op_1p_of_sweep": 6,
+      "A_n": 6,
+      "B_unit_1p_of_sweep": 1,
+      "B_op_1p_of_sweep": 1,
+      "B_n": 6,
+      "B_unit_recs": {
+        "Keep 3P": 3,
+        "Test as 3P first": 2,
+        "Bring in-house": 1
+      },
+      "note": "No verified current UK toys-specialist gross margin is cited. GM is swept at 25%, 32% and 40% (Assumption). Fulfilment swept at 12% and 18% (Assumption). Amazon UK Toys and Games referral is commonly 15%; UNVERIFIED in this run."
+    }
+  }
+}

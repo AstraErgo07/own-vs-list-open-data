@@ -1,11 +1,13 @@
-# Own stock vs marketplace listing — Joybuy UK (v3.1)
+# Own stock vs marketplace listing — Entrant A vs Established B (v3.2)
 
 A decision-support model for whether a UK marketplace should **stock a
 line itself (1P)** or **leave it with a third-party seller (3P)**.
 
-The central lens is a **scale-up entrant** (Joybuy-like) versus an
-**established marketplace** (Amazon UK-like), and the 1P versus 3P mix
-that follows. A platform-maturity slider interpolates between the two.
+The central lens is a **scale-up entrant (A)** versus an
+**established marketplace (B)**, and the 1P versus 3P mix
+that follows. A is Joybuy-inspired and illustrative, not Joybuy's
+actual economics. Real names appear only where a published figure
+is cited. A platform-maturity slider interpolates between the two.
 
 This is **not a forecast**, **not a profit claim**, and **not Joybuy’s
 actual numbers**. Joybuy has not published a seller fee card.
@@ -48,7 +50,7 @@ first**, **Keep 3P**, or **Do not range**.
 
 ## The two scenarios
 
-**A. Entrant (Joybuy-like).** Seller coverage is assumed at 0%: Joybuy
+**A. Entrant.** Seller coverage is assumed at 0%: Joybuy
 launched 1P-only, so the real alternative to 1P is ‘not ranged’. 1P
 gross margin is close to the Currys, Zalando and THG benchmarks (a
 **5% relative haircut**, in a 0–10% default band; 25% is a stress
@@ -62,7 +64,7 @@ shown separately. A land-grab layer, separate from unit economics,
 values range completeness. Every number on this side is an
 **Assumption** with stated reasoning.
 
-**B. Established (Amazon UK-like).** Seller coverage is assumed at
+**B. Established.** Seller coverage is assumed at
 90%: a deep seller base can actually supply the range, so 3P is a
 real alternative and the strategic layer follows unit economics.
 Published 1P benchmarks (Currys group gross margin 18.3%, THG Beauty
@@ -83,8 +85,10 @@ seller depth and ad income grow.
 ## Headline results under the default assumptions
 
 These are model estimates on assumed mid-band prices, not Joybuy
-decisions and not a forecast. They were not fitted to Joybuy’s
-launch; the launch is a sanity check.
+decisions and not a forecast. Parameters were not searched to hit
+a 100% 1P mix. The 0% seller-coverage default was set to the
+launch-day 1P-only state, which is published, and that choice does
+most of the work on the unit 100% 1P result.
 
 - **Entrant (A), mid band, operating (strategic) verdict:** Bring
   in-house 20, Test 0, Keep 3P 0, Do not range 0. Implied 1P mix:
@@ -102,12 +106,16 @@ launch; the launch is a sanity check.
   (four lines) and baby care stay 1P; electronics, appliances and
   most clothing move to the 3P path, because a mature 3P take
   (Amazon referral grossed up for VAT, plus ads) beats a thin fully
-  loaded 1P contribution.
+  loaded 1P contribution. A stress test of v3.1 found that a 5-point
+  cut on the THG Beauty and Zalando published gross margins turns
+  all five B 1P lines to Test as 3P first (0% of modelled sales).
+  That 25% / 6% headline is assumption-driven. A full stress-test
+  note is in `docs/stress_test_v3.1.pdf`.
 - **Fifteen of 20** mid-band sub-categories change operating
   recommendation between A and B (durables and clothing leave 1P as
   coverage and ads grow; beauty and baby care stay 1P).
 
-What drives the 1P-led entrant result, without fitting:
+What drives the 1P-led entrant result (coverage was set to the launch; parameters were not searched):
 
 1. **Seller coverage of 0%.** The unit test compares 1P with ‘not
    ranged’ (payoff zero), not with a 3P take that is not available.
