@@ -27,25 +27,32 @@ SCENARIOS = {
     "Marketplace C — omnichannel hybrid": (.98,.025,0,.84,.90),
 }
 
-# Illustrative annual hours per product, not observed labour standards.
-# These are annual SKU-level activities; per-sale fulfilment and service costs
-# are modelled separately.
-ADMIN_ACTIVITIES = {
+# Illustrative product-level labour hours. Initial listing/setup is charged
+# once and spread over the chosen useful life; annual work recurs each year.
+# Not measured industry averages. Per-transaction costs are modelled elsewhere.
+SETUP_ACTIVITIES = {
+    "1P": [
+        ("Create product record, SKU and stock configuration", 4.0),
+        ("Create listing, images, specifications and content", 3.0),
+    ],
+    "3P": [
+        ("Activate seller's product and availability settings", 2.0),
+        ("Initial listing and catalogue checks", 2.0),
+    ],
+}
+RECURRING_ACTIVITIES = {
     "1P": [
         ("Supplier purchasing and purchase orders", 8.0),
         ("Replenishment planning", 10.0),
         ("Stock and ageing reviews", 8.0),
-        ("Product records and inventory reconciliation", 4.0),
+        ("Inventory reconciliation and listing updates", 4.0),
     ],
     "3P": [
-        ("Seller-product activation and availability checks", 2.0),
-        ("Listing and catalogue quality checks", 2.0),
+        ("Ongoing listing and catalogue maintenance", 2.0),
         ("Product-level seller performance follow-up", 3.0),
         ("Product-level seller compliance checks", 1.0),
     ],
 }
-BASE_1P_HOURS = sum(hours for _,hours in ADMIN_ACTIVITIES["1P"])
-BASE_3P_HOURS = sum(hours for _,hours in ADMIN_ACTIVITIES["3P"])
 
 with st.expander("Adjust model assumptions · optional stress test", expanded=False):
     col_a, col_b = st.columns(2)
@@ -55,48 +62,60 @@ with st.expander("Adjust model assumptions · optional stress test", expanded=Fa
         demand_adjust = st.slider("Inventory markdown-risk multiplier",.5,2.,1.,.1)
     with col_b:
         coverage_adjust = st.slider("Seller availability adjustment (percentage points)",-40,40,0,5)/100
-        st.caption("Customer switching between 1P and 3P is calculated from the recommended sales split, not a separate cannibalisation penalty.")
-    st.caption("Adjustments are illustrative and apply to all profiles. Costs and selling prices are treated on a consistent net-of-tax basis.")
-    st.markdown("**Annual product administration costs — editable assumptions**")
-    rate=st.number_input("Staff cost per hour (£, including employer costs)",min_value=0.0,
-        max_value=150.0,value=25.0,step=5.0)
-    hours_a,hours_b=st.columns(2)
-    with hours_a:
-        one_p_admin_hours=st.number_input("1P admin hours per product / year",
+        st.caption("1P and 3P draw from the same customer pool; sales switching is not charged twice.")
+    st.caption("Assumptions are illustrative and apply to all profiles. Selling prices and costs are net of tax.")
+    st.markdown("**Product setup and annual administration costs — editable**")
+    rate=st.number_input("Staff cost per hour (£, including employer costs)",
+        min_value=0.0,max_value=150.0,value=25.0,step=5.0)
+    setup_years=st.number_input("Years to spread initial product setup cost over",
+        min_value=1,max_value=5,value=2,step=1)
+    x,y=st.columns(2)
+    with x:
+        one_p_setup_hours=st.number_input("1P initial setup and listing hours",
+            min_value=0.0,max_value=100.0,value=7.0,step=1.0)
+        one_p_admin_hours=st.number_input("1P recurring admin hours/year",
             min_value=0.0,max_value=200.0,value=30.0,step=1.0)
-    with hours_b:
-        three_p_admin_hours=st.number_input("3P admin hours per product / year",
-            min_value=0.0,max_value=200.0,value=8.0,step=1.0)
-    st.caption("Default 1P: 30 hours × £25 = £750. Default 3P: 8 hours × £25 = £200. "
-        "These are illustrative labour allocations, not verified industry averages.")
-fixed_cost_1p=one_p_admin_hours*rate
-fixed_cost_3p=three_p_admin_hours*rate
+    with y:
+        three_p_setup_hours=st.number_input("3P initial setup and listing hours",
+            min_value=0.0,max_value=100.0,value=4.0,step=1.0)
+        three_p_admin_hours=st.number_input("3P recurring admin hours/year",
+            min_value=0.0,max_value=200.0,value=6.0,step=1.0)
 
-with st.expander("How the £750 and £200 annual costs are calculated",expanded=False):
+fixed_cost_1p=(one_p_admin_hours+one_p_setup_hours/setup_years)*rate
+fixed_cost_3p=(three_p_admin_hours+three_p_setup_hours/setup_years)*rate
+
+with st.expander("How product setup, listing and annual costs are calculated",expanded=False):
     rows=[]
-    for channel,annual_hours,baseline_hours in (
-        ("1P",one_p_admin_hours,BASE_1P_HOURS),
-        ("3P",three_p_admin_hours,BASE_3P_HOURS)):
-        for activity,base_hours in ADMIN_ACTIVITIES[channel]:
-            activity_hours=annual_hours*base_hours/baseline_hours
-            rows.append({
-                "Selling model":channel,
-                "Activity":activity,
-                "Hours per product/year":round(activity_hours,2),
-                "Cost per hour (£)":rate,
-                "Annual cost (£)":round(activity_hours*rate,2)})
+    for channel,setup_hours,annual_hours in (
+        ("1P",one_p_setup_hours,one_p_admin_hours),
+        ("3P",three_p_setup_hours,three_p_admin_hours)):
+        for cost_type,activities,total_hours,divisor in (
+            ("Initial setup (spread across years)",SETUP_ACTIVITIES[channel],setup_hours,setup_years),
+            ("Recurring annual work",RECURRING_ACTIVITIES[channel],annual_hours,1)):
+            baseline=sum(h for _,h in activities)
+            for activity,base_hours in activities:
+                hours=total_hours*base_hours/baseline if baseline else 0
+                rows.append({
+                    "Selling model":channel,
+                    "Cost type":cost_type,
+                    "Activity":activity,
+                    "Activity hours":round(hours,2),
+                    "Staff cost/hour (£)":rate,
+                    "Cost per year (£)":round(hours*rate/divisor,2)})
     st.dataframe(pd.DataFrame(rows),use_container_width=True,hide_index=True)
     st.markdown(
-        f"**Total 1P: £{fixed_cost_1p:,.0f} per product/year** "
-        f"({one_p_admin_hours:g} hours × £{rate:g}/hour).  "
-        f"**Total 3P: £{fixed_cost_3p:,.0f} per product/year** "
-        f"({three_p_admin_hours:g} hours × £{rate:g}/hour)."
+        f"**1P annual cost: £{fixed_cost_1p:,.2f}** = "
+        f"({one_p_admin_hours:g} recurring hours + "
+        f"{one_p_setup_hours:g} setup hours ÷ {setup_years} years) × £{rate:g}/hour.  "
+        f"**3P annual cost: £{fixed_cost_3p:,.2f}** = "
+        f"({three_p_admin_hours:g} recurring hours + "
+        f"{three_p_setup_hours:g} setup hours ÷ {setup_years} years) × £{rate:g}/hour."
     )
-    st.caption("Hours are allocated across activities in the proportions shown. "
-        "These costs cover recurring purchasing, stock and seller administration, "
-        "not per-sale delivery, payment processing or seller-service costs already "
-        "included elsewhere. Actual labour costs and time requirements need validation.")
-
+    st.caption("The activity hours are illustrative allocations, not measured benchmarks. "
+        "Product photography, content production and creative-agency charges are not separately priced; "
+        "only the assumed internal labour is included. Delivery and transaction servicing are modelled elsewhere. "
+        "If setup is charged only in the first year, rather than spread over a product's life, "
+        "first-year cash costs will be higher than the annualised figures shown.")
 
 def make_profiles():
     rows=[]
@@ -236,6 +255,9 @@ def recommend(r,scenario,sales_factor=1.0):
         three_p_annual_admin_cost=round(fixed_cost_3p,2),
         one_p_admin_hours=one_p_admin_hours,
         three_p_admin_hours=three_p_admin_hours,
+        one_p_setup_hours=one_p_setup_hours,
+        three_p_setup_hours=three_p_setup_hours,
+        setup_cost_spread_years=setup_years,
         admin_hourly_cost=rate,
         one_p_threshold=crossover_volume(r,scenario),
         risk=r["markdown"]*demand_adjust,
@@ -320,9 +342,12 @@ with st.expander("See costs, scale savings and customer switching",expanded=Fals
         "annual_fixed_cost":"Annual product operating cost (£)",
         "one_p_annual_admin_cost":"1P annual admin cost (£)",
         "three_p_annual_admin_cost":"3P annual admin cost (£)",
-        "one_p_admin_hours":"1P annual admin hours",
-        "three_p_admin_hours":"3P annual admin hours",
-        "admin_hourly_cost":"Admin staff cost/hour (£)",
+        "one_p_admin_hours":"1P annual recurring hours",
+        "three_p_admin_hours":"3P annual recurring hours",
+        "one_p_setup_hours":"1P initial listing/setup hours",
+        "three_p_setup_hours":"3P initial listing/setup hours",
+        "setup_cost_spread_years":"Setup cost spread (years)",
+        "admin_hourly_cost":"Staff cost/hour (£)",
         "stock_days":"1P stock held (days)",
         "risk":"Assumed markdown rate",
         "procurement_ratio":"1P buying cost / selling price (before volume discount)",
@@ -345,7 +370,7 @@ with st.expander("Assumptions and limitations",expanded=False):
     st.markdown("""
 **Volume discounts are illustrative, not an industry benchmark.** Assumed annual 1P units: below 500 = 0% buying discount and 0% fulfilment saving; 500–1,499 = 1% and 2%; 1,500–2,999 = 2% and 4%; 3,000+ = 3% and 6%. These are assumptions for sensitivity testing. Actual supplier rebates depend on negotiated purchase commitments, order quantities and product mix. Discounts apply to 1P only.
 
-**Annual product administration costs:** Defaults are built bottom-up: 1P 30 hours/year × £25/hour = £750; 3P 8 hours/year × £25/hour = £200. See the activity-level cost breakdown above. Change the hourly rate or hours in Adjust model assumptions; the calculations, decision and CSV update automatically. These are illustrative labour allocations, not published industry averages. Only the relevant channel's annual admin cost is charged; a hybrid incurs both. No fixed company-wide overhead is allocated.
+**Product setup, listing and administration costs:** Both 1P and 3P include initial product setup/listing and recurring annual administration. The default 1P estimate is 30 annual hours plus 7 initial setup hours spread over 2 years, at £25/hour = **£837.50 per year**. The default 3P estimate is 6 annual hours plus 4 initial setup hours spread over 2 years, at £25/hour = **£200 per year**. These are illustrative labour estimates, not industry benchmarks. Activity-level breakdown and adjustable inputs appear above. One-time external content production or photography costs are not separately estimated; they should be added when data are available. Both channel costs apply to a hybrid.
 
 **Switching threshold:** The earliest tested annual sales volume where all-1P contribution overtakes all-3P contribution, scanning 10%–300% of the original sales estimate. A hybrid can still be better. "No crossover" means none within that tested range, not that 1P can never win.
 
